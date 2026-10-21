@@ -103,6 +103,45 @@ To add another leader, repeat step 3 with their Account ID.
 
 ---
 
+## 9. Recommended: move hosting to Firebase
+
+On GitHub Pages, the site (`github.io`) and Firebase's sign-in page (`firebaseapp.com`) are on different domains. iPhones and the built-in browsers in apps like Instagram and Messages block sign-in across domains. Hosting on Firebase puts both on **`https://nt70-quest.web.app`**, so Google sign-in works everywhere. After setup, every merge to `master` deploys automatically.
+
+### 9a. Turn on Hosting
+
+Firebase console › **Hosting & Serverless › Hosting** › **Get started**. Click **Next** through the install, init and deploy screens (GitHub does those for you), then **Continue to console**.
+
+### 9b. Create a deploy key
+
+1. Open <https://console.cloud.google.com/iam-admin/serviceaccounts?project=nt70-quest>.
+2. Click **Create service account**. Name: `github-deploy`. Click **Create and continue**.
+3. Add the roles **Firebase Hosting Admin** and **API Keys Viewer**, click **Continue**, then **Done**.
+4. Click the new account › **Keys** › **Add key › Create new key** › **JSON** › **Create**. A `.json` file downloads.
+
+Treat this file like a password. Don't email it or paste it anywhere except the GitHub secret below. Delete it from your computer afterwards.
+
+### 9c. Give the key to GitHub
+
+1. Open <https://github.com/mcarthur08/git-test/settings/secrets/actions/new>.
+2. Name: `FIREBASE_SERVICE_ACCOUNT_NT70_QUEST`
+3. Secret: open the `.json` file in a text editor and paste its **entire** contents.
+4. Click **Add secret**.
+
+### 9d. Deploy
+
+Open <https://github.com/mcarthur08/git-test/actions/workflows/firebase-hosting.yml>, click **Run workflow › Run workflow**, and wait for the green check (about a minute). The site is then live at **https://nt70-quest.web.app**.
+
+### 9e. Allow Google sign-in on the new address
+
+1. Open <https://console.cloud.google.com/apis/credentials?project=nt70-quest> and click **Web client (auto created by Google Service)**.
+2. Under **Authorized JavaScript origins**, add `https://nt70-quest.web.app`.
+3. Under **Authorized redirect URIs**, add `https://nt70-quest.web.app/__/auth/handler`.
+4. Click **Save**. Changes can take a few minutes to apply.
+
+Also check **Authentication › Settings › Authorized domains** in Firebase. `nt70-quest.web.app` is normally listed already; add it if it isn't.
+
+From then on, share **https://nt70-quest.web.app** with the group. GitHub Pages keeps working, but the Firebase address is the one to use. Accounts and progress are the same on both.
+
 ## Good to know
 
 - **Ages.** Google accounts need the user to be 13 or older, unless a parent manages the account through Family Link. Email-link sign-in works with any email address. Check your church's policy on collecting youth emails and parental consent.
@@ -117,4 +156,5 @@ To add another leader, repeat step 3 with their Account ID.
 | `index.html` | The app |
 | `firebase-config.js` | Your Firebase project settings (step 2) |
 | `firestore.rules` | Database security rules (step 5) |
+| `firebase.json`, `.firebaserc`, `.github/workflows/firebase-hosting.yml` | Firebase Hosting setup and automatic deploys (step 9) |
 | `manifest.webmanifest`, `icon-*.png`, `apple-touch-icon.png` | Home-screen app name and icons |

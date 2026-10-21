@@ -1574,14 +1574,17 @@ function authMsg(e) {
 const POPUP_HELP = "Google sign-in can't open in this browser. If you tapped the link inside another app (Messages, Instagram, Gmail, Claude…), open it in Safari or Chrome instead, or use the email link below.";
 // Built-in browsers inside other apps block the Google sign-in window.
 const IN_APP_BROWSER = /FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|musical_ly|GSA\/|Twitter|LinkedInApp|; wv\)/i.test(navigator.userAgent || "");
+const ON_FIREBASE_HOST = /\.(web\.app|firebaseapp\.com)$/.test(location.hostname);
 const cleanUrl = () => { try { history.replaceState(null, "", location.pathname); } catch {} };
 
 async function startFirebase(cfg) {
   const base = "https://www.gstatic.com/firebasejs/10.12.2/";
   await loadScript(base + "firebase-app-compat.js");
   await Promise.all([loadScript(base + "firebase-auth-compat.js"), loadScript(base + "firebase-firestore-compat.js")]);
-  firebase.initializeApp(cfg);
+  // On Firebase Hosting the page and the sign-in handler share one domain, so redirect sign-in works everywhere.
+  firebase.initializeApp(ON_FIREBASE_HOST ? { ...cfg, authDomain: location.hostname } : cfg);
   const auth = firebase.auth(), fs = firebase.firestore();
+  if (ON_FIREBASE_HOST) auth.getRedirectResult().catch(e => { state.auth.error = authMsg(e); render(true); });
   fb = { auth, fs };
   state.backend = "firebase";
   if (auth.isSignInWithEmailLink(location.href)) {
@@ -1605,7 +1608,7 @@ function viewSignIn() {
       <input type="email" id="fin-email" required autocomplete="email" placeholder="you@example.com"><button class="btn go" type="submit">Finish signing in</button></form>`;
   else if (a.sent) body = `<div class="note">We sent a sign-in link to <b>${esc(a.sent)}</b>. Open it on this phone or computer to finish. Check your spam folder if it doesn't show up.</div>
       <div><button class="btn sm" data-auth="reset">Use a different email</button></div>`;
-  else body = `${IN_APP_BROWSER ? `<div class="note small">You're in another app's built-in browser, where Google sign-in may not open. Use your browser's menu to <b>Open in Safari</b> or <b>Open in Chrome</b>, or sign in with an email link below.</div>` : ""}
+  else body = `${IN_APP_BROWSER && !ON_FIREBASE_HOST ? `<div class="note small">You're in another app's built-in browser, where Google sign-in may not open. Use your browser's menu to <b>Open in Safari</b> or <b>Open in Chrome</b>, or sign in with an email link below.</div>` : ""}
       <button class="btn google big" data-auth="google" ${a.busy ? "disabled" : ""}>${GOOGLE_G} Continue with Google</button>
       <div class="or"><span>or get a link by email</span></div>
       <form id="emailform" class="row" style="flex-wrap:nowrap"><input type="email" id="si-email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address" style="flex:1;min-width:0">
@@ -1627,7 +1630,10 @@ async function authAction(kind) {
     try { await fb.auth.signInWithPopup(provider); }
     catch (e) {
       // No redirect fallback: browsers that partition storage (iPhone Safari, in-app browsers) break redirect sign-in across domains.
-      if (["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/web-storage-unsupported", "auth/internal-error"].includes(e.code)) a.error = POPUP_HELP;
+      if (["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/web-storage-unsupported", "auth/internal-error"].includes(e.code)) {
+        if (ON_FIREBASE_HOST) { try { await fb.auth.signInWithRedirect(provider); return; } catch (e2) { a.error = authMsg(e2); } }
+        else a.error = POPUP_HELP;
+      }
       else if (e.code !== "auth/popup-closed-by-user") a.error = authMsg(e);
     }
     a.busy = false; if (state.phase === "signin") render(true);
