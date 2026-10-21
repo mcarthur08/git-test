@@ -76,7 +76,7 @@ These rules mean:
 
 1. Commit the updated `firebase-config.js` to the repository.
 2. On GitHub, open the repository's **Settings › Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**. Pick the branch with the app (`main` after this work is merged, or `claude/bible-reading-tracker-avatars-oz590y` for now) and the `/ (root)` folder. Click **Save**.
+3. Under **Build and deployment**, choose **Deploy from a branch**. Pick the branch with the app (`master` after this work is merged, or `claude/bible-reading-tracker-avatars-oz590y` for now) and the `/ (root)` folder. Click **Save**.
 4. After a minute or two the site is live at **`https://mcarthur08.github.io/git-test/`**.
 
 GitHub Pages is free for public repositories. A private repository needs a paid GitHub plan for Pages.
