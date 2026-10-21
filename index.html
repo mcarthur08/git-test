@@ -1,5 +1,9 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F0562A"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="NT70 Quest"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script src="firebase-config.js"></script>
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
 <title>NT70 Reading Quest</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -251,11 +255,18 @@ main.enter > *:nth-child(4) { animation-delay: .15s; } main.enter > *:nth-child(
 .opt[disabled] { cursor: not-allowed; opacity: .4; text-decoration: line-through; }
 .opt.lock { opacity: .55; }
 .opt .lk { width: 12px; height: 12px; }
+.feats { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
+.feat { border: 0; border-radius: 14px; background: var(--surface-2); padding: 6px 4px 6px; cursor: pointer; display: grid; justify-items: center; gap: 4px; font-size: 0.72rem; font-weight: 700; transition: transform .15s var(--spring), box-shadow .2s; }
+.feat:active { transform: scale(.95); }
+.feat[aria-pressed="true"] { box-shadow: 0 0 0 2.5px var(--ink); background: var(--surface); }
+.fprev { width: 64px; height: 40px; border-radius: 10px; overflow: hidden; display: block; background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--flame-2) 22%, var(--surface)), var(--surface-2)); }
+.fprev .av { width: 100%; height: 100%; }
+.feat[data-look="face"] .fprev { height: 64px; border-radius: 50%; }
 .sw-opt { width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--line); cursor: pointer; padding: 0; position: relative; transition: transform .15s var(--spring), box-shadow .2s; }
 .sw-opt:hover { transform: scale(1.08); }
 .sw-opt[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--ink); }
 .sw-opt.lock::after { content: attr(data-day); position: absolute; inset: -3px; border-radius: 50%; background: rgba(12,16,28,.62); color: #fff; font-size: 0.58rem; font-weight: 800; display: grid; place-items: center; }
-select, input[type="date"], input[type="text"] { font: inherit; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; max-width: 100%; }
+select, input[type="date"], input[type="text"], input[type="email"] { font: inherit; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; max-width: 100%; }
 .seg { display: inline-flex; justify-self: start; background: var(--surface-2); border-radius: 999px; padding: 4px; }
 .seg button { border: 0; background: none; border-radius: 999px; padding: 7px 16px; cursor: pointer; font-weight: 700; color: var(--muted); transition: background .2s, color .2s; }
 .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
@@ -314,6 +325,13 @@ select, input[type="date"], input[type="text"] { font: inherit; color: var(--ink
 .trip { display: grid; grid-template-columns: 240px 1fr; gap: 18px; align-items: center; }
 .trip-map { border: 0; padding: 0; border-radius: 16px; overflow: hidden; height: 160px; cursor: pointer; background: var(--sea); display: block; width: 100%; }
 .trip-map .map { height: 100%; border-radius: 0; }
+.signin { display: grid; grid-template-columns: 240px 1fr; gap: 26px; align-items: center; max-width: 760px; width: 100%; justify-self: center; }
+.signin .stage { height: 280px; }
+.btn.google { background: #fff; color: #1F1F1F; box-shadow: 0 0 0 1px #DADCE0, var(--shadow); font-family: var(--font-body); font-weight: 700; }
+.btn.google svg { width: 22px; height: 22px; }
+.or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: var(--step--1); }
+.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+code { font-size: .78rem; background: var(--surface-2); padding: 2px 6px; border-radius: 6px; overflow-wrap: anywhere; }
 .loading { display: grid; justify-items: center; gap: 12px; padding: 60px 0; }
 .loading .av { width: 90px; height: 120px; }
 .lead-grid { display: grid; gap: 16px; max-width: 560px; }
@@ -321,7 +339,8 @@ select, input[type="date"], input[type="text"] { font: inherit; color: var(--ink
 
 @media (max-width: 720px) {
   .editor { grid-template-columns: 1fr; }
-  .journey, .trip { grid-template-columns: 1fr; }
+  .journey, .trip, .signin { grid-template-columns: 1fr; }
+  .signin .stage { height: 200px; }
   .journey > .card:last-child { position: static; }
   .preview { position: static; }
   .two { grid-template-columns: 1fr; }
@@ -456,6 +475,44 @@ const VICTORIES = [
 const SKINS = ["#F6D3B3", "#E9B58C", "#C98B5E", "#A2683F", "#7B4A2A", "#4F2F1C"];
 const HAIRC = ["#1E1A16", "#4A2E1A", "#7A4B22", "#B07A3A", "#D9B26A", "#9A9A9A"];
 const HAIRS = [["Short", "short"], ["Long", "long"], ["Bun", "bun"], ["Curly", "curly"], ["Braids", "braids"], ["Crop", "crop"]];
+const FACES = [["Round", "M32 52 A28 28 0 1 0 88 52 A28 28 0 1 0 32 52 Z", 28], ["Oval", "M35 52 A25 30 0 1 0 85 52 A25 30 0 1 0 35 52 Z", 25],
+  ["Square", "M33 45 Q33 24 60 24 Q87 24 87 45 L87 65 Q87 81 71 82 L49 82 Q33 81 33 65 Z", 27], ["Heart", "M60 24 C83 24 90 40 87 55 C84 69 71 80 60 84 C49 80 36 69 33 55 C30 40 37 24 60 24 Z", 28],
+  ["Long", "M36 48 Q36 21 60 21 Q84 21 84 48 L84 63 Q84 85 60 86 Q36 85 36 63 Z", 24]];
+const EYES = [["Round", "round"], ["Almond", "almond"], ["Big & bright", "big"], ["Happy", "happy"], ["Sleepy", "sleepy"]];
+const EYEC = ["#5A3519", "#1E1A2E", "#8A6630", "#3D7CC9", "#3E8E5A", "#6E7A86"];
+const BROWS = [["Soft arch", "M43 45 Q49 41 55 44", 2.4], ["Straight", "M43 44.5 L55 43.5", 2.6], ["Bold", "M42 45.5 Q49 40.5 56 44", 3.8], ["Thin", "M44 44.5 Q49 42 54 44", 1.5], ["Raised", "M43 43 Q49 37.5 55 41.5", 2.4]];
+const MOUTHS = [["Smile", "smile"], ["Big grin", "grin"], ["Smirk", "smirk"], ["Calm", "calm"], ["Laugh", "laugh"], ["Surprised", "o"]];
+// Face features. g: "f" adds lashes, tinted lips, a finer nose and softer brows; "m" gets bolder brows and a stronger nose.
+function faceSVG(L, skin, hc) {
+  const f = L.g === "f", ink = "#2A1E1E", iris = EYEC[L.eyeColor], kind = EYES[L.eyes][1];
+  const S = (d, c, w, extra = "") => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`;
+  const eye = (cx, side) => {
+    let o = "";
+    if (kind === "round") o = `<ellipse cx="${cx}" cy="54" rx="5.4" ry="6.4" fill="#fff"/><circle cx="${cx}" cy="55.4" r="3.6" fill="${iris}"/><circle cx="${cx}" cy="55.4" r="1.7" fill="#111"/><circle cx="${cx + 1.3}" cy="53.6" r="1.2" fill="#fff"/>` + S(`M${cx - 5.6} 53.2 Q${cx} 46.6 ${cx + 5.6} 53.2`, ink, 1.7);
+    if (kind === "almond") o = `<path d="M${cx - 6} 55 Q${cx} 48.5 ${cx + 6} 55 Q${cx} 59.6 ${cx - 6} 55 Z" fill="#fff"/><circle cx="${cx}" cy="54.8" r="3.1" fill="${iris}"/><circle cx="${cx}" cy="54.8" r="1.5" fill="#111"/><circle cx="${cx + 1.1}" cy="53.6" r="1" fill="#fff"/>` + S(`M${cx - 6.2} 55 Q${cx} 48.3 ${cx + 6.2} 55`, ink, 1.9);
+    if (kind === "big") o = `<ellipse cx="${cx}" cy="54" rx="6.4" ry="7.4" fill="#fff"/><circle cx="${cx}" cy="55" r="4.6" fill="${iris}"/><circle cx="${cx}" cy="55" r="2.2" fill="#111"/><circle cx="${cx + 1.8}" cy="52.8" r="1.6" fill="#fff"/><circle cx="${cx - 1.4}" cy="57.4" r=".8" fill="#fff"/>` + S(`M${cx - 6.6} 52.8 Q${cx} 45.6 ${cx + 6.6} 52.8`, ink, 1.8);
+    if (kind === "happy") o = S(`M${cx - 5} 56 Q${cx} 50 ${cx + 5} 56`, ink, 2.4);
+    if (kind === "sleepy") o = `<ellipse cx="${cx}" cy="55" rx="5.4" ry="5" fill="#fff"/><circle cx="${cx}" cy="56.2" r="3.2" fill="${iris}"/><circle cx="${cx}" cy="56.2" r="1.5" fill="#111"/><path d="M${cx - 6} 55 Q${cx} 48.6 ${cx + 6} 55 Z" fill="${skin}"/>` + S(`M${cx - 6} 55 L${cx + 6} 55`, ink, 1.7);
+    if (f) { const ox = cx + side * (kind === "big" ? 6.2 : 5.6), oy = kind === "happy" ? 55 : 53;
+      o += S(`M${ox} ${oy} l${side * 2.6} -2.2 M${ox - side * 1.4} ${oy - 1.7} l${side * 1.9} -2.6`, ink, 1.3); }
+    return o;
+  };
+  const [, browD, bw] = BROWS[L.brows], browC = shade(hc, -0.15), brW = bw + (f ? -0.3 : 0.6);
+  const brows = S(browD, browC, brW) + `<g transform="translate(120 0) scale(-1 1)">${S(browD, browC, brW)}</g>`;
+  const noseC = shade(skin, -0.32);
+  const nose = f ? S("M59.2 59.6 Q58.6 62 60.6 62.3", noseC, 1.6) : S("M58.6 58 Q57.2 62.6 60.4 63 Q62.4 63.1 63 61.6", noseC, 1.9);
+  const lip = L.beard ? shade(hc, 0.55) : f ? "#B84A5E" : shade(skin, -0.48), dark = "#5A1F24", mk = MOUTHS[L.mouth][1];
+  let mouth = "";
+  if (mk === "smile") mouth = S("M53 66 Q60 72 67 66", lip, f ? 2.8 : 2.5) + (f ? S("M57.4 70.4 Q60 71.5 62.6 70.4", lip, 1.5, 'opacity=".55"') : "");
+  if (mk === "grin") mouth = `<path d="M52.5 65 Q60 75.5 67.5 65 Q60 67 52.5 65 Z" fill="${dark}"/><path d="M54 65.8 Q60 67.4 66 65.8 L65.4 67.6 Q60 69 54.6 67.6 Z" fill="#fff"/>` + S("M52.5 65 Q60 75.5 67.5 65", lip, 1.4);
+  if (mk === "smirk") mouth = S("M54 67.5 Q61 69.5 67 64.5", lip, 2.5);
+  if (mk === "calm") mouth = S("M55.5 67 Q60 68.6 64.5 67", lip, 2.4) + (f ? S("M58 69.6 Q60 70.4 62 69.6", lip, 1.4, 'opacity=".55"') : "");
+  if (mk === "laugh") mouth = `<path d="M52 64.5 Q60 78 68 64.5 Z" fill="${dark}"/><ellipse cx="60" cy="71.4" rx="4" ry="2.2" fill="#E2747E"/><path d="M53.6 64.6 L66.4 64.6 L65.8 66.6 L54.2 66.6 Z" fill="#fff"/>` + S("M52 64.5 Q60 78 68 64.5 Z", lip, 1.3);
+  if (mk === "o") mouth = `<ellipse cx="60" cy="67.6" rx="3" ry="3.8" fill="${dark}" stroke="${lip}" stroke-width="1.3"/>`;
+  const blush = f ? 0.38 : 0.16;
+  return `<ellipse cx="42" cy="64" rx="${f ? 5.8 : 5}" ry="3.2" fill="#FF6B6B" opacity="${blush}"/><ellipse cx="78" cy="64" rx="${f ? 5.8 : 5}" ry="3.2" fill="#FF6B6B" opacity="${blush}"/>
+    <g class="eyes">${eye(49, -1)}${eye(71, 1)}</g>${brows}${nose}${mouth}`;
+}
 // [label, value, days needed]
 const UNLOCK = {
   tunic: [["Earth", "#7B5B3A", 0], ["Olive", "#5E7A35", 0], ["River", "#3B6491", 0], ["Linen", "#CDBE9F", 0], ["Scarlet", "#A8322D", 3],
@@ -497,7 +554,8 @@ function normLook(l, n) {
   l = l && typeof l === "object" ? l : {};
   const pick = (v, arr, gated) => { let i = Number.isInteger(v) && v >= 0 && v < arr.length ? v : 0; if (gated && arr[i][2] > n) i = 0; return i; };
   return { skin: pick(l.skin, SKINS), hair: pick(l.hair, HAIRS), hairColor: pick(l.hairColor, HAIRC), beard: l.beard === true,
-           tunic: pick(l.tunic, UNLOCK.tunic, 1), sash: pick(l.sash, UNLOCK.sash, 1), hat: pick(l.hat, UNLOCK.hat, 1), item: pick(l.item, UNLOCK.item, 1) };
+           tunic: pick(l.tunic, UNLOCK.tunic, 1), sash: pick(l.sash, UNLOCK.sash, 1), hat: pick(l.hat, UNLOCK.hat, 1), item: pick(l.item, UNLOCK.item, 1),
+           face: pick(l.face, FACES), eyes: pick(l.eyes, EYES), eyeColor: pick(l.eyeColor, EYEC), brows: pick(l.brows, BROWS), mouth: pick(l.mouth, MOUTHS), g: l.g === "f" ? "f" : "m" };
 }
 // opts: live (idle animation), cheer (celebrate), bust (crop to head and shoulders)
 function avatarSVG(look, n, opts = {}) {
@@ -544,12 +602,12 @@ function avatarSVG(look, n, opts = {}) {
     + P("M55 17 Q58 0 76 4 Q68 9 66 17 Z", "#D9363E") + R(28, 46, 64, 6, 3, "#9AA6B4");
   if (hat === "crown") hatSVG = P("M37 33 L40 11 L50 24 L60 7 L70 24 L80 11 L83 33 Z", "#F5B301") + R(36, 30, 48, 8, 3, "#E09E00") + C(60, 34, 3, "#E11D48") + C(47, 34, 2.4, "#2F7BF0") + C(73, 34, 2.4, "#0E9C8D") + C(60, 7, 2.4, "#FFE27A") + C(40, 11, 2, "#FFE27A") + C(80, 11, 2, "#FFE27A");
 
+  const [, facePath, hw] = FACES[L.face], outline = shade(skin, -0.24);
   const beard = L.beard ? P("M33 56 Q34 86 60 88 Q86 86 87 56 Q82 70 72 70 Q60 75 48 70 Q38 70 33 56 Z", hc) : "";
-  const mouth = `<path d="M53 66 Q60 72 67 66" fill="none" stroke="${L.beard ? shade(hc, 0.55) : "#7A3A30"}" stroke-width="2.6" stroke-linecap="round"/>`;
-  const vb = opts.bust ? "18 6 84 84" : "0 0 120 160";
+  const vb = opts.vb || (opts.bust ? "18 6 84 84" : "0 0 120 160");
   const d = opts.live ? ` style="--d:${(-Math.random() * 4).toFixed(2)}s"` : "";
   return `<svg class="av${opts.live ? " live" : ""}${opts.cheer ? " cheer" : ""}" viewBox="${vb}" aria-hidden="true"${d}>
-    ${opts.bust ? "" : E(60, 152, 30, 5, "#000", 'opacity=".12"')}
+    ${opts.bust || opts.vb ? "" : E(60, 152, 30, 5, "#000", 'opacity=".12"')}
     <g class="a-body">
       ${R(46, 126, 11, 22, 5.5, sk2)}${R(63, 126, 11, 22, 5.5, sk2)}
       ${E(51, 148, 9, 4, "#5A3A22")}${E(69, 148, 9, 4, "#5A3A22")}
@@ -562,14 +620,11 @@ function avatarSVG(look, n, opts = {}) {
       <g class="arm-r">${R(77, 86, 13, 34, 6.5, tunic)}${R(77, 112, 13, 5, 2, td)}${rItem}${C(83.5, 121, 6.5, skin)}</g>
       <g class="a-head">
         ${hairBack}
-        ${C(33, 58, 7, skin)}${C(87, 58, 7, skin)}${C(33, 58, 3.5, sk2)}${C(87, 58, 3.5, sk2)}
-        ${C(60, 52, 28, skin)}
-        ${E(42, 64, 5.5, 3.2, "#FF6B6B", 'opacity=".32"')}${E(78, 64, 5.5, 3.2, "#FF6B6B", 'opacity=".32"')}
+        <circle cx="${60 - hw - 1}" cy="58" r="7" fill="${skin}" stroke="${outline}" stroke-width="1.3"/><circle cx="${60 + hw + 1}" cy="58" r="7" fill="${skin}" stroke="${outline}" stroke-width="1.3"/>
+        <circle cx="${60 - hw - 1}" cy="58" r="3.3" fill="${sk2}"/><circle cx="${60 + hw + 1}" cy="58" r="3.3" fill="${sk2}"/>
+        <path d="${facePath}" fill="${skin}" stroke="${outline}" stroke-width="1.4"/>
         ${beard}
-        <g class="eyes">${E(49, 54, 5.6, 6.6, "#FFFFFF")}${E(71, 54, 5.6, 6.6, "#FFFFFF")}${C(50, 55.5, 3.8, "#1E1A2E")}${C(70, 55.5, 3.8, "#1E1A2E")}${C(51.6, 53.6, 1.4, "#FFFFFF")}${C(71.6, 53.6, 1.4, "#FFFFFF")}</g>
-        <path d="M43 44 Q49 41 55 44 M65 44 Q71 41 77 44" fill="none" stroke="${shade(hc, -0.1)}" stroke-width="2.4" stroke-linecap="round"/>
-        ${P("M58 59 Q60 62 62 59", "none", `stroke="${sk2}" stroke-width="2" stroke-linecap="round"`)}
-        ${mouth}
+        ${faceSVG(L, skin, hc)}
         ${hairFront}${hatSVG}
       </g>
     </g></svg>`;
@@ -612,7 +667,7 @@ function normPlayer(d, id) {
   }
   return { id, alias: typeof d.alias === "string" && d.alias.trim() ? d.alias.slice(0, 40) : "Traveler",
     gender: d.gender === "f" ? "f" : "m", team: typeof d.team === "string" ? d.team.slice(0, 30) : "",
-    look: d.look && typeof d.look === "object" ? d.look : {}, done,
+    look: d.look && typeof d.look === "object" ? { g: d.gender === "f" ? "f" : "m", ...d.look } : { g: d.gender === "f" ? "f" : "m" }, done,
     createdAt: typeof d.createdAt === "string" ? d.createdAt : "", updatedAt: typeof d.updatedAt === "string" ? d.updatedAt : "" };
 }
 function stats(p) {
@@ -641,13 +696,13 @@ const BADGES = [
 ];
 
 /* ---------- state ---------- */
-const DEFAULT_CONFIG = { start: "", groupName: "Youth Group", version: "KJV", teams: ["Tribe of Judah", "Tribe of Benjamin"] };
+const DEFAULT_CONFIG = { start: "2026-10-22", groupName: "Youth Group", version: "KJV", teams: ["Tribe of Judah", "Tribe of Benjamin"] };
 const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Map"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Wins"], ["me", "My Character", "Me"], ["leader", "Leader", "Leader"]];
 const state = {
   phase: "loading", mode: "local", db: null, user: null, uid: null,
   me: null, players: {}, playersLoaded: false, config: { ...DEFAULT_CONFIG },
   canLead: false, isOwner: false, readOnly: false, writeError: null,
-  tab: "today", enter: true, cheerUntil: 0, sel: null, stop: null, draft: null, confirmRemove: null, renderPending: false
+  backend: "local", auth: {}, account: null, tab: "today", enter: true, cheerUntil: 0, sel: null, stop: null, draft: null, confirmRemove: null, renderPending: false
 };
 function normConfig(c) {
   c = c && typeof c === "object" ? c : {};
@@ -679,7 +734,7 @@ async function flush() {
       createdAt: me.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
     state.writeError = null;
   } catch (e) {
-    if (e && e.code === "invalid_argument") state.readOnly = true;
+    if (e && (e.code === "invalid_argument" || e.code === "permission-denied")) state.readOnly = true;
     state.writeError = (e && e.code) || "unavailable";
     render(true);
   }
@@ -975,7 +1030,7 @@ function viewGroup() {
       <div class="who"><b>${esc(p.alias)}${isMe ? " (you)" : ""}</b><span>${ti >= 0 ? `<span class="dot" style="background:${TEAM_COLORS[ti]}"></span>${esc(p.team)} · ` : ""}${p.s.streak > 0 ? `${p.s.streak}-day streak` : "no streak"}${pace ? " · " + pace : ""}</span></div>
       <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters ${rm}</div></div>`;
   }).join("");
-  return `${state.mode === "local" ? `<div class="note">You're playing solo on this device, so only your own character shows here. Open the group's shared link while signed in to claude.ai to join everyone else.</div>` : ""}
+  return `${state.mode === "local" ? `<div class="note">You're playing solo on this device, so only your own character shows here. Open the group's shared link and sign in to join everyone else.</div>` : ""}
   ${teamHTML}
   <section class="card stack"><h2>The road to Revelation</h2><p class="small muted">Each dot is one day of reading; gold dots are Victory Moments. Scroll sideways to see everyone.</p>${track}</section>
   <section class="card stack"><div class="row between"><h2>Leaderboard</h2><span class="small muted">${plural(list.length, "reader")}</span></div><div class="board">${rows || '<p class="muted">Nobody has joined yet.</p>'}</div></section>`;
@@ -1028,6 +1083,11 @@ function viewEditor(onboarding) {
           <button class="btn sm" data-random="1">Random name</button></div>
       </div>
       ${teams.length ? `<div class="field"><span class="lbl">Team</span><div class="opts">${teams.map((t, i) => `<button class="opt" data-team="${esc(t)}" aria-pressed="${d.team === t}"><span class="dot" style="background:${TEAM_COLORS[i]}"></span>${esc(t)}</button>`).join("")}</div></div>` : ""}
+      ${featurePicker("face", FACES, "Face shape", "22 14 76 76", d, n)}
+      ${featurePicker("eyes", EYES, "Eyes", "34 37 52 26", d, n)}
+      <div class="field"><span class="lbl">Eye color</span><div class="opts">${EYEC.map((c, i) => `<button class="sw-opt" style="background:${c}" data-look="eyeColor" data-val="${i}" aria-pressed="${d.look.eyeColor === i}" aria-label="Eye color ${i + 1}"></button>`).join("")}</div></div>
+      ${featurePicker("brows", BROWS, "Eyebrows", "34 33 52 26", d, n)}
+      ${featurePicker("mouth", MOUTHS, "Mouth", "40 52 40 26", d, n)}
       <div class="two">
         <div class="field"><span class="lbl">Skin</span><div class="opts">${swatches("skin", SKINS, "Skin")}</div></div>
         <div class="field"><span class="lbl">Hair color</span><div class="opts">${swatches("hairColor", HAIRC, "Hair color")}</div></div>
@@ -1041,8 +1101,24 @@ function viewEditor(onboarding) {
       <div class="field"><span class="lbl">Headgear</span><div class="opts">${unl("hat")}</div></div>
       <div class="field"><span class="lbl">Item</span><div class="opts">${unl("item")}</div>
         <p class="small muted">Locked gear shows how many days of reading it takes. You have ${plural(n, "day")}.</p></div>
+      ${!onboarding && state.backend === "firebase" && state.account ? `<div class="field acct"><span class="lbl">Account</span>
+        <p class="small muted">Signed in${state.account.email ? ` as ${esc(state.account.email)}` : ""}. Only you see this.</p>
+        <p class="small muted">Account ID (your leader may ask for it): <code>${esc(state.account.uid)}</code></p>
+        <div><button class="btn sm" data-auth="signout">Sign out</button></div></div>` : ""}
     </div>
   </section>`;
+}
+
+function featurePicker(key, list, title, vb, d, n) {
+  return `<div class="field"><span class="lbl">${title}</span><div class="feats">${list.map(([label], i) =>
+    `<button class="feat" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}"><span class="fprev">${avatarSVG({ ...d.look, [key]: i, hat: key === "face" ? 0 : d.look.hat }, n, { vb })}</span><span>${esc(label)}</span></button>`).join("")}</div></div>`;
+}
+
+function startHint(v) {
+  const st = parseISO(v); if (!st) return "Not set yet.";
+  const end = dayDate(st, DAYS), dec31 = new Date(st.getFullYear(), 11, 31);
+  if (end > dec31) return `Day 70 would be ${fmtDate(end)}, ${end.getFullYear()}, which is after December 31. Pick ${fmtDate(new Date(st.getFullYear(), 11, 31 - (DAYS - 1)))} or earlier.`;
+  return `Day 70 lands on ${fmtDate(end)}, ${end.getFullYear()}.`;
 }
 
 function viewLeader() {
@@ -1052,12 +1128,17 @@ function viewLeader() {
     <form class="lead-grid" id="leadform">
       <div class="field"><label for="cfg-name">Group name</label><input type="text" id="cfg-name" maxlength="40" value="${esc(c.groupName)}"></div>
       <div class="field"><label for="cfg-start">Day 1 date</label><input type="date" id="cfg-start" value="${esc(c.start)}">
-        <span class="small muted">${st ? `Day 70 lands on ${fmtDate(dayDate(st, DAYS))}.` : "Not set yet."}</span></div>
+        <span class="small muted" id="starthint">${startHint(c.start)}</span></div>
       <div class="field"><span class="lbl">Teams (up to 4, leave blank to turn teams off)</span>
         ${[0, 1, 2, 3].map(i => `<input type="text" id="cfg-team${i}" maxlength="30" aria-label="Team ${i + 1}" value="${esc(c.teams[i] || "")}" placeholder="Team ${i + 1}">`).join("")}</div>
       <div class="row"><button class="btn go" type="submit">Save settings</button><span class="small muted" id="leadmsg"></span></div>
     </form></section>
-  ${shared ? `<section class="card stack"><h3>Inviting the group</h3><ol class="small" style="margin:0;padding-left:20px;max-width:68ch;display:grid;gap:6px">
+  ${state.backend === "firebase" ? `<section class="card stack"><h3>Inviting the group</h3><ol class="small" style="margin:0;padding-left:20px;max-width:68ch;display:grid;gap:6px">
+      <li>Send the group this page's web address.</li>
+      <li>Each person signs in with Google or with an email link. Their real name is never shown.</li>
+      <li>On a phone, they can use Share › <b>Add to Home Screen</b> so it opens like an app.</li>
+      <li>As a leader you can remove a player from the Group leaderboard.</li></ol></section>` : ""}
+  ${shared && state.backend === "claude" ? `<section class="card stack"><h3>Inviting the group</h3><ol class="small" style="margin:0;padding-left:20px;max-width:68ch;display:grid;gap:6px">
       <li>Use the Share menu on this page and give the group <b>Contributor</b> access, so each person can save their own progress.</li>
       <li>Send them the link. Everyone needs to be signed in to claude.ai.</li>
       <li>Each person picks an anonymous Bible name. Real names never appear on this page.</li>
@@ -1089,6 +1170,7 @@ function render(force) {
   $("#top").innerHTML = headerHTML();
   main.classList.toggle("enter", state.enter); state.enter = false;
   if (state.phase === "loading") { main.innerHTML = `<div class="loading">${avatarSVG({}, 0, { live: true })}<p class="disp">Getting your quest ready…</p></div>`; return; }
+  if (state.phase === "signin") { main.innerHTML = viewSignIn(); return; }
   if (state.phase === "join") { main.innerHTML = viewEditor(true); return; }
   if (state.tab === "me" && !state.draft && state.me) state.draft = draftFrom(state.me);
   const v = { today: viewToday, journey: viewJourney, plan: viewPlan, group: viewGroup, victories: viewVictories, me: () => viewEditor(false), leader: viewLeader }[state.tab] || viewToday;
@@ -1111,9 +1193,12 @@ function draftFrom(p) {
   const name = place ? p.alias.slice(0, -(place.length + 1)) : p.alias;
   return { gender: p.gender, name: all.includes(name) ? name : "", place, team: p.team, look: { ...L } };
 }
-function newDraft() {
-  const g = Math.random() < 0.5 ? "m" : "f";
-  return { gender: g, name: "", place: "", team: "", look: { skin: Math.floor(Math.random() * SKINS.length), hair: g === "f" ? 1 : 0, hairColor: Math.floor(Math.random() * 4), beard: false, tunic: Math.floor(Math.random() * 4), sash: 0, hat: 0, item: 0 } };
+function newDraft() { return newDraftFor(Math.random() < 0.5 ? "m" : "f"); }
+function newDraftFor(g) {
+  const r = arr => arr[Math.floor(Math.random() * arr.length)];
+  return { gender: g, name: "", place: "", team: "", look: { g, skin: Math.floor(Math.random() * SKINS.length), hair: g === "f" ? r([1, 2, 4]) : r([0, 3, 5]), hairColor: Math.floor(Math.random() * 4),
+    beard: false, tunic: Math.floor(Math.random() * 4), sash: 0, hat: 0, item: 0, face: g === "f" ? r([1, 3]) : r([0, 2, 4]), eyes: g === "f" ? r([1, 2]) : r([0, 1]),
+    eyeColor: Math.floor(Math.random() * 3), brows: g === "f" ? r([0, 3]) : r([1, 2]), mouth: r([0, 1, 3]) } };
 }
 
 /* ---------- celebrations ---------- */
@@ -1186,7 +1271,7 @@ async function joinOrSave() {
   if (takenAliases().has(alias.toLowerCase())) return;
   const base = state.me || { id: state.uid || "local", done: {}, createdAt: new Date().toISOString() };
   const n = stats({ done: base.done || {} }).n;
-  state.me = { ...base, alias, gender: d.gender, team: state.config.teams.includes(d.team) ? d.team : "", look: normLook(d.look, n) };
+  state.me = { ...base, alias, gender: d.gender, team: state.config.teams.includes(d.team) ? d.team : "", look: normLook({ ...d.look, g: d.gender }, n) };
   const joining = state.phase === "join";
   if (joining) { state.phase = "ready"; state.tab = "today"; state.enter = true; state.cheerUntil = Date.now() + 2000; }
   saveMe(); render(true);
@@ -1203,7 +1288,7 @@ async function saveConfig(e) {
   const msg = $("#leadmsg");
   if (state.mode === "local") { state.config = cfg; lsSet("nt70.config", cfg); document.activeElement.blur(); render(true); toast("Settings saved"); return; }
   try { msg.textContent = "Saving…"; await state.db.doc("config/plan").set(cfg); state.config = cfg; document.activeElement.blur(); render(true); toast("Settings saved for the group"); }
-  catch (err) { msg.textContent = err && err.code === "invalid_argument" ? "Only editors can change these settings." : "Couldn't save. Try again in a moment."; }
+  catch (err) { msg.textContent = err && (err.code === "invalid_argument" || err.code === "permission-denied") ? "Only leaders can change these settings." : "Couldn't save. Try again in a moment."; }
 }
 
 async function removePlayer(id) {
@@ -1222,6 +1307,7 @@ document.addEventListener("click", e => {
   if (st && !e.target.closest(".trip-map")) { selectStop(+st.dataset.stop); return; }
   const t = e.target.closest("button, a"); if (!t) return;
   const ds = t.dataset;
+  if (ds.auth) { authAction(ds.auth); return; }
   if (ds.reveal) { closeReveal(ds.reveal === "act"); return; }
   if (ds.stopnav) { const cur = state.stop ?? Math.max(0, STOPS.findIndex(x => x.day > stats(state.me).n) - 1); selectStop(Math.max(0, Math.min(STOPS.length - 1, (cur < 0 ? STOPS.length - 1 : cur) + +ds.stopnav))); return; }
   if (ds.tab) { e.preventDefault(); setTab(ds.tab); return; }
@@ -1231,7 +1317,10 @@ document.addEventListener("click", e => {
   if (ds.remove) { removePlayer(ds.remove); return; }
   const d = state.draft;
   if (!d) return;
-  if (ds.gender) { d.gender = ds.gender; d.name = ""; }
+  if (ds.gender) {
+    if (state.phase === "join" && d.gender !== ds.gender) { const fresh = newDraftFor(ds.gender).look; ["hair", "face", "eyes", "brows", "beard"].forEach(k => { d.look[k] = fresh[k]; }); }
+    d.gender = ds.gender; d.name = ""; d.look.g = ds.gender;
+  }
   else if (ds.name) d.name = ds.name;
   else if (ds.team) d.team = d.team === ds.team ? "" : ds.team;
   else if (ds.beard) d.look.beard = !d.look.beard;
@@ -1251,7 +1340,8 @@ document.addEventListener("click", e => {
 document.addEventListener("change", e => {
   if (e.target.id === "place" && state.draft) { state.draft.place = e.target.value; e.target.blur(); render(true); }
 });
-document.addEventListener("submit", e => { if (e.target.id === "leadform") saveConfig(e); });
+document.addEventListener("submit", e => { if (e.target.id === "leadform") saveConfig(e); else if (e.target.id === "emailform" || e.target.id === "emailfinish") emailSubmit(e); });
+document.addEventListener("input", e => { if (e.target.id === "cfg-start") { const h = $("#starthint"); if (h) h.textContent = startHint(e.target.value); } });
 
 
 /* ---------- boot ---------- */
@@ -1266,17 +1356,97 @@ function startLocal() {
   render(true);
 }
 
-async function boot() {
-  render(true);
-  const c = window.claude;
-  if (!c || typeof c.use !== "function") { startLocal(); return; }
-  let db = null, user = null;
-  try { [db, user] = await Promise.all([c.use("db"), c.use("user")]); } catch {}
-  const uid = user ? await user.id().catch(() => null) : null;
-  if (!db || !uid) { startLocal(); return; }
-  state.mode = "shared"; state.db = db; state.user = user; state.uid = uid;
-  const [canEdit, isOwner, canWrite] = await Promise.all([user.canEdit().catch(() => false), user.isOwner().catch(() => false), user.can("data.write").catch(() => null)]);
-  state.canLead = canEdit || isOwner; state.isOwner = isOwner; if (canWrite === false) state.readOnly = true;
+/* ---------- Firebase web app (Google + email-link sign-in) ---------- */
+let fb = null;
+const GOOGLE_G = `<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
+const loadScript = src => new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("load " + src)); document.head.appendChild(s); });
+function authMsg(e) {
+  const c = (e && e.code) || "";
+  if (c === "auth/invalid-email") return "That email address doesn't look right.";
+  if (c === "auth/invalid-action-code" || c === "auth/expired-action-code") return "That sign-in link has expired or was already used. Request a new one.";
+  if (c === "auth/unauthorized-domain") return "This web address isn't approved for sign-in yet. Your leader needs to add it in Firebase (see SETUP.md).";
+  if (c === "auth/operation-not-allowed") return "This sign-in method isn't turned on yet. Your leader needs to enable it in Firebase.";
+  if (c === "auth/network-request-failed") return "No connection. Check your internet and try again.";
+  return "Sign-in didn't work. Please try again.";
+}
+const cleanUrl = () => { try { history.replaceState(null, "", location.pathname); } catch {} };
+
+async function startFirebase(cfg) {
+  const base = "https://www.gstatic.com/firebasejs/10.12.2/";
+  await loadScript(base + "firebase-app-compat.js");
+  await Promise.all([loadScript(base + "firebase-auth-compat.js"), loadScript(base + "firebase-firestore-compat.js")]);
+  firebase.initializeApp(cfg);
+  const auth = firebase.auth(), fs = firebase.firestore();
+  fb = { auth, fs };
+  state.backend = "firebase";
+  if (auth.isSignInWithEmailLink(location.href)) {
+    const email = lsGet("nt70.email");
+    if (email) { try { await auth.signInWithEmailLink(email, location.href); } catch (e) { state.auth.error = authMsg(e); } cleanUrl(); }
+    else state.auth.finishEmail = true;
+  }
+  auth.getRedirectResult().catch(e => { state.auth.error = authMsg(e); render(true); });
+  auth.onAuthStateChanged(async u => {
+    if (!u) { if (state.uid) { location.reload(); return; } state.phase = "signin"; render(true); return; }
+    if (state.uid) return;
+    state.account = { email: u.email || "", uid: u.uid };
+    const admin = await fs.doc("admins/" + u.uid).get().then(d => d.exists).catch(() => false);
+    startShared(fs, u.uid, { canLead: admin, isOwner: admin, readOnly: false });
+  });
+}
+
+function viewSignIn() {
+  const a = state.auth;
+  let body;
+  if (a.finishEmail) body = `<form id="emailfinish" class="stack"><label for="fin-email" class="small">Confirm the email address you used</label>
+      <input type="email" id="fin-email" required autocomplete="email" placeholder="you@example.com"><button class="btn go" type="submit">Finish signing in</button></form>`;
+  else if (a.sent) body = `<div class="note">We sent a sign-in link to <b>${esc(a.sent)}</b>. Open it on this phone or computer to finish. Check your spam folder if it doesn't show up.</div>
+      <div><button class="btn sm" data-auth="reset">Use a different email</button></div>`;
+  else body = `<button class="btn google big" data-auth="google" ${a.busy ? "disabled" : ""}>${GOOGLE_G} Continue with Google</button>
+      <div class="or"><span>or get a link by email</span></div>
+      <form id="emailform" class="row" style="flex-wrap:nowrap"><input type="email" id="si-email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address" style="flex:1;min-width:0">
+      <button class="btn dark" type="submit" ${a.busy ? "disabled" : ""}>Send link</button></form>`;
+  return `<section class="card signin"><div class="stage">${avatarSVG(SIGNIN_LOOK, 0, { live: true })}</div>
+    <div class="stack" style="gap:14px"><p class="eyebrow">New Testament in 70 days</p><h2>Join the NT70 Quest</h2>
+      <p class="muted">Sign in so your character and progress follow you on any device. The group only ever sees the Bible name you pick.</p>
+      ${body}${a.error ? `<p class="small" style="color:var(--rose)">${esc(a.error)}</p>` : ""}</div></section>`;
+}
+const SIGNIN_LOOK = { g: "f", skin: 2, hair: 4, hairColor: 0, tunic: 2, sash: 1, face: 3, eyes: 2, eyeColor: 0, brows: 0, mouth: 1 };
+
+async function authAction(kind) {
+  const a = state.auth;
+  if (kind === "reset") { state.auth = {}; render(true); return; }
+  if (kind === "signout") { try { await fb.auth.signOut(); } catch {} location.reload(); return; }
+  if (kind === "google") {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    a.error = ""; a.busy = true; render(true);
+    try { await fb.auth.signInWithPopup(provider); }
+    catch (e) {
+      if (["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/cancelled-popup-request"].includes(e.code)) { try { await fb.auth.signInWithRedirect(provider); } catch (e2) { a.error = authMsg(e2); } }
+      else if (e.code !== "auth/popup-closed-by-user") a.error = authMsg(e);
+    }
+    a.busy = false; if (state.phase === "signin") render(true);
+  }
+}
+async function emailSubmit(e) {
+  e.preventDefault();
+  const a = state.auth;
+  if (e.target.id === "emailform") {
+    const email = $("#si-email").value.trim(); if (!email) return;
+    a.busy = true; a.error = ""; render(true);
+    try { await fb.auth.sendSignInLinkToEmail(email, { url: location.origin + location.pathname, handleCodeInApp: true }); lsSet("nt70.email", email); a.sent = email; }
+    catch (err) { a.error = authMsg(err); }
+    a.busy = false; render(true);
+  } else if (e.target.id === "emailfinish") {
+    const email = $("#fin-email").value.trim();
+    try { await fb.auth.signInWithEmailLink(email, location.href); a.finishEmail = false; cleanUrl(); }
+    catch (err) { a.error = authMsg(err); render(true); }
+  }
+}
+
+function startShared(db, uid, perms) {
+  state.mode = "shared"; state.db = db; state.uid = uid;
+  state.canLead = perms.canLead; state.isOwner = perms.isOwner; state.readOnly = perms.readOnly;
+  state.phase = "loading"; render(true);
   const h = (location.hash || "").slice(1); if (h) state.tab = TABS.some(([k]) => k === h) ? h : "today";
 
   db.doc("config/plan").onSnapshot(snap => {
@@ -1297,11 +1467,32 @@ async function boot() {
     } else if ((state.phase === "loading" || state.phase === "join") && mine) { state.me = mine; state.phase = "ready"; }
     if (state.phase === "ready" && state.tab === "me" && !state.draft) state.draft = draftFrom(state.me);
     render();
-  }, err => {
+  }, () => {
     if (state.phase === "loading") { startLocal(); toast("Couldn't reach the group. Playing solo for now."); }
   });
 
   setTimeout(() => { if (state.phase === "loading" && !state.playersLoaded) { state.playersLoaded = true; state.phase = state.me ? "ready" : "join"; if (!state.me) state.draft = newDraft(); render(true); } }, 8000);
+}
+
+async function boot() {
+  render(true);
+  const c = window.claude;
+  if (c && typeof c.use === "function") {
+    let db = null, user = null;
+    try { [db, user] = await Promise.all([c.use("db"), c.use("user")]); } catch {}
+    const uid = user ? await user.id().catch(() => null) : null;
+    if (!db || !uid) { startLocal(); return; }
+    state.backend = "claude";
+    const [canEdit, isOwner, canWrite] = await Promise.all([user.canEdit().catch(() => false), user.isOwner().catch(() => false), user.can("data.write").catch(() => null)]);
+    startShared(db, uid, { canLead: canEdit || isOwner, isOwner, readOnly: canWrite === false });
+    return;
+  }
+  const cfg = window.NT70_FIREBASE;
+  if (cfg && cfg.apiKey && !/^PASTE/.test(cfg.apiKey)) {
+    try { await startFirebase(cfg); } catch { startLocal(); toast("Couldn't connect to sign-in. Playing solo for now."); }
+    return;
+  }
+  startLocal();
 }
 boot();
 })();
