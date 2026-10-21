@@ -1567,9 +1567,13 @@ function authMsg(e) {
   if (c === "auth/invalid-action-code" || c === "auth/expired-action-code") return "That sign-in link has expired or was already used. Request a new one.";
   if (c === "auth/unauthorized-domain") return "This web address isn't approved for sign-in yet. Your leader needs to add it in Firebase (see SETUP.md).";
   if (c === "auth/operation-not-allowed") return "This sign-in method isn't turned on yet. Your leader needs to enable it in Firebase.";
+  if (c === "auth/popup-blocked" || c === "auth/operation-not-supported-in-this-environment" || c === "auth/web-storage-unsupported") return POPUP_HELP;
   if (c === "auth/network-request-failed") return "No connection. Check your internet and try again.";
   return "Sign-in didn't work. Please try again.";
 }
+const POPUP_HELP = "Google sign-in can't open in this browser. If you tapped the link inside another app (Messages, Instagram, Gmail, Claude…), open it in Safari or Chrome instead, or use the email link below.";
+// Built-in browsers inside other apps block the Google sign-in window.
+const IN_APP_BROWSER = /FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|musical_ly|GSA\/|Twitter|LinkedInApp|; wv\)/i.test(navigator.userAgent || "");
 const cleanUrl = () => { try { history.replaceState(null, "", location.pathname); } catch {} };
 
 async function startFirebase(cfg) {
@@ -1585,7 +1589,6 @@ async function startFirebase(cfg) {
     if (email) { try { await auth.signInWithEmailLink(email, location.href); } catch (e) { state.auth.error = authMsg(e); } cleanUrl(); }
     else state.auth.finishEmail = true;
   }
-  auth.getRedirectResult().catch(e => { state.auth.error = authMsg(e); render(true); });
   auth.onAuthStateChanged(async u => {
     if (!u) { if (state.uid) { location.reload(); return; } state.phase = "signin"; render(true); return; }
     if (state.uid) return;
@@ -1602,7 +1605,8 @@ function viewSignIn() {
       <input type="email" id="fin-email" required autocomplete="email" placeholder="you@example.com"><button class="btn go" type="submit">Finish signing in</button></form>`;
   else if (a.sent) body = `<div class="note">We sent a sign-in link to <b>${esc(a.sent)}</b>. Open it on this phone or computer to finish. Check your spam folder if it doesn't show up.</div>
       <div><button class="btn sm" data-auth="reset">Use a different email</button></div>`;
-  else body = `<button class="btn google big" data-auth="google" ${a.busy ? "disabled" : ""}>${GOOGLE_G} Continue with Google</button>
+  else body = `${IN_APP_BROWSER ? `<div class="note small">You're in another app's built-in browser, where Google sign-in may not open. Use your browser's menu to <b>Open in Safari</b> or <b>Open in Chrome</b>, or sign in with an email link below.</div>` : ""}
+      <button class="btn google big" data-auth="google" ${a.busy ? "disabled" : ""}>${GOOGLE_G} Continue with Google</button>
       <div class="or"><span>or get a link by email</span></div>
       <form id="emailform" class="row" style="flex-wrap:nowrap"><input type="email" id="si-email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address" style="flex:1;min-width:0">
       <button class="btn dark" type="submit" ${a.busy ? "disabled" : ""}>Send link</button></form>`;
@@ -1622,7 +1626,8 @@ async function authAction(kind) {
     a.error = ""; a.busy = true; render(true);
     try { await fb.auth.signInWithPopup(provider); }
     catch (e) {
-      if (["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/cancelled-popup-request"].includes(e.code)) { try { await fb.auth.signInWithRedirect(provider); } catch (e2) { a.error = authMsg(e2); } }
+      // No redirect fallback: browsers that partition storage (iPhone Safari, in-app browsers) break redirect sign-in across domains.
+      if (["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/web-storage-unsupported", "auth/internal-error"].includes(e.code)) a.error = POPUP_HELP;
       else if (e.code !== "auth/popup-closed-by-user") a.error = authMsg(e);
     }
     a.busy = false; if (state.phase === "signin") render(true);
