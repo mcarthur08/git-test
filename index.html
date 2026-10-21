@@ -27,6 +27,7 @@
   --shadow: 0 1px 2px rgba(20,27,45,.06), 0 10px 30px -8px rgba(20,27,45,.16);
   --shadow-lg: 0 20px 60px -12px rgba(20,27,45,.35);
   --radius: 22px;
+  --sea: #CBE7F4; --sea-ink: #3D8DC2; --land: #F4E6C4; --land-2: #E9D3A1; --hill: #D7BB82; --hill-2: #C4A56A; --tree: #7EB46A; --map-ink: #6A5532;
   --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   --step--1: 0.8125rem; --step-0: 1rem; --step-1: 1.25rem; --step-2: 1.6rem; --step-3: 2.4rem;
@@ -41,6 +42,7 @@
     --sec-g: #1FAE9E; --sec-a: #FF6A3D; --sec-p: #E39A10; --sec-l: #8A62FF; --sec-r: #F0365E;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -8px rgba(0,0,0,.55);
     --shadow-lg: 0 20px 60px -12px rgba(0,0,0,.7);
+    --sea: #13324A; --sea-ink: #5FA9DA; --land: #3A3428; --land-2: #4A4130; --hill: #5E513A; --hill-2: #4E432F; --tree: #4E8A4F; --map-ink: #E6D8BA;
     color-scheme: dark;
   }
 }
@@ -51,6 +53,7 @@
   --sec-g: #1FAE9E; --sec-a: #FF6A3D; --sec-p: #E39A10; --sec-l: #8A62FF; --sec-r: #F0365E;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -8px rgba(0,0,0,.55);
   --shadow-lg: 0 20px 60px -12px rgba(0,0,0,.7);
+  --sea: #13324A; --sea-ink: #5FA9DA; --land: #3A3428; --land-2: #4A4130; --hill: #5E513A; --hill-2: #4E432F; --tree: #4E8A4F; --map-ink: #E6D8BA;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -279,6 +282,38 @@ select, input[type="date"], input[type="text"] { font: inherit; color: var(--ink
 .reveal .kicker { font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: var(--step--1); color: var(--flame); }
 .reveal h2 { font-size: var(--step-2); }
 
+/* Journey map */
+.journey { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.journey > .card:last-child { position: sticky; top: 130px; }
+.map-card { padding: 10px; }
+.map { width: 100%; height: auto; display: block; border-radius: 16px; }
+.m-town { font: 700 9.5px var(--font-body); fill: var(--map-ink); paint-order: stroke; stroke: var(--land); stroke-width: 3px; stroke-linejoin: round; }
+.m-town.big { font: 800 12.5px var(--font-display); }
+.m-region { font: 800 10px var(--font-display); letter-spacing: .25em; fill: var(--map-ink); opacity: .42; }
+.m-sea { font: 800 11px var(--font-display); letter-spacing: .4em; fill: var(--sea-ink); opacity: .7; }
+.m-water { font: italic 600 8.5px var(--font-body); fill: var(--sea-ink); }
+.m-n { font: 800 8px var(--font-body); fill: var(--map-ink); }
+.m-you { font: 800 8px var(--font-body); fill: #fff; }
+.m-more { font: 800 9px var(--font-body); fill: var(--map-ink); }
+.m-stop { cursor: pointer; outline: none; }
+.m-dot { fill: var(--surface); stroke: var(--map-ink); stroke-width: 2; }
+.m-stop.reached .m-dot { fill: var(--flame); stroke: #fff; }
+.m-stop.sel .m-dot, .m-stop:focus-visible .m-dot { stroke: var(--sky); stroke-width: 4; }
+.m-pulse { fill: none; stroke: var(--gold); stroke-width: 2.5; transform-box: fill-box; transform-origin: center; animation: mpulse 1.8s ease-out infinite; }
+@keyframes mpulse { from { transform: scale(.7); opacity: 1; } to { transform: scale(1.9); opacity: 0; } }
+.stop-card { display: grid; gap: 10px; }
+.stop-card blockquote { margin: 0; padding: 12px 16px; border-radius: 14px; background: color-mix(in srgb, var(--gold) 14%, var(--surface)); font-family: var(--font-display); font-weight: 600; font-size: var(--step-1); line-height: 1.3; letter-spacing: -0.01em; }
+.stop-card blockquote span { display: block; font-family: var(--font-body); font-size: var(--step--1); font-weight: 600; color: var(--muted); margin-top: 4px; letter-spacing: 0; }
+.stoplist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.stoplist button { width: 100%; display: flex; gap: 10px; align-items: center; text-align: left; border: 0; background: var(--surface-2); border-radius: 14px; padding: 8px 10px; cursor: pointer; }
+.stoplist button > span:last-child { display: grid; min-width: 0; }
+.stoplist .sn { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); font-weight: 800; flex: none; font-size: var(--step--1); }
+.stoplist .sn svg { width: 14px; height: 14px; }
+.stoplist li.reached .sn { background: var(--flame); color: #fff; }
+.stoplist li.cur button { box-shadow: 0 0 0 2px var(--ink); }
+.trip { display: grid; grid-template-columns: 240px 1fr; gap: 18px; align-items: center; }
+.trip-map { border: 0; padding: 0; border-radius: 16px; overflow: hidden; height: 160px; cursor: pointer; background: var(--sea); display: block; width: 100%; }
+.trip-map .map { height: 100%; border-radius: 0; }
 .loading { display: grid; justify-items: center; gap: 12px; padding: 60px 0; }
 .loading .av { width: 90px; height: 120px; }
 .lead-grid { display: grid; gap: 16px; max-width: 560px; }
@@ -286,6 +321,8 @@ select, input[type="date"], input[type="text"] { font: inherit; color: var(--ink
 
 @media (max-width: 720px) {
   .editor { grid-template-columns: 1fr; }
+  .journey, .trip { grid-template-columns: 1fr; }
+  .journey > .card:last-child { position: static; }
   .preview { position: static; }
   .two { grid-template-columns: 1fr; }
 }
@@ -546,6 +583,7 @@ const ICON = {
   victories: '<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 14v4M8 21h8"/>',
   me: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.3 2.2 2 3.5 2s2.5-.7 3.5-2M9 9.5h.01M15 9.5h.01"/>',
   leader: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  journey: '<path d="M9 4L3 6.5V20l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',
   book: '<path d="M4 5.5C6.5 4.3 9.3 4.4 12 6c2.7-1.6 5.5-1.7 8-.5v13c-2.5-1.2-5.3-1.1-8 .5-2.7-1.6-5.5-1.7-8-.5z"/><path d="M12 6v13"/>',
   flame: '<path d="M12 3c.8 3.2 5 5 5 10a5 5 0 0 1-10 0c0-2.2 1-3.6 2.2-4.6.2 1.6 1 2.6 2.1 2.9C11 8.6 11 5.6 12 3z"/>',
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
@@ -604,12 +642,12 @@ const BADGES = [
 
 /* ---------- state ---------- */
 const DEFAULT_CONFIG = { start: "", groupName: "Youth Group", version: "KJV", teams: ["Tribe of Judah", "Tribe of Benjamin"] };
-const TABS = [["today", "Today", "Today"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Wins"], ["me", "My Character", "Me"], ["leader", "Leader", "Leader"]];
+const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Map"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Wins"], ["me", "My Character", "Me"], ["leader", "Leader", "Leader"]];
 const state = {
   phase: "loading", mode: "local", db: null, user: null, uid: null,
   me: null, players: {}, playersLoaded: false, config: { ...DEFAULT_CONFIG },
   canLead: false, isOwner: false, readOnly: false, writeError: null,
-  tab: "today", enter: true, cheerUntil: 0, sel: null, draft: null, confirmRemove: null, renderPending: false
+  tab: "today", enter: true, cheerUntil: 0, sel: null, stop: null, draft: null, confirmRemove: null, renderPending: false
 };
 function normConfig(c) {
   c = c && typeof c === "object" ? c : {};
@@ -650,6 +688,152 @@ async function flush() {
 }
 const savePending = () => writing || dirty || saveTimer !== null;
 
+
+/* ---------- Journey to the Passover ---------- */
+// x/y are map coordinates (viewBox 360 x 560, north up). lx/ly/la place the label.
+const STOPS = [
+  { day: 0, place: "Bethlehem", title: "Born in Bethlehem", ref: "Luke 2:1–20", x: 197, y: 457, lx: -9, ly: 4, la: "end",
+    text: "Jesus' journey begins in the little town of Bethlehem, the city of David, where shepherds came to see the baby lying in a manger.",
+    verse: "For unto you is born this day in the city of David a Saviour, which is Christ the Lord.", verseRef: "Luke 2:11" },
+  { day: 6, place: "Nazareth", title: "Growing up in Nazareth", ref: "Luke 2:39–52", x: 222, y: 198, lx: -9, ly: 4, la: "end",
+    text: "Jesus grew up in Nazareth of Galilee. Every year his family walked to Jerusalem for the feast of the passover, and at twelve he amazed the teachers in the temple.",
+    verse: "And Jesus increased in wisdom and stature, and in favour with God and man.", verseRef: "Luke 2:52" },
+  { day: 12, place: "River Jordan", title: "Baptized in the Jordan", ref: "Matthew 3:13–17", x: 271, y: 396, lx: 9, ly: 3, la: "start",
+    text: "At Bethabara beyond Jordan, John baptized Jesus. The heavens opened, the Spirit came down like a dove, and the Father spoke from heaven.",
+    verse: "This is my beloved Son, in whom I am well pleased.", verseRef: "Matthew 3:17" },
+  { day: 18, place: "The Wilderness", title: "Tempted in the wilderness", ref: "Matthew 4:1–11", x: 240, y: 466, lx: 2, ly: 16, la: "middle",
+    text: "For forty days Jesus fasted in the wilderness of Judaea. Every time the devil tempted him, Jesus answered with Scripture. That's why we read every day.",
+    verse: "It is written, Man shall not live by bread alone, but by every word that proceedeth out of the mouth of God.", verseRef: "Matthew 4:4" },
+  { day: 24, place: "Cana", title: "Water into wine", ref: "John 2:1–11", x: 229, y: 178, lx: -9, ly: 3, la: "end",
+    text: "At a wedding in Cana, the wine ran out. Jesus told the servants to fill the waterpots, and the water became the best wine of the feast.",
+    verse: "This beginning of miracles did Jesus in Cana of Galilee, and manifested forth his glory.", verseRef: "John 2:11" },
+  { day: 30, place: "Capernaum", title: "Fishers of men", ref: "Matthew 4:13–22", x: 266, y: 150, lx: -9, ly: 2, la: "end",
+    text: "Jesus made Capernaum his home by the sea. Walking the shore, he called Peter, Andrew, James and John to leave their nets and follow him.",
+    verse: "Follow me, and I will make you fishers of men.", verseRef: "Matthew 4:19" },
+  { day: 36, place: "Sea of Galilee", title: "Peace, be still", ref: "Mark 4:35–41", x: 277, y: 176, lx: 0, ly: 0, la: "none",
+    text: "A great storm hit the disciples' boat while Jesus slept. He stood up, rebuked the wind, and the sea became completely calm.",
+    verse: "And he arose, and rebuked the wind, and said unto the sea, Peace, be still. And the wind ceased, and there was a great calm.", verseRef: "Mark 4:39" },
+  { day: 42, place: "Bethsaida", title: "Feeding the five thousand", ref: "Luke 9:10–17", x: 289, y: 149, lx: 9, ly: 2, la: "start",
+    text: "Near Bethsaida a hungry crowd of five thousand men followed Jesus. With five loaves and two fishes he fed them all, with twelve baskets left over.",
+    verse: "I am the bread of life: he that cometh to me shall never hunger.", verseRef: "John 6:35" },
+  { day: 48, place: "Caesarea Philippi", title: "Thou art the Christ", ref: "Matthew 16:13–20", x: 293, y: 64, lx: 0, ly: -10, la: "middle",
+    text: "Far in the north, Jesus asked his disciples, \"Whom say ye that I am?\" Peter answered with the truth the whole New Testament is about.",
+    verse: "Thou art the Christ, the Son of the living God.", verseRef: "Matthew 16:16" },
+  { day: 54, place: "Samaria", title: "Set his face to Jerusalem", ref: "Luke 9:51; John 4", x: 213, y: 316, lx: -9, ly: 4, la: "end",
+    text: "Jesus turned south toward Jerusalem. In Samaria, at Jacob's well near Sychar, he offered a thirsty woman living water.",
+    verse: "He stedfastly set his face to go to Jerusalem.", verseRef: "Luke 9:51" },
+  { day: 60, place: "Jericho", title: "Zacchaeus and Bartimaeus", ref: "Luke 19:1–10", x: 247, y: 416, lx: 4, ly: 15, la: "middle",
+    text: "In Jericho, blind Bartimaeus received his sight, and a short tax collector named Zacchaeus climbed a sycomore tree and met Jesus.",
+    verse: "For the Son of man is come to seek and to save that which was lost.", verseRef: "Luke 19:10" },
+  { day: 65, place: "Bethany", title: "Six days before the passover", ref: "John 11–12", x: 217, y: 426, lx: 2, ly: -9, la: "middle",
+    text: "At Bethany Jesus raised Lazarus from the dead. Then, six days before the passover, Mary anointed his feet with costly ointment.",
+    verse: "I am the resurrection, and the life: he that believeth in me, though he were dead, yet shall he live.", verseRef: "John 11:25" },
+  { day: 70, place: "Jerusalem", title: "The Passover", ref: "Luke 22:7–20", x: 199, y: 431, lx: -10, ly: 4, la: "end",
+    text: "You made it to Jerusalem for the Passover. Jesus shared the Passover meal with his disciples, gave his life on the cross, and rose again on the third day.",
+    verse: "For even Christ our passover is sacrificed for us.", verseRef: "1 Corinthians 5:7" }
+];
+const qpt = (a, c, b, t) => ({ x: (1 - t) ** 2 * a.x + 2 * (1 - t) * t * c.x + t * t * b.x, y: (1 - t) ** 2 * a.y + 2 * (1 - t) * t * c.y + t * t * b.y });
+function segCtrl(k) {
+  const a = STOPS[k], b = STOPS[k + 1], mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+  const off = (k % 2 ? 1 : -1) * Math.min(28, len * 0.16);
+  return { x: mx - dy / len * off, y: my + dx / len * off };
+}
+function journeyPos(n) {
+  n = Math.max(0, Math.min(DAYS, n));
+  for (let k = 0; k < STOPS.length - 1; k++) {
+    if (n < STOPS[k + 1].day) { const t = (n - STOPS[k].day) / (STOPS[k + 1].day - STOPS[k].day); return { k, t, ...qpt(STOPS[k], segCtrl(k), STOPS[k + 1], t) }; }
+  }
+  const last = STOPS[STOPS.length - 1]; return { k: STOPS.length - 1, t: 0, x: last.x, y: last.y };
+}
+function routePath(n) {
+  const p = journeyPos(n); let d = `M${STOPS[0].x} ${STOPS[0].y}`;
+  for (let k = 0; k < p.k && k < STOPS.length - 1; k++) { const c = segCtrl(k); d += ` Q${c.x.toFixed(1)} ${c.y.toFixed(1)} ${STOPS[k + 1].x} ${STOPS[k + 1].y}`; }
+  if (p.k < STOPS.length - 1 && p.t > 0) { const a = STOPS[p.k], c = segCtrl(p.k), c1 = { x: a.x + (c.x - a.x) * p.t, y: a.y + (c.y - a.y) * p.t }; d += ` Q${c1.x.toFixed(1)} ${c1.y.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`; }
+  return d;
+}
+const fullRoute = () => routePath(DAYS);
+const placeAvatar = (svg, x, y, w) => svg.replace("<svg ", `<svg x="${(x - w / 2).toFixed(1)}" y="${(y - w * 4 / 3 + 3).toFixed(1)}" width="${w}" height="${(w * 4 / 3).toFixed(1)}" `);
+
+function mapSVG(opts = {}) {
+  const myN = state.me ? stats(state.me).n : 0;
+  const sel = state.stop;
+  const hills = [[200, 250], [225, 262], [188, 372], [210, 384], [176, 470], [196, 490], [232, 300], [168, 410], [245, 345], [320, 300], [330, 420], [312, 120], [205, 120]]
+    .map(([x, y]) => `<path d="M${x - 9} ${y} L${x} ${y - 9} L${x + 9} ${y} Z" fill="var(--hill)"/><path d="M${x} ${y - 9} L${x + 9} ${y} L${x + 3} ${y} Z" fill="var(--hill-2)"/>`).join("");
+  const trees = [[240, 230], [250, 238], [190, 210], [300, 260], [306, 268], [232, 335], [180, 340], [258, 120], [315, 175], [150, 400]]
+    .map(([x, y]) => `<rect x="${x - 1}" y="${y}" width="2" height="5" fill="var(--map-ink)" opacity=".5"/><circle cx="${x}" cy="${y - 2}" r="5" fill="var(--tree)"/>`).join("");
+  const waves = [[60, 120], [40, 200], [80, 330], [30, 420], [50, 500], [110, 60]].map(([x, y]) => `<path d="M${x} ${y} q5 -4 10 0 t10 0" fill="none" stroke="var(--sea-ink)" stroke-width="1.4" opacity=".45"/>`).join("");
+  const stops = STOPS.map((s, i) => {
+    const reached = myN >= s.day, next = !reached && (i === 0 || myN >= STOPS[i - 1].day), last = i === STOPS.length - 1;
+    const r = last ? 9 : 6;
+    const label = s.la === "none" ? "" : `<text x="${s.x + s.lx}" y="${s.y + s.ly}" text-anchor="${s.la}" class="m-town${last ? " big" : ""}">${esc(s.place)}</text>`;
+    const attrs = opts.mini ? "" : ` data-stop="${i}" tabindex="0" role="button" aria-label="${esc(s.place)}: ${esc(s.title)}${reached ? ", reached" : `, at day ${s.day}`}"`;
+    return `<g class="m-stop${reached ? " reached" : ""}${next ? " next" : ""}${sel === i && !opts.mini ? " sel" : ""}"${attrs}>
+      ${next ? `<circle cx="${s.x}" cy="${s.y}" r="${r + 4}" class="m-pulse"/>` : ""}
+      <circle cx="${s.x}" cy="${s.y}" r="${r + 7}" fill="transparent"/>
+      <circle cx="${s.x}" cy="${s.y}" r="${r}" class="m-dot"/>
+      ${last ? `<path d="M${s.x - 4} ${s.y + 1} l3 3 l5 -6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${reached ? 1 : 0}"/><path d="M${s.x - 5} ${s.y - 14} h10 v-3 l-2.5 2 l-2.5 -4 l-2.5 4 l-2.5 -2 z" fill="var(--gold)"/>` : ""}
+      ${label}</g>`;
+  }).join("");
+  // characters
+  const people = allPlayers();
+  const buckets = new Map();
+  people.forEach(p => { if (state.me && p.id === state.me.id) return; const key = p.s.n; (buckets.get(key) || buckets.set(key, []).get(key)).push(p); });
+  let crowd = "";
+  buckets.forEach((ps, n) => {
+    const pos = journeyPos(n);
+    ps.slice(0, 5).forEach((p, j) => { const ox = (j % 2 ? 1 : -1) * Math.ceil(j / 2) * 9; crowd += `<g class="m-person"><title>${esc(p.alias)} · ${p.s.n} days</title>${placeAvatar(avatarSVG(p.look, p.s.n), pos.x + ox, pos.y, 22)}</g>`; });
+    if (ps.length > 5) crowd += `<text x="${pos.x + 26}" y="${pos.y - 18}" class="m-more">+${ps.length - 5}</text>`;
+  });
+  let meSVG = "";
+  if (state.me) {
+    const pos = journeyPos(myN);
+    meSVG = `<g class="m-me">${placeAvatar(avatarSVG(state.me.look, myN, { live: !opts.mini }), pos.x, pos.y, 34)}
+      <g transform="translate(${pos.x.toFixed(1)} ${(pos.y - 52).toFixed(1)})"><rect x="-17" y="-9" width="34" height="14" rx="7" fill="var(--flame)"/><text x="0" y="1.5" text-anchor="middle" class="m-you">You</text></g></g>`;
+  }
+  let vb = "0 0 360 560";
+  if (opts.mini) { const p = journeyPos(myN), w = 170, h = 120; vb = `${Math.max(0, Math.min(360 - w, p.x - w / 2)).toFixed(0)} ${Math.max(0, Math.min(560 - h, p.y - h / 2 - 12)).toFixed(0)} ${w} ${h}`; }
+  return `<svg class="map" viewBox="${vb}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map of the land of Israel showing Jesus' journey from Bethlehem to Jerusalem for the Passover">
+    <rect width="360" height="560" fill="var(--sea)"/>${waves}
+    <path d="M150 0 Q165 40 168 88 Q170 120 158 132 Q174 140 150 154 Q140 190 130 230 Q118 290 102 350 Q88 410 74 470 Q62 520 52 560 L360 560 L360 0 Z" fill="var(--land)"/>
+    <path d="M150 0 Q165 40 168 88 Q170 120 158 132 Q174 140 150 154 Q140 190 130 230 Q118 290 102 350 Q88 410 74 470 Q62 520 52 560" fill="none" stroke="var(--land-2)" stroke-width="6" opacity=".9"/>
+    <path d="M300 0 Q340 140 320 260 Q345 380 330 560 L360 560 L360 0 Z" fill="var(--land-2)" opacity=".55"/>
+    ${hills}${trees}
+    <path d="M292 62 Q285 85 282 101 M282 115 Q279 138 276 153 M275 197 Q262 230 276 262 Q262 300 274 340 Q262 380 270 430" fill="none" stroke="var(--sea-ink)" stroke-width="2.6" stroke-linecap="round"/>
+    <ellipse cx="282" cy="108" rx="5" ry="7" fill="var(--sea)" stroke="var(--sea-ink)" stroke-width="1.5"/>
+    <path d="M276 152 C292 152 291 175 287 188 C283 198 270 200 267 190 C262 176 264 156 276 152 Z" fill="var(--sea)" stroke="var(--sea-ink)" stroke-width="1.5"/>
+    <path d="M270 430 C286 430 288 470 285 505 C283 530 270 540 264 525 C258 500 258 445 270 430 Z" fill="var(--sea)" stroke="var(--sea-ink)" stroke-width="1.5"/>
+    <text x="74" y="270" class="m-sea" transform="rotate(-72 74 270)">THE GREAT SEA</text>
+    <text x="298" y="214" class="m-water">Sea of</text><text x="298" y="224" class="m-water">Galilee</text>
+    <text x="294" y="482" class="m-water">Salt Sea</text><text x="294" y="492" class="m-water">(Dead Sea)</text>
+    <text x="284" y="318" class="m-water" transform="rotate(80 284 318)">Jordan</text>
+    <text x="205" y="132" class="m-region">GALILEE</text><text x="168" y="290" class="m-region">SAMARIA</text>
+    <text x="132" y="512" class="m-region">JUDAEA</text><text x="318" y="360" class="m-region" text-anchor="middle">PERAEA</text>
+    <text x="316" y="240" class="m-region" text-anchor="middle">DECAPOLIS</text>
+    <g transform="translate(30 40)"><circle r="16" fill="var(--surface)" opacity=".85"/><path d="M0 -12 L4 0 L0 -3 L-4 0 Z" fill="var(--flame)"/><path d="M0 12 L4 0 L0 3 L-4 0 Z" fill="var(--map-ink)" opacity=".5"/><text y="-17" text-anchor="middle" class="m-n">N</text></g>
+    <path d="${fullRoute()}" fill="none" stroke="var(--map-ink)" stroke-width="2" stroke-dasharray="1 6" stroke-linecap="round" opacity=".55"/>
+    <path d="${routePath(myN)}" fill="none" stroke="var(--flame)" stroke-width="3.5" stroke-linecap="round" class="m-walked"/>
+    ${stops}${crowd}${meSVG}
+  </svg>`;
+}
+
+function viewJourney() {
+  const n = stats(state.me).n, pos = journeyPos(n);
+  const nextI = STOPS.findIndex(s => s.day > n), next = STOPS[nextI];
+  const sel = state.stop ?? (next ? Math.max(0, nextI - 1) : STOPS.length - 1);
+  const s = STOPS[sel], open = n >= s.day || (state.canLead && state.mode === "shared");
+  const card = `<div class="stop-card" id="stopcard"><div class="row between"><p class="eyebrow">Stop ${sel + 1} of ${STOPS.length} · ${n >= s.day ? "reached" : `day ${s.day}`}</p><span class="chip">${esc(s.ref)}</span></div>
+    <h3>${esc(s.place)}: ${esc(s.title)}</h3>
+    ${open ? `<p>${esc(s.text)}</p><blockquote>"${esc(s.verse)}"<span>${esc(s.verseRef)} · KJV</span></blockquote>
+      <div class="row"><a class="btn sm" href="${readingURL(s.ref.split(";")[0], "KJV")}" target="_blank" rel="noopener">Read ${esc(s.ref.split(";")[0])} ${icon("ext")}</a></div>`
+      : `<p class="muted">Read ${plural(s.day - n, "more day")} to walk here and unlock this stop.</p>`}
+    <div class="row" style="justify-content:space-between"><button class="btn sm" data-stopnav="-1" ${sel === 0 ? "disabled" : ""}>Previous stop</button><button class="btn sm" data-stopnav="1" ${sel === STOPS.length - 1 ? "disabled" : ""}>Next stop</button></div></div>`;
+  return `<section class="card stack"><div class="row between"><div><p class="eyebrow">Journey to the Passover</p><h2>From Bethlehem to Jerusalem</h2></div>
+      <span class="chip">${icon("target")} ${next ? `${plural(next.day - n, "day")} to ${esc(next.place)}` : "Arrived in Jerusalem"}</span></div>
+    <p class="muted small" style="max-width:68ch">Every day you read moves your character along the road Jesus walked. Finish all 70 days and you arrive in Jerusalem for the Passover. Tap a town to read what happened there.</p>
+    <div class="meter"><i data-w="${n / DAYS * 100}" data-k="m-journey" style="width:${n / DAYS * 100}%"></i></div></section>
+  <section class="journey"><div class="card map-card">${mapSVG()}</div><div class="card">${card}</div></section>
+  <section class="card stack"><h3>All stops</h3><ol class="stoplist">${STOPS.map((t, i) => `<li class="${n >= t.day ? "reached" : ""}${i === sel ? " cur" : ""}"><button data-stop="${i}"><span class="sn">${n >= t.day ? icon("check") : i + 1}</span><span><b>${esc(t.place)}</b><span class="small muted">${esc(t.title)} · day ${t.day}</span></span></button></li>`).join("")}</ol></section>`;
+}
 
 /* ---------- views ---------- */
 const dayDate = (start, day) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + day - 1);
@@ -712,12 +896,22 @@ function viewToday() {
   <div class="meter" role="img" aria-label="${s.chapters} of 260 chapters"><i data-w="${s.chapters / TOTAL * 100}" data-k="m-main" style="width:${s.chapters / TOTAL * 100}%"></i></div>
   ${behind.length ? `<section class="card stack"><h3>Catch up</h3><p class="small muted">Tap a day to mark it read. Each one gets you closer to the group.</p>
     <div class="catch">${behind.map(d => `<button class="btn sm" data-toggle="${d.day}" ${state.readOnly ? "disabled" : ""}>Day ${d.day} · ${esc(d.short)}</button>`).join("")}</div></section>` : ""}
+  ${tripCard(s.n)}
   ${nv ? `<section class="card row between">
       <div class="row" style="gap:14px;flex-wrap:nowrap;min-width:0">${victoryMedal(VICTORIES.indexOf(nv)).replace('class="medal"', 'class="medal" style="width:52px;height:52px;flex:none;filter:grayscale(.6);opacity:.8"')}
       <div style="min-width:0"><p class="eyebrow">Next Victory Moment · Day ${nv.day}</p><h3>${esc(nv.title)}</h3><p class="small muted">${plural(nv.day - s.n, "more day")} to unlock this story from ${esc(nv.ref)}.</p></div></div>
       <button class="btn sm" data-tab="victories">See victories</button></section>` : ""}
   <section class="card stack"><div class="row between"><h3>Badges</h3><span class="small muted">${BADGES.filter(b => b.test(s)).length} of ${BADGES.length}</span></div>
     <div class="badges">${BADGES.map(b => { const on = b.test(s); return `<div class="badge ${on ? "" : "locked"}">${medalIcon(b)}<div><b>${b.name}</b><span>${b.desc}</span></div></div>`; }).join("")}</div></section>`;
+}
+
+function tripCard(n) {
+  const pos = journeyPos(n), next = STOPS.find(t => t.day > n);
+  const where = !next ? "You made it to Jerusalem for the Passover!" : pos.t === 0 ? `You're in ${STOPS[pos.k].place}` : `On the road from ${STOPS[pos.k].place} to ${STOPS[pos.k + 1].place}`;
+  return `<section class="card trip"><button class="trip-map" data-tab="journey" aria-label="Open the journey map">${mapSVG({ mini: true })}</button>
+    <div class="stack" style="gap:6px"><p class="eyebrow">Journey to the Passover</p><h3>${esc(where)}</h3>
+    <p class="small muted">${next ? `${plural(next.day - n, "day")} to ${esc(next.place)} · ${plural(DAYS - n, "day")} to the Passover in Jerusalem` : "You walked the whole road with Jesus, from Bethlehem to Jerusalem."}</p>
+    <div><button class="btn sm" data-tab="journey">${icon("journey")} Open map</button></div></div></section>`;
 }
 
 function viewPlan() {
@@ -897,7 +1091,7 @@ function render(force) {
   if (state.phase === "loading") { main.innerHTML = `<div class="loading">${avatarSVG({}, 0, { live: true })}<p class="disp">Getting your quest ready…</p></div>`; return; }
   if (state.phase === "join") { main.innerHTML = viewEditor(true); return; }
   if (state.tab === "me" && !state.draft && state.me) state.draft = draftFrom(state.me);
-  const v = { today: viewToday, plan: viewPlan, group: viewGroup, victories: viewVictories, me: () => viewEditor(false), leader: viewLeader }[state.tab] || viewToday;
+  const v = { today: viewToday, journey: viewJourney, plan: viewPlan, group: viewGroup, victories: viewVictories, me: () => viewEditor(false), leader: viewLeader }[state.tab] || viewToday;
   main.innerHTML = v();
   animateValues();
   if (state.tab === "group") { const t = $("#track"), m = $("#trackme"); if (t && m) t.scrollLeft = Math.max(0, m.parentElement.offsetLeft - t.clientWidth / 2); }
@@ -969,6 +1163,9 @@ function toggleDay(day, el) {
     setTimeout(() => document.querySelectorAll(".av.cheer").forEach(a => a.classList.remove("cheer")), 2000);
     toast(`Day ${day} done · +${PLAN[day - 1].count} chapters`);
     if (el) { const r = el.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top + r.height / 2); }
+    STOPS.forEach((t, i) => { if (t.day > 0 && t.day === after.n) queueReveal({ kicker: i === STOPS.length - 1 ? "You made it to the Passover" : "New stop on your journey", title: t.place, text: t.title + ". " + t.verseRef + ".",
+      art: `<svg class="medal" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4C20 4 11 13 11 25c0 16 21 35 21 35s21-19 21-35C53 13 44 4 32 4z" fill="var(--flame)"/><circle cx="32" cy="25" r="9" fill="#fff"/></svg>`,
+      action: "Open the map", onAct: () => { state.stop = i; setTab("journey"); } }); });
     const vic = VICTORIES.find(v => v.day === after.n);
     if (vic) queueReveal({ kicker: "Victory Moment unlocked", title: vic.title, text: `${vic.ref} is ready for you. A story of God bringing his people through.`, art: victoryMedal(VICTORIES.indexOf(vic)), action: "Read the story", onAct: () => setTab("victories") });
     BADGES.filter(b => b.test(after) && !b.test(before)).forEach(b => queueReveal({ kicker: "Badge earned", title: b.name, text: b.desc + ".", art: medalIcon(b) }));
@@ -1014,11 +1211,19 @@ async function removePlayer(id) {
   catch { toast("Couldn't remove that player"); }
 }
 
+function selectStop(i) {
+  state.stop = i; render(true);
+  const c = $("#stopcard"); if (c && innerWidth <= 720) c.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+document.addEventListener("keydown", e => { const st = e.target.closest && e.target.closest("g[data-stop]"); if (st && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectStop(+st.dataset.stop); } });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#reveal").hidden) closeReveal(false); });
 document.addEventListener("click", e => {
+  const st = e.target.closest("[data-stop]");
+  if (st && !e.target.closest(".trip-map")) { selectStop(+st.dataset.stop); return; }
   const t = e.target.closest("button, a"); if (!t) return;
   const ds = t.dataset;
   if (ds.reveal) { closeReveal(ds.reveal === "act"); return; }
+  if (ds.stopnav) { const cur = state.stop ?? Math.max(0, STOPS.findIndex(x => x.day > stats(state.me).n) - 1); selectStop(Math.max(0, Math.min(STOPS.length - 1, (cur < 0 ? STOPS.length - 1 : cur) + +ds.stopnav))); return; }
   if (ds.tab) { e.preventDefault(); setTab(ds.tab); return; }
   if (ds.toggle) { toggleDay(+ds.toggle, t); return; }
   if ("sel" in ds) { state.sel = ds.sel ? +ds.sel : null; render(true); if (state.sel) { const d = $("#daydetail"); if (d) d.scrollIntoView({ block: "nearest", behavior: "smooth" }); } return; }
