@@ -1,0 +1,34 @@
+rules_version = '2';
+// NT70 Quest security rules. Paste into Firebase console > Firestore Database > Rules, then Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isLeader() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function validPlayer() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['alias', 'gender', 'team', 'look', 'done', 'createdAt', 'updatedAt'])
+        && d.alias is string && d.alias.size() <= 40
+        && d.team is string && d.team.size() <= 30
+        && d.look is map && d.done is map && d.done.size() <= 70;
+    }
+
+    // Each person writes only their own player; everyone signed in sees the leaderboard.
+    match /players/{uid} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == uid && validPlayer();
+      allow delete: if signedIn() && (request.auth.uid == uid || isLeader());
+    }
+
+    // Group settings (start date, teams): everyone reads, only leaders write.
+    match /config/{doc} {
+      allow read: if signedIn();
+      allow write: if isLeader();
+    }
+
+    // Leaders are added by hand in the Firebase console (see SETUP.md).
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}
