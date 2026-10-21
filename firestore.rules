@@ -15,13 +15,16 @@ service cloud.firestore {
     // Each person writes only their own player; everyone signed in sees the leaderboard.
     match /players/{uid} {
       allow read: if signedIn();
-      allow create, update: if signedIn() && request.auth.uid == uid && validPlayer();
+      allow create: if signedIn() && request.auth.uid == uid && validPlayer();
+      // Players update themselves; leaders may only move someone to another tribe.
+      allow update: if signedIn() && ((request.auth.uid == uid && validPlayer())
+        || (isLeader() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['team'])));
       allow delete: if signedIn() && (request.auth.uid == uid || isLeader());
     }
 
-    // Group settings (start date, teams): everyone reads, only leaders write.
+    // Group settings (start date, tribe names): public so the welcome page can show the dates; only leaders write.
     match /config/{doc} {
-      allow read: if signedIn();
+      allow read: if true;
       allow write: if isLeader();
     }
 
