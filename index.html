@@ -8,368 +8,363 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Alegreya+Sans:wght@400;500;700;800&display=swap">
 <style>
-/* Layout: app shell — top bar + pill tabs on desktop, bottom tab bar on phones; soft rounded cards on a cool ground; sunrise flame + Galilee teal accents. */
+/* Layout: game quest-log shell. Dark lamplit ground, leather-dark panels with bronze hairlines, Roman-inscription serif titles, parchment text, gold for progress. Single deliberate dark theme. */
 :root {
-  --bg: #F2F4FA;
-  --surface: #FFFFFF;
-  --surface-2: #EBEFF7;
-  --ink: #141B2D;
-  --muted: #5A6377;
-  --line: #DCE1EC;
-  --flame: #F0562A;
-  --flame-2: #FF9A3C;
-  --gold: #F5B301;
-  --teal: #0E9C8D;
-  --violet: #7C4DFF;
-  --rose: #E11D48;
-  --sky: #2F7BF0;
-  --on: #FFFFFF;
-  --gold-ink: #3A2A00;
-  --sec-g: #0E9C8D; --sec-a: #F0562A; --sec-p: #D98A00; --sec-l: #7C4DFF; --sec-r: #E11D48;
-  --shadow: 0 1px 2px rgba(20,27,45,.06), 0 10px 30px -8px rgba(20,27,45,.16);
-  --shadow-lg: 0 20px 60px -12px rgba(20,27,45,.35);
-  --radius: 22px;
-  --sea: #CBE7F4; --sea-ink: #3D8DC2; --land: #F4E6C4; --land-2: #E9D3A1; --hill: #D7BB82; --hill-2: #C4A56A; --tree: #7EB46A; --map-ink: #6A5532;
-  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
-  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --step--1: 0.8125rem; --step-0: 1rem; --step-1: 1.25rem; --step-2: 1.6rem; --step-3: 2.4rem;
+  --bg: #0E0B09;
+  --surface: #1A1512;
+  --surface-2: #241D18;
+  --ink: #ECE1CA;
+  --muted: #A8977C;
+  --line: #3E3227;
+  --bronze: #8C6A3E;
+  --flame: #C8572F;
+  --flame-2: #E0913A;
+  --gold: #D9AE55;
+  --gold-hi: #F2D58C;
+  --teal: #8DA35E;
+  --violet: #9A6AAE;
+  --rose: #C2533F;
+  --sky: #8FA8DC;
+  --on: #1A120B;
+  --gold-ink: #22170A;
+  --sec-g: #8DA35E; --sec-a: #C8692F; --sec-p: #D3A24A; --sec-l: #7F8BD0; --sec-r: #B9493D;
+  --shadow: 0 1px 0 rgba(255,230,190,.04) inset, 0 18px 40px -18px rgba(0,0,0,.9);
+  --shadow-lg: 0 30px 80px -20px rgba(0,0,0,.95);
+  --radius: 10px;
+  --sea: #7E9C98; --sea-ink: #3F5F5C; --land: #D8C399; --land-2: #C6AC78; --hill: #AF9060; --hill-2: #937549; --tree: #6E7F42; --map-ink: #4A3721;
+  --font-display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --font-body: "Alegreya Sans", "Gill Sans", system-ui, sans-serif;
+  --step--1: 0.85rem; --step-0: 1.0625rem; --step-1: 1.3rem; --step-2: 1.7rem; --step-3: 2.5rem;
   --ease: cubic-bezier(.2,.8,.2,1);
-  --spring: cubic-bezier(.34,1.56,.64,1);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0B1020; --surface: #151C2E; --surface-2: #1E273C; --ink: #EEF2FA; --muted: #9BA5BA; --line: #2A3450;
-    --flame: #FF6A3D; --flame-2: #FFA552; --gold: #FFC531; --teal: #2CC4B2; --violet: #9B7BFF; --rose: #FF4D73; --sky: #5B9BFF;
-    --on: #FFFFFF; --gold-ink: #2A1E00;
-    --sec-g: #1FAE9E; --sec-a: #FF6A3D; --sec-p: #E39A10; --sec-l: #8A62FF; --sec-r: #F0365E;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -8px rgba(0,0,0,.55);
-    --shadow-lg: 0 20px 60px -12px rgba(0,0,0,.7);
-    --sea: #13324A; --sea-ink: #5FA9DA; --land: #3A3428; --land-2: #4A4130; --hill: #5E513A; --hill-2: #4E432F; --tree: #4E8A4F; --map-ink: #E6D8BA;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0B1020; --surface: #151C2E; --surface-2: #1E273C; --ink: #EEF2FA; --muted: #9BA5BA; --line: #2A3450;
-  --flame: #FF6A3D; --flame-2: #FFA552; --gold: #FFC531; --teal: #2CC4B2; --violet: #9B7BFF; --rose: #FF4D73; --sky: #5B9BFF;
-  --on: #FFFFFF; --gold-ink: #2A1E00;
-  --sec-g: #1FAE9E; --sec-a: #FF6A3D; --sec-p: #E39A10; --sec-l: #8A62FF; --sec-r: #F0365E;
-  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -8px rgba(0,0,0,.55);
-  --shadow-lg: 0 20px 60px -12px rgba(0,0,0,.7);
-  --sea: #13324A; --sea-ink: #5FA9DA; --land: #3A3428; --land-2: #4A4130; --hill: #5E513A; --hill-2: #4E432F; --tree: #4E8A4F; --map-ink: #E6D8BA;
+  --spring: cubic-bezier(.34,1.4,.64,1);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
-body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.5; -webkit-font-smoothing: antialiased; }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
-h1, h2, h3, .disp { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; margin: 0; line-height: 1.1; }
+body { background: radial-gradient(120% 60% at 50% -10%, #3A2716 0%, rgba(58,39,22,0) 60%), radial-gradient(80% 50% at 100% 100%, #1E1410 0%, rgba(30,20,16,0) 70%), var(--bg); background-attachment: fixed; color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: #120E0B; }
+h1, h2, h3, .disp { font-family: var(--font-display); font-weight: 700; letter-spacing: .02em; text-wrap: balance; margin: 0; line-height: 1.15; color: var(--ink); }
 h2 { font-size: var(--step-2); }
-h3 { font-size: var(--step-1); font-weight: 700; }
+h3 { font-size: var(--step-1); font-weight: 600; }
 p { margin: 0; }
-a { color: var(--sky); }
+a { color: var(--gold); }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; border-radius: 8px; }
-.wrap { max-width: 980px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+.wrap { max-width: 1000px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 
 /* Top bar */
-#top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); border-bottom: 1px solid var(--line); }
+#top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: linear-gradient(#17120E, #120E0B); border-bottom: 1px solid var(--line); box-shadow: 0 1px 0 rgba(217,174,85,.08), 0 10px 30px -10px #000; }
 .bar { display: flex; align-items: center; gap: 12px; padding-block: 10px; }
-.brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-.brand-mark { width: 38px; height: 38px; flex: none; border-radius: 12px; background: linear-gradient(135deg, var(--flame), var(--flame-2) 60%, var(--gold)); color: #fff; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 15px; letter-spacing: -0.03em; box-shadow: 0 6px 16px -6px var(--flame); }
-.brand h1 { font-size: var(--step-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.brand small { display: block; font-family: var(--font-body); font-weight: 500; font-size: var(--step--1); color: var(--muted); letter-spacing: 0; }
-.mepill { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 0; border-radius: 999px; padding: 3px 12px 3px 3px; cursor: pointer; min-width: 0; }
-.mepill .bubble { width: 34px; height: 34px; }
-.mepill span:not(.bubble) { font-weight: 700; font-size: var(--step--1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
-.tabs { display: flex; gap: 4px; padding-block: 0 10px; }
-.tabs button { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; border-radius: 999px; padding: 8px 14px; font-weight: 600; color: var(--muted); cursor: pointer; transition: background .2s, color .2s; }
-.tabs button svg { width: 18px; height: 18px; }
-.tabs button:hover { background: var(--surface-2); color: var(--ink); }
-.tabs button[aria-current="page"] { background: var(--ink); color: var(--surface); }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+.brand-mark { width: 40px; height: 40px; flex: none; border-radius: 50%; background: radial-gradient(circle at 35% 30%, var(--gold-hi), var(--gold) 45%, #7A5520 100%); color: #2A1A08; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 14px; box-shadow: 0 0 0 2px #2A1F16, 0 0 0 3px var(--bronze), 0 6px 18px -6px rgba(217,174,85,.6); }
+.brand h1 { font-size: var(--step-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .06em; }
+.brand small { display: block; font-family: var(--font-body); font-weight: 500; font-size: var(--step--1); color: var(--muted); letter-spacing: .02em; }
+.mepill { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px 14px 3px 3px; cursor: pointer; min-width: 0; }
+.mepill .bubble { width: 36px; height: 36px; }
+.mepill span:not(.bubble) { font-family: var(--font-display); font-weight: 600; font-size: var(--step--1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+.tabs { display: flex; gap: 2px; padding-block: 0; }
+.tabs button { position: relative; display: inline-flex; align-items: center; gap: 7px; background: none; border: 0; padding: 10px 14px 12px; font-family: var(--font-display); font-weight: 600; font-size: var(--step--1); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: color .2s; }
+.tabs button svg { width: 17px; height: 17px; }
+.tabs button:hover { color: var(--ink); }
+.tabs button[aria-current="page"] { color: var(--gold); }
+.tabs button[aria-current="page"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
 
-main { padding-block: 22px 72px; display: grid; gap: 18px; }
-main.enter > * { animation: rise .5s var(--ease) both; }
-main.enter > *:nth-child(2) { animation-delay: .05s; } main.enter > *:nth-child(3) { animation-delay: .1s; }
-main.enter > *:nth-child(4) { animation-delay: .15s; } main.enter > *:nth-child(5) { animation-delay: .2s; } main.enter > *:nth-child(n+6) { animation-delay: .25s; }
-@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+main { padding-block: 24px 72px; display: grid; gap: 18px; }
+main.enter > * { animation: rise .55s var(--ease) both; }
+main.enter > *:nth-child(2) { animation-delay: .06s; } main.enter > *:nth-child(3) { animation-delay: .12s; }
+main.enter > *:nth-child(4) { animation-delay: .18s; } main.enter > *:nth-child(5) { animation-delay: .24s; } main.enter > *:nth-child(n+6) { animation-delay: .3s; }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 
-/* Cards */
-.card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; min-width: 0; }
+/* Panels */
+.card { position: relative; background: linear-gradient(180deg, #211A15, #18130F); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; min-width: 0; }
+.card::before { content: ""; position: absolute; inset: 4px; border: 1px solid rgba(217,174,85,.07); border-radius: 7px; pointer-events: none; }
 .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .between { justify-content: space-between; }
 .stack { display: grid; gap: 12px; }
 .muted { color: var(--muted); }
 .small { font-size: var(--step--1); }
-.eyebrow { font-size: var(--step--1); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.note { border-radius: 16px; padding: 12px 16px; background: color-mix(in srgb, var(--sky) 12%, var(--surface)); color: var(--ink); }
-.note.warn { background: color-mix(in srgb, var(--rose) 14%, var(--surface)); }
+.eyebrow { font-family: var(--font-display); font-size: .74rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); }
+.note { border-radius: 8px; padding: 12px 16px; background: rgba(217,174,85,.08); border: 1px solid rgba(217,174,85,.22); color: var(--ink); }
+.note.warn { background: rgba(194,83,63,.12); border-color: rgba(194,83,63,.4); }
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 999px; background: var(--surface-2); padding: 11px 18px; font-weight: 700; cursor: pointer; text-decoration: none; color: var(--ink); transition: transform .15s var(--spring), box-shadow .2s, filter .2s; }
-.btn:hover { filter: brightness(1.04); }
-.btn:active { transform: scale(.96); }
-.btn svg { width: 18px; height: 18px; }
-.btn.go { background: linear-gradient(135deg, var(--flame), var(--flame-2)); color: #fff; box-shadow: 0 10px 24px -10px var(--flame); }
-.btn.dark { background: var(--ink); color: var(--surface); }
-.btn.big { font-size: var(--step-1); padding: 15px 26px; font-family: var(--font-display); font-weight: 800; }
-.btn.sm { padding: 7px 12px; font-size: var(--step--1); }
-.btn.danger { background: var(--rose); color: #fff; }
-.btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
-.btn.done-state { background: color-mix(in srgb, var(--teal) 16%, var(--surface)); color: var(--teal); box-shadow: none; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); border-radius: 6px; background: linear-gradient(#2B231C, #211A15); padding: 10px 18px; font-family: var(--font-display); font-weight: 600; font-size: var(--step--1); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; text-decoration: none; color: var(--ink); transition: transform .15s var(--spring), filter .2s, box-shadow .2s; box-shadow: 0 1px 0 rgba(255,230,190,.06) inset; }
+.btn:hover { filter: brightness(1.12); }
+.btn:active { transform: scale(.97); }
+.btn svg { width: 17px; height: 17px; }
+.btn.go { background: linear-gradient(180deg, var(--gold-hi), var(--gold) 45%, #A57A2E); color: var(--gold-ink); border-color: #6E4F1E; box-shadow: 0 1px 0 rgba(255,255,255,.4) inset, 0 -2px 0 rgba(0,0,0,.2) inset, 0 10px 26px -12px rgba(217,174,85,.8); text-shadow: 0 1px 0 rgba(255,240,200,.4); }
+.btn.dark { background: linear-gradient(#ECE1CA, #CDBF9F); color: #23190E; border-color: #8C7A58; }
+.btn.big { font-size: var(--step-0); padding: 14px 24px; }
+.btn.sm { padding: 7px 12px; font-size: .72rem; }
+.btn.danger { background: linear-gradient(#B04A39, #8A3326); color: #fff; border-color: #5E2219; }
+.btn[disabled] { opacity: .4; cursor: not-allowed; transform: none; filter: none; }
+.btn.done-state { background: rgba(141,163,94,.14); color: var(--teal); border-color: rgba(141,163,94,.4); }
 
+.chip { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; border-radius: 4px; padding: 3px 9px; font-size: .78rem; font-weight: 700; letter-spacing: .03em; background: var(--surface-2); border: 1px solid var(--line); }
 .chip svg { width: 14px; height: 14px; flex: none; }
-.chip { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px 10px; font-size: var(--step--1); font-weight: 700; background: var(--surface-2); }
-.chip.sec { background: color-mix(in srgb, var(--sc) 16%, var(--surface)); color: var(--sc); }
-.chip.ok { background: color-mix(in srgb, var(--teal) 16%, var(--surface)); color: var(--teal); }
-.chip.behind { background: color-mix(in srgb, var(--rose) 14%, var(--surface)); color: var(--rose); }
+.chip.sec { background: color-mix(in srgb, var(--sc) 14%, transparent); color: var(--sc); border-color: color-mix(in srgb, var(--sc) 40%, transparent); }
+.chip.ok { background: rgba(141,163,94,.14); color: var(--teal); border-color: rgba(141,163,94,.4); }
+.chip.behind { background: rgba(194,83,63,.14); color: #E07E69; border-color: rgba(194,83,63,.4); }
 .sec-g { --sc: var(--sec-g); } .sec-a { --sc: var(--sec-a); } .sec-p { --sc: var(--sec-p); } .sec-l { --sc: var(--sec-l); } .sec-r { --sc: var(--sec-r); }
 
-/* Avatar */
+/* Portraits, frames and figures */
 .av { display: block; overflow: visible; }
-.av .a-body { transform-origin: 60px 150px; }
-.av .a-head { transform-origin: 60px 80px; }
-.av .eyes { transform-origin: 60px 54px; }
-.av .arm-l { transform-origin: 40px 88px; transition: transform .45s var(--spring); }
-.av .arm-r { transform-origin: 80px 88px; transition: transform .45s var(--spring); }
-.av.live .a-body { animation: breathe 3.4s ease-in-out infinite; animation-delay: var(--d, 0s); }
-.av.live .a-head { animation: sway 6s ease-in-out infinite; animation-delay: var(--d, 0s); }
-.av.live .eyes { animation: blink 5s infinite; animation-delay: var(--d, 0s); }
-.av .flame { transform-origin: 90px 120px; animation: flicker .5s ease-in-out infinite alternate; }
-@keyframes breathe { 50% { transform: translateY(-1.5px) scaleY(1.012); } }
-@keyframes sway { 25% { transform: rotate(-2.5deg); } 75% { transform: rotate(2.5deg); } }
-@keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 95.5% { transform: scaleY(.08); } }
-@keyframes flicker { to { transform: scale(1.12, .9); } }
-.av.cheer .a-body { animation: jump 1s var(--ease) 2; }
-.av.cheer .arm-l { transform: rotate(150deg); }
-.av.cheer .arm-r { transform: rotate(-150deg); }
-@keyframes jump { 0%, 100% { transform: none; } 30% { transform: translateY(-16px) scaleY(1.03); } 55% { transform: translateY(0) scaleY(.95); } 70% { transform: translateY(-4px); } }
-.bubble { border-radius: 50%; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--flame-2) 30%, var(--surface)), var(--surface-2)); overflow: hidden; flex: none; display: grid; place-items: end center; }
+.pt .pt-body { transform-origin: 100px 240px; }
+.pt .pt-head { transform-origin: 100px 140px; }
+.pt .pt-eyes { transform-origin: 100px 92px; }
+.pt.live .pt-body { animation: breathe 4.2s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.pt.live .pt-head { animation: sway 7s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.pt.live .pt-eyes { animation: blink 5.5s infinite; animation-delay: var(--d, 0s); }
+.pt.cheer .pt-head { animation: lift 1.6s var(--ease) 1; }
+.fg .fg-body { transform-origin: 30px 78px; }
+.fg.live .fg-body { animation: sway-fig 5s ease-in-out infinite; animation-delay: var(--d, 0s); }
+.fg.cheer .fg-body { animation: hop .9s var(--ease) 2; }
+.av .flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker .45s ease-in-out infinite alternate; }
+@keyframes breathe { 50% { transform: translateY(-1.2px) scaleY(1.006); } }
+@keyframes sway { 30% { transform: rotate(-.8deg); } 70% { transform: rotate(.7deg); } }
+@keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+@keyframes lift { 35% { transform: rotate(-2.5deg) translateY(-3px); } }
+@keyframes sway-fig { 50% { transform: rotate(1.2deg); } }
+@keyframes hop { 40% { transform: translateY(-5px); } }
+@keyframes flicker { to { transform: scale(1.15, .88); } }
+.bubble { border-radius: 50%; background: radial-gradient(circle at 50% 30%, #4A3420, #1E1712 75%); overflow: hidden; flex: none; display: block; box-shadow: 0 0 0 1px var(--bronze), 0 0 0 3px #1A1410; }
 .bubble .av { width: 100%; height: 100%; }
+.frame { position: relative; aspect-ratio: 5 / 6; width: 100%; max-width: 100%; border-radius: 8px; overflow: hidden;
+  background: radial-gradient(70% 55% at 50% 38%, #6A4527 0%, #3A2617 45%, #160F0B 100%);
+  box-shadow: 0 0 0 1px #6E5330, 0 0 0 4px #1A1410, 0 0 0 5px var(--bronze), 0 20px 40px -18px #000; }
+.frame::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 40% at 30% 18%, rgba(255,200,120,.22), transparent 70%); pointer-events: none; z-index: 1; }
+.frame::after { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(217,174,85,.25); border-radius: 4px; pointer-events: none; z-index: 2; }
+.frame > .pt { position: absolute; inset: 0; width: 100%; height: 100%; }
+.frame-fig { position: absolute; right: 8px; bottom: 6px; width: 22%; aspect-ratio: 3 / 4; z-index: 3; filter: drop-shadow(0 2px 4px rgba(0,0,0,.7)); }
+.frame-fig .av { width: 100%; height: 100%; }
+.frame.glow { box-shadow: 0 0 0 1px #6E5330, 0 0 0 4px #1A1410, 0 0 0 5px var(--gold), 0 0 50px -6px rgba(242,213,140,.7); transition: box-shadow .6s; }
 
 /* Today */
-.hero { display: grid; grid-template-columns: 190px 1fr; gap: 24px; align-items: center; }
-.stage { position: relative; display: grid; place-items: end center; height: 230px; border-radius: 20px; background:
-  radial-gradient(120% 80% at 50% 100%, color-mix(in srgb, var(--flame-2) 32%, transparent), transparent 70%),
-  linear-gradient(180deg, color-mix(in srgb, var(--sky) 10%, var(--surface)), var(--surface-2)); overflow: hidden; }
-.stage::after { content: ""; position: absolute; left: 12%; right: 12%; bottom: 14px; height: 10px; border-radius: 50%; background: rgba(0,0,0,.12); filter: blur(3px); }
-.stage .av { width: 150px; height: 200px; position: relative; z-index: 1; margin-bottom: 4px; }
-.hero-day { font-size: var(--step-3); }
-.hero-read { font-size: var(--step-2); font-family: var(--font-display); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+.hero { display: grid; grid-template-columns: 230px 1fr; gap: 28px; align-items: center; }
+.hero-day { font-size: var(--step-3); color: var(--gold-hi); text-shadow: 0 2px 18px rgba(217,174,85,.25); }
+.hero-read { font-size: var(--step-2); font-family: var(--font-display); font-weight: 500; line-height: 1.15; }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.stat { background: var(--surface); border-radius: 18px; box-shadow: var(--shadow); padding: 14px 16px; display: grid; gap: 2px; }
-.stat b { font-family: var(--font-display); font-size: var(--step-2); font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.stat b small { font-size: var(--step-0); color: var(--muted); font-weight: 600; }
+.stat { background: linear-gradient(180deg, #211A15, #18130F); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; display: grid; gap: 2px; }
+.stat b { font-family: var(--font-display); font-size: var(--step-2); font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums lining-nums; color: var(--gold-hi); }
+.stat b small { font-size: var(--step-0); color: var(--muted); font-weight: 500; }
 .stat .sl { font-size: var(--step--1); color: var(--muted); }
-.stat .ic { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; margin-bottom: 6px; }
-.stat .ic svg { width: 16px; height: 16px; }
-.meter { height: 12px; border-radius: 999px; background: var(--surface-2); position: relative; overflow: hidden; }
-.meter i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: linear-gradient(90deg, var(--flame), var(--flame-2), var(--gold)); transition: width 1s var(--ease); }
-.meter i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent); transform: translateX(-100%); animation: shine 2.6s ease-in-out infinite 1s; }
+.stat .ic { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 6px; border: 1px solid currentColor; }
+.stat .ic svg { width: 15px; height: 15px; }
+.meter { height: 10px; border-radius: 999px; background: #0E0B09; border: 1px solid var(--line); position: relative; overflow: hidden; box-shadow: 0 1px 2px #000 inset; }
+.meter i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: linear-gradient(90deg, #8A5A22, var(--gold), var(--gold-hi)); box-shadow: 0 0 12px rgba(242,213,140,.5); transition: width 1.1s var(--ease); }
+.meter i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent); transform: translateX(-100%); animation: shine 3s ease-in-out infinite 1s; }
 @keyframes shine { 60%, 100% { transform: translateX(100%); } }
 .catch { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* Badges */
-.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-.badge { display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 16px; background: var(--surface-2); }
-.badge.locked { opacity: .5; }
-.badge.locked .medal-ic { filter: grayscale(1); }
-.medal-ic { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #fff; box-shadow: inset 0 -3px 0 rgba(0,0,0,.18), 0 4px 10px -4px var(--bc); background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--bc) 60%, #fff), var(--bc) 70%); }
+.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.badge { display: grid; grid-template-columns: 42px 1fr; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
+.badge.locked { opacity: .45; }
+.badge.locked .medal-ic { filter: grayscale(1) brightness(.7); }
+.medal-ic { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: #2A1A08; background: radial-gradient(circle at 35% 30%, var(--gold-hi), var(--gold) 50%, #7A5520); box-shadow: 0 0 0 2px #1A1410, 0 0 0 3px var(--bc), 0 4px 12px -4px rgba(0,0,0,.8); }
 .medal-ic svg { width: 20px; height: 20px; }
-.badge b { display: block; font-size: var(--step--1); line-height: 1.2; }
-.badge span { font-size: 0.72rem; color: var(--muted); line-height: 1.2; display: block; }
+.badge b { display: block; font-family: var(--font-display); font-size: .8rem; font-weight: 600; line-height: 1.2; }
+.badge > div span { font-size: .78rem; color: var(--muted); line-height: 1.2; display: block; }
 
 /* Plan grid */
 .week { display: grid; gap: 8px; }
-.week + .week { margin-top: 16px; }
+.week + .week { margin-top: 18px; }
 .week-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; align-items: baseline; }
-.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
-.tile { position: relative; border: 0; border-radius: 14px; background: var(--surface-2); min-height: 70px; padding: 8px; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; transition: transform .2s var(--spring), background .25s, box-shadow .2s; box-shadow: inset 0 3px 0 var(--sc); }
-.tile:hover { transform: translateY(-2px); }
-.tile .n { font-family: var(--font-display); font-weight: 800; font-size: var(--step-1); line-height: 1; }
-.tile .r { font-size: 0.7rem; line-height: 1.15; overflow-wrap: anywhere; color: var(--muted); }
-.tile .ck { position: absolute; right: 7px; top: 8px; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,.25); display: grid; place-items: center; }
+.week-head h3 { font-size: var(--step-0); letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.tile { position: relative; border: 1px solid var(--line); border-radius: 6px; background: linear-gradient(#1F1813, #17120E); min-height: 72px; padding: 8px; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; transition: transform .2s var(--spring), background .25s, box-shadow .2s, border-color .2s; box-shadow: inset 0 2px 0 var(--sc); }
+.tile:hover { transform: translateY(-2px); border-color: var(--bronze); }
+.tile .n { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); line-height: 1; }
+.tile .r { font-size: .72rem; line-height: 1.15; overflow-wrap: anywhere; color: var(--muted); }
+.tile .ck { position: absolute; right: 6px; top: 7px; width: 18px; height: 18px; border-radius: 50%; background: rgba(0,0,0,.25); display: grid; place-items: center; }
 .tile .ck svg { width: 12px; height: 12px; }
-.tile.done { background: var(--sc); color: #fff; box-shadow: 0 8px 18px -10px var(--sc); }
-.tile.done .r { color: rgba(255,255,255,.85); }
-.tile.today { box-shadow: inset 0 3px 0 var(--sc), 0 0 0 3px var(--gold); }
-.tile.sel { box-shadow: 0 0 0 3px var(--ink); }
-.tile.vic::before { content: ""; position: absolute; left: 8px; bottom: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 30%, transparent); }
-.tile.done.vic::before { background: #fff; }
+.tile.done { background: linear-gradient(180deg, color-mix(in srgb, var(--sc) 85%, #fff 15%), var(--sc)); color: #170F08; border-color: color-mix(in srgb, var(--sc) 60%, #000); box-shadow: 0 6px 16px -10px var(--sc); }
+.tile.done .r { color: rgba(23,15,8,.75); }
+.tile.today { box-shadow: inset 0 2px 0 var(--sc), 0 0 0 2px var(--gold), 0 0 18px -2px rgba(242,213,140,.55); }
+.tile.sel { box-shadow: 0 0 0 2px var(--ink); }
+.tile.vic::before { content: ""; position: absolute; left: 8px; bottom: 8px; width: 8px; height: 8px; transform: rotate(45deg); background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.tile.done.vic::before { background: #170F08; box-shadow: none; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* Group */
 .teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
-.team { border-radius: 18px; padding: 14px; background: var(--surface-2); display: grid; gap: 8px; }
+.team { border-radius: 8px; padding: 14px; background: rgba(0,0,0,.25); border: 1px solid var(--line); display: grid; gap: 8px; }
 .team h3 { display: flex; align-items: center; gap: 8px; font-size: var(--step-0); }
-.team .meter i { background: var(--tc); }
-.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
-.rank1 { font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: var(--gold); color: var(--gold-ink); }
-.track-wrap { overflow-x: auto; border-radius: 18px; background: linear-gradient(180deg, color-mix(in srgb, var(--sky) 8%, var(--surface)), var(--surface-2)); scrollbar-width: thin; }
+.team .meter i { background: var(--tc); box-shadow: none; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1px rgba(0,0,0,.5); }
+.rank1 { font-family: var(--font-display); font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; background: var(--gold); color: var(--gold-ink); }
+.track-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--line); background: linear-gradient(180deg, #2A1D13 0%, #1A1410 70%); scrollbar-width: thin; }
 .track { display: grid; grid-template-columns: repeat(71, 34px); align-items: end; width: max-content; padding: 10px 14px 12px; position: relative; }
-.track::after { content: ""; position: absolute; left: 31px; right: 31px; bottom: 21px; height: 4px; border-radius: 4px; background: var(--line); z-index: 0; }
+.track::after { content: ""; position: absolute; left: 31px; right: 31px; bottom: 21px; height: 3px; background: repeating-linear-gradient(90deg, var(--bronze) 0 6px, transparent 6px 10px); z-index: 0; opacity: .7; }
 .tcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; position: relative; z-index: 1; }
 .tcol .ppl { display: flex; flex-direction: column-reverse; align-items: center; min-height: 52px; }
-.tcol .ppl > span + span { margin-bottom: -18px; }
+.tcol .ppl > span + span { margin-bottom: -20px; }
 .tcol .av { width: 30px; height: 40px; }
-.tcol .more { font-size: 0.65rem; font-weight: 800; }
-.tdot { width: 10px; height: 10px; border-radius: 50%; background: var(--surface); border: 2px solid var(--line); }
-.tdot.mile { width: 18px; height: 18px; background: var(--gold); border-color: var(--surface); box-shadow: 0 0 0 2px var(--gold); }
-.tdot.go { width: 18px; height: 18px; background: var(--teal); border-color: var(--surface); }
-.tdot.me { background: var(--flame); border-color: var(--surface); box-shadow: 0 0 0 3px color-mix(in srgb, var(--flame) 40%, transparent); }
-.tlabel { font-size: 0.62rem; font-weight: 700; color: var(--muted); height: 12px; line-height: 12px; }
+.tcol .more { font-size: .65rem; font-weight: 800; }
+.tdot { width: 10px; height: 10px; border-radius: 50%; background: #1A1410; border: 2px solid var(--bronze); }
+.tdot.mile { width: 16px; height: 16px; border-radius: 2px; transform: rotate(45deg); background: var(--gold); border-color: #1A1410; box-shadow: 0 0 10px rgba(242,213,140,.6); }
+.tdot.go { width: 16px; height: 16px; background: var(--teal); border-color: #1A1410; }
+.tdot.me { background: var(--flame-2); border-color: #1A1410; box-shadow: 0 0 0 3px rgba(224,145,58,.4), 0 0 12px var(--flame-2); }
+.tlabel { font-size: .62rem; font-weight: 700; color: var(--muted); height: 12px; line-height: 12px; }
 .board { display: grid; gap: 8px; }
-.prow { display: grid; grid-template-columns: 26px 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; border-radius: 16px; padding: 8px 12px; background: var(--surface-2); }
-.prow.me { background: color-mix(in srgb, var(--flame) 12%, var(--surface)); }
-.prow .rank { font-family: var(--font-display); font-weight: 800; font-size: var(--step-1); text-align: center; font-variant-numeric: tabular-nums; color: var(--muted); }
+.prow { display: grid; grid-template-columns: 26px 46px minmax(0, 1fr) auto; gap: 12px; align-items: center; border-radius: 8px; padding: 8px 12px; background: rgba(0,0,0,.22); border: 1px solid var(--line); }
+.prow.me { background: rgba(217,174,85,.08); border-color: rgba(217,174,85,.4); }
+.prow .rank { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); text-align: center; font-variant-numeric: tabular-nums lining-nums; color: var(--muted); }
 .prow:nth-child(-n+3) .rank { color: var(--gold); }
-.prow .bubble { width: 44px; height: 44px; }
-.prow .who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prow .bubble { width: 46px; height: 46px; }
+.prow .who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-display); font-weight: 600; }
 .prow .who span { font-size: var(--step--1); color: var(--muted); display: inline-flex; align-items: center; gap: 5px; flex-wrap: wrap; }
 .prow .nums { text-align: right; font-variant-numeric: tabular-nums; font-size: var(--step--1); color: var(--muted); display: grid; justify-items: end; gap: 4px; }
-.prow .nums b { font-family: var(--font-display); font-size: var(--step-1); color: var(--ink); line-height: 1; }
+.prow .nums b { font-family: var(--font-display); font-size: var(--step-1); color: var(--gold-hi); line-height: 1; }
 
 /* Victories */
 .vics { display: grid; gap: 16px; }
-.vic { display: grid; grid-template-columns: 72px 1fr; gap: 18px; }
-.vic .medal { width: 72px; height: 72px; }
-.vic.locked { background: var(--surface-2); box-shadow: none; }
-.vic.locked .medal { filter: grayscale(1); opacity: .45; }
-.vic blockquote { margin: 4px 0; padding: 12px 16px; border-radius: 14px; background: color-mix(in srgb, var(--gold) 14%, var(--surface)); font-family: var(--font-display); font-weight: 600; font-size: var(--step-1); line-height: 1.3; letter-spacing: -0.01em; }
-.vic blockquote span { display: block; font-family: var(--font-body); font-size: var(--step--1); font-weight: 600; color: var(--muted); margin-top: 4px; letter-spacing: 0; }
-.vic .q { padding: 12px 14px; border-radius: 14px; background: var(--surface-2); }
+.vic { display: grid; grid-template-columns: 76px 1fr; gap: 20px; }
+.vic .medal { width: 76px; height: 76px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.6)); }
+.vic.locked { background: #120E0B; }
+.vic.locked .medal { filter: grayscale(1) brightness(.6); }
+.vic blockquote, .stop-card blockquote { margin: 0; padding: 14px 18px; border-radius: 6px; background: linear-gradient(180deg, #E9DCC0, #D8C7A2); color: #2A1C0E; font-family: var(--font-display); font-weight: 500; font-size: var(--step-1); line-height: 1.35; box-shadow: 0 0 0 1px #8C7450 inset, 0 10px 20px -12px #000; }
+.vic blockquote span, .stop-card blockquote span { display: block; font-family: var(--font-body); font-size: var(--step--1); font-weight: 700; color: #6A5536; margin-top: 6px; letter-spacing: .04em; }
+.vic .q { padding: 12px 14px; border-radius: 6px; background: rgba(0,0,0,.25); border: 1px solid var(--line); }
 .vic .body { display: grid; gap: 10px; max-width: 68ch; }
 
 /* Editor */
-.editor { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 26px; }
-.preview { display: grid; justify-items: center; gap: 10px; align-content: start; position: sticky; top: 130px; }
-.preview .stage { width: 100%; height: 260px; }
-.preview .stage .av { width: 170px; height: 227px; }
-.preview .alias { font-family: var(--font-display); font-weight: 800; font-size: var(--step-1); text-align: center; }
+.editor { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 30px; }
+.preview { display: grid; justify-items: center; gap: 10px; align-content: start; position: sticky; top: 120px; }
+.preview .alias { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); text-align: center; color: var(--gold-hi); }
+.group { display: grid; gap: 18px; }
+.ghead { font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 12px; }
+.ghead::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
 .field { display: grid; gap: 8px; }
 .field > label, .field > .lbl { font-weight: 700; }
 .opts { display: flex; flex-wrap: wrap; gap: 6px; }
-.opt { border: 0; border-radius: 999px; background: var(--surface-2); padding: 7px 12px; cursor: pointer; font-size: var(--step--1); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: background .2s, color .2s, transform .15s var(--spring); }
-.opt:active { transform: scale(.94); }
-.opt[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
-.opt[disabled] { cursor: not-allowed; opacity: .4; text-decoration: line-through; }
+.opt { border: 1px solid var(--line); border-radius: 4px; background: rgba(0,0,0,.25); padding: 6px 11px; cursor: pointer; font-size: .85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: background .2s, color .2s, border-color .2s, transform .15s var(--spring); }
+.opt:hover { border-color: var(--bronze); }
+.opt:active { transform: scale(.95); }
+.opt[aria-pressed="true"] { background: linear-gradient(var(--gold-hi), var(--gold)); color: var(--gold-ink); border-color: #6E4F1E; }
+.opt[disabled] { cursor: not-allowed; opacity: .35; text-decoration: line-through; }
 .opt.lock { opacity: .55; }
-.opt .lk { width: 12px; height: 12px; }
-.feats { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
-.feat { border: 0; border-radius: 14px; background: var(--surface-2); padding: 6px 4px 6px; cursor: pointer; display: grid; justify-items: center; gap: 4px; font-size: 0.72rem; font-weight: 700; transition: transform .15s var(--spring), box-shadow .2s; }
-.feat:active { transform: scale(.95); }
-.feat[aria-pressed="true"] { box-shadow: 0 0 0 2.5px var(--ink); background: var(--surface); }
-.fprev { width: 64px; height: 40px; border-radius: 10px; overflow: hidden; display: block; background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--flame-2) 22%, var(--surface)), var(--surface-2)); }
+.opt .lk { width: 12px; height: 12px; display: inline-grid; }
+.feats { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.feat { border: 1px solid var(--line); border-radius: 6px; background: rgba(0,0,0,.25); padding: 6px 4px; cursor: pointer; display: grid; justify-items: center; gap: 5px; font-size: .78rem; font-weight: 700; transition: transform .15s var(--spring), border-color .2s, box-shadow .2s; }
+.feat:hover { border-color: var(--bronze); }
+.feat:active { transform: scale(.96); }
+.feat[aria-pressed="true"] { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 0 16px -4px rgba(242,213,140,.6); color: var(--gold-hi); }
+.fprev { width: 72px; height: 40px; border-radius: 4px; overflow: hidden; display: block; background: radial-gradient(80% 80% at 50% 40%, #5A3B22, #1A1310); }
 .fprev .av { width: 100%; height: 100%; }
-.feat[data-look="face"] .fprev { height: 64px; border-radius: 50%; }
-.sw-opt { width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--line); cursor: pointer; padding: 0; position: relative; transition: transform .15s var(--spring), box-shadow .2s; }
+.feat[data-look="face"] .fprev, .feat[data-look="hair"] .fprev, .feat[data-look="cover"] .fprev, .feat[data-look="beard"] .fprev, .feat[data-look="jewel"] .fprev { height: 72px; }
+.sw-opt { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #1A1410; box-shadow: 0 0 0 1px var(--line); cursor: pointer; padding: 0; position: relative; transition: transform .15s var(--spring), box-shadow .2s; }
 .sw-opt:hover { transform: scale(1.08); }
-.sw-opt[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--ink); }
-.sw-opt.lock::after { content: attr(data-day); position: absolute; inset: -3px; border-radius: 50%; background: rgba(12,16,28,.62); color: #fff; font-size: 0.58rem; font-weight: 800; display: grid; place-items: center; }
-select, input[type="date"], input[type="text"], input[type="email"] { font: inherit; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; max-width: 100%; }
-.seg { display: inline-flex; justify-self: start; background: var(--surface-2); border-radius: 999px; padding: 4px; }
-.seg button { border: 0; background: none; border-radius: 999px; padding: 7px 16px; cursor: pointer; font-weight: 700; color: var(--muted); transition: background .2s, color .2s; }
-.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.sw-opt[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--gold), 0 0 12px -2px rgba(242,213,140,.7); }
+.sw-opt.lock::after { content: attr(data-day); position: absolute; inset: -2px; border-radius: 50%; background: rgba(10,8,6,.7); color: var(--ink); font-size: .58rem; font-weight: 800; display: grid; place-items: center; }
+select, input[type="date"], input[type="text"], input[type="email"] { font: inherit; color: var(--ink); background: #0F0C0A; border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; max-width: 100%; }
+.seg { display: inline-flex; justify-self: start; background: #0F0C0A; border: 1px solid var(--line); border-radius: 6px; padding: 3px; }
+.seg button { border: 0; background: none; border-radius: 4px; padding: 7px 18px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); transition: background .2s, color .2s; }
+.seg button[aria-pressed="true"] { background: linear-gradient(#3A2E22, #2A2119); color: var(--gold-hi); box-shadow: 0 0 0 1px var(--bronze); }
 
-/* Toast, confetti, reveal */
-.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 30; background: var(--ink); color: var(--surface); border-radius: 999px; padding: 12px 20px; font-weight: 700; box-shadow: var(--shadow-lg); max-width: calc(100vw - 32px); text-align: center; animation: toastin .4s var(--spring); }
-@keyframes toastin { from { transform: translate(-50%, 20px) scale(.9); opacity: 0; } }
-.confetti { position: fixed; z-index: 31; pointer-events: none; width: 7px; height: 12px; border-radius: 2px; animation: confetti 1.4s cubic-bezier(.15,.6,.4,1) forwards; }
-@keyframes confetti { 0% { transform: translate(0,0) rotate(0); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
-.reveal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); background: rgba(8,11,22,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); animation: fadein .3s ease; }
+/* Toast, sparks, reveal */
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 30; background: linear-gradient(#2B221A, #1C1612); color: var(--ink); border: 1px solid var(--bronze); border-radius: 6px; padding: 12px 20px; font-family: var(--font-display); font-weight: 600; letter-spacing: .04em; box-shadow: var(--shadow-lg), 0 0 24px -8px rgba(217,174,85,.6); max-width: calc(100vw - 32px); text-align: center; animation: toastin .45s var(--spring); }
+@keyframes toastin { from { transform: translate(-50%, 18px); opacity: 0; } }
+.confetti { position: fixed; z-index: 31; pointer-events: none; width: 4px; height: 4px; border-radius: 50%; box-shadow: 0 0 8px 2px currentColor; animation: confetti 1.5s cubic-bezier(.15,.6,.4,1) forwards; }
+@keyframes confetti { 0% { transform: translate(0,0); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+.reveal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); background: radial-gradient(circle at 50% 40%, rgba(40,26,14,.75), rgba(5,4,3,.92)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: fadein .35s ease; }
 @keyframes fadein { from { opacity: 0; } }
-.reveal-card { position: relative; width: min(380px, 100%); background: var(--surface); border-radius: 28px; padding: 28px 22px 22px; text-align: center; display: grid; gap: 10px; justify-items: center; box-shadow: var(--shadow-lg); animation: pop .55s var(--spring); overflow: hidden; }
-@keyframes pop { from { transform: scale(.7) translateY(30px); opacity: 0; } }
-.reveal-art { position: relative; width: 170px; height: 170px; display: grid; place-items: center; }
-.reveal-art::before { content: ""; position: absolute; inset: -30px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 8%, color-mix(in srgb, var(--gold) 55%, transparent) 10%, transparent 14% 33%, color-mix(in srgb, var(--flame-2) 50%, transparent) 36%, transparent 40% 58%, color-mix(in srgb, var(--gold) 55%, transparent) 61%, transparent 65% 83%, color-mix(in srgb, var(--flame-2) 50%, transparent) 86%, transparent 90%); animation: spin 8s linear infinite; mask: radial-gradient(circle, #000 30%, transparent 70%); -webkit-mask: radial-gradient(circle, #000 30%, transparent 70%); }
-.reveal-art::after { content: ""; position: absolute; inset: 20px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--gold) 45%, transparent), transparent 70%); animation: pulse 1.8s ease-in-out infinite; }
+.reveal-card { position: relative; width: min(390px, 100%); background: linear-gradient(180deg, #241C16, #15110D); border: 1px solid var(--bronze); border-radius: 12px; padding: 30px 22px 22px; text-align: center; display: grid; gap: 10px; justify-items: center; box-shadow: var(--shadow-lg), 0 0 60px -20px rgba(217,174,85,.5); animation: pop .6s var(--spring); overflow: hidden; }
+.reveal-card::before { content: ""; position: absolute; inset: 5px; border: 1px solid rgba(217,174,85,.18); border-radius: 8px; pointer-events: none; }
+@keyframes pop { from { transform: scale(.85) translateY(24px); opacity: 0; } }
+.reveal-art { position: relative; width: 180px; height: 180px; display: grid; place-items: center; }
+.reveal-art::before { content: ""; position: absolute; inset: -40px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 6%, rgba(242,213,140,.4) 8%, transparent 11% 31%, rgba(224,145,58,.35) 33%, transparent 36% 56%, rgba(242,213,140,.4) 58%, transparent 61% 81%, rgba(224,145,58,.35) 83%, transparent 86%); animation: spin 14s linear infinite; mask: radial-gradient(circle, #000 25%, transparent 68%); -webkit-mask: radial-gradient(circle, #000 25%, transparent 68%); }
+.reveal-art::after { content: ""; position: absolute; inset: 24px; border-radius: 50%; background: radial-gradient(circle, rgba(242,213,140,.4), transparent 70%); animation: pulse 2.2s ease-in-out infinite; }
 .reveal-art > * { position: relative; z-index: 1; }
-.reveal-art .medal-ic { width: 110px; height: 110px; }
-.reveal-art .medal-ic svg { width: 54px; height: 54px; }
-.reveal-art .av { width: 130px; height: 173px; }
-.reveal-art .medal { width: 120px; height: 120px; }
+.reveal-art .medal-ic { width: 112px; height: 112px; }
+.reveal-art .medal-ic svg { width: 52px; height: 52px; }
+.reveal-art .frame.mid { width: 150px; }
+.reveal-art .medal { width: 124px; height: 124px; }
 @keyframes spin { to { transform: rotate(1turn); } }
 @keyframes pulse { 50% { transform: scale(1.12); opacity: .7; } }
-.reveal .kicker { font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: var(--step--1); color: var(--flame); }
-.reveal h2 { font-size: var(--step-2); }
+.reveal .kicker { font-family: var(--font-display); font-weight: 600; letter-spacing: .2em; text-transform: uppercase; font-size: .72rem; color: var(--gold); }
+.reveal h2 { font-size: var(--step-2); color: var(--gold-hi); }
 
 /* Journey map */
 .journey { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
-.journey > .card:last-child { position: sticky; top: 130px; }
+.journey > .card:last-child { position: sticky; top: 120px; }
 .map-card { padding: 10px; }
-.map { width: 100%; height: auto; display: block; border-radius: 16px; }
+.map { width: 100%; height: auto; display: block; border-radius: 6px; filter: sepia(.12) saturate(.95); }
 .m-town { font: 700 9.5px var(--font-body); fill: var(--map-ink); paint-order: stroke; stroke: var(--land); stroke-width: 3px; stroke-linejoin: round; }
-.m-town.big { font: 800 12.5px var(--font-display); }
-.m-region { font: 800 10px var(--font-display); letter-spacing: .25em; fill: var(--map-ink); opacity: .42; }
-.m-sea { font: 800 11px var(--font-display); letter-spacing: .4em; fill: var(--sea-ink); opacity: .7; }
+.m-town.big { font: 700 12.5px var(--font-display); }
+.m-region { font: 700 10px var(--font-display); letter-spacing: .25em; fill: var(--map-ink); opacity: .45; }
+.m-sea { font: 600 11px var(--font-display); letter-spacing: .4em; fill: var(--sea-ink); opacity: .8; }
 .m-water { font: italic 600 8.5px var(--font-body); fill: var(--sea-ink); }
-.m-n { font: 800 8px var(--font-body); fill: var(--map-ink); }
-.m-you { font: 800 8px var(--font-body); fill: #fff; }
+.m-n { font: 800 8px var(--font-display); fill: var(--map-ink); }
+.m-you { font: 700 7.5px var(--font-display); fill: #fff; letter-spacing: .08em; }
 .m-more { font: 800 9px var(--font-body); fill: var(--map-ink); }
 .m-stop { cursor: pointer; outline: none; }
-.m-dot { fill: var(--surface); stroke: var(--map-ink); stroke-width: 2; }
-.m-stop.reached .m-dot { fill: var(--flame); stroke: #fff; }
-.m-stop.sel .m-dot, .m-stop:focus-visible .m-dot { stroke: var(--sky); stroke-width: 4; }
-.m-pulse { fill: none; stroke: var(--gold); stroke-width: 2.5; transform-box: fill-box; transform-origin: center; animation: mpulse 1.8s ease-out infinite; }
+.m-dot { fill: #F1E6CC; stroke: var(--map-ink); stroke-width: 2; }
+.m-stop.reached .m-dot { fill: #A8401F; stroke: #F1E6CC; }
+.m-stop.sel .m-dot, .m-stop:focus-visible .m-dot { stroke: #1F4E8C; stroke-width: 4; }
+.m-pulse { fill: none; stroke: #B07A1E; stroke-width: 2.5; transform-box: fill-box; transform-origin: center; animation: mpulse 1.8s ease-out infinite; }
 @keyframes mpulse { from { transform: scale(.7); opacity: 1; } to { transform: scale(1.9); opacity: 0; } }
-.stop-card { display: grid; gap: 10px; }
-.stop-card blockquote { margin: 0; padding: 12px 16px; border-radius: 14px; background: color-mix(in srgb, var(--gold) 14%, var(--surface)); font-family: var(--font-display); font-weight: 600; font-size: var(--step-1); line-height: 1.3; letter-spacing: -0.01em; }
-.stop-card blockquote span { display: block; font-family: var(--font-body); font-size: var(--step--1); font-weight: 600; color: var(--muted); margin-top: 4px; letter-spacing: 0; }
-.stoplist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
-.stoplist button { width: 100%; display: flex; gap: 10px; align-items: center; text-align: left; border: 0; background: var(--surface-2); border-radius: 14px; padding: 8px 10px; cursor: pointer; }
+.stop-card { display: grid; gap: 12px; }
+.stoplist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.stoplist button { width: 100%; display: flex; gap: 10px; align-items: center; text-align: left; border: 1px solid var(--line); background: rgba(0,0,0,.25); border-radius: 6px; padding: 8px 10px; cursor: pointer; }
+.stoplist button:hover { border-color: var(--bronze); }
 .stoplist button > span:last-child { display: grid; min-width: 0; }
-.stoplist .sn { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); font-weight: 800; flex: none; font-size: var(--step--1); }
+.stoplist b { font-family: var(--font-display); font-weight: 600; }
+.stoplist .sn { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #0F0C0A; border: 1px solid var(--bronze); font-family: var(--font-display); font-weight: 700; flex: none; font-size: .8rem; }
 .stoplist .sn svg { width: 14px; height: 14px; }
-.stoplist li.reached .sn { background: var(--flame); color: #fff; }
-.stoplist li.cur button { box-shadow: 0 0 0 2px var(--ink); }
-.trip { display: grid; grid-template-columns: 240px 1fr; gap: 18px; align-items: center; }
-.trip-map { border: 0; padding: 0; border-radius: 16px; overflow: hidden; height: 160px; cursor: pointer; background: var(--sea); display: block; width: 100%; }
+.stoplist li.reached .sn { background: linear-gradient(var(--gold-hi), var(--gold)); color: var(--gold-ink); border-color: #6E4F1E; }
+.stoplist li.cur button { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.trip { display: grid; grid-template-columns: 250px 1fr; gap: 20px; align-items: center; }
+.trip-map { border: 1px solid var(--bronze); padding: 0; border-radius: 6px; overflow: hidden; height: 160px; cursor: pointer; background: var(--sea); display: block; width: 100%; }
 .trip-map .map { height: 100%; border-radius: 0; }
-.signin { display: grid; grid-template-columns: 240px 1fr; gap: 26px; align-items: center; max-width: 760px; width: 100%; justify-self: center; }
-.signin .stage { height: 280px; }
-.btn.google { background: #fff; color: #1F1F1F; box-shadow: 0 0 0 1px #DADCE0, var(--shadow); font-family: var(--font-body); font-weight: 700; }
+
+/* Sign-in */
+.signin { display: grid; grid-template-columns: 250px 1fr; gap: 28px; align-items: center; max-width: 780px; width: 100%; justify-self: center; }
+.btn.google { background: #F4EFE6; color: #1F1F1F; border-color: #8C7A58; font-family: var(--font-body); text-transform: none; letter-spacing: 0; font-weight: 700; font-size: var(--step-0); }
 .btn.google svg { width: 22px; height: 22px; }
 .or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: var(--step--1); }
 .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-code { font-size: .78rem; background: var(--surface-2); padding: 2px 6px; border-radius: 6px; overflow-wrap: anywhere; }
-.loading { display: grid; justify-items: center; gap: 12px; padding: 60px 0; }
-.loading .av { width: 90px; height: 120px; }
+code { font-size: .8rem; background: #0F0C0A; border: 1px solid var(--line); padding: 2px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+
+.loading { display: grid; justify-items: center; gap: 14px; padding: 70px 0; }
+.loading .av { width: 70px; height: 94px; }
 .lead-grid { display: grid; gap: 16px; max-width: 560px; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .editor { grid-template-columns: 1fr; }
-  .journey, .trip, .signin { grid-template-columns: 1fr; }
-  .signin .stage { height: 200px; }
-  .journey > .card:last-child { position: static; }
   .preview { position: static; }
+  .preview .frame { max-width: 260px; }
   .two { grid-template-columns: 1fr; }
+  .journey, .trip, .signin { grid-template-columns: 1fr; }
+  .journey > .card:last-child { position: static; }
+  .signin .frame { max-width: 240px; justify-self: center; }
 }
 @media (max-width: 640px) {
-  #top { backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--surface); }
-  .tabs { position: fixed; z-index: 6; left: 0; right: 0; bottom: 0; justify-content: space-around; gap: 0; background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
-  .tabs button { flex-direction: column; gap: 2px; padding: 6px 4px; font-size: 0.68rem; flex: 1; border-radius: 14px; }
-  .tabs button svg { width: 22px; height: 22px; }
-  .tabs button[aria-current="page"] { background: none; color: var(--flame); }
+  #top { box-shadow: none; }
+  .tabs { position: fixed; z-index: 6; left: 0; right: 0; bottom: 0; justify-content: space-around; gap: 0; background: linear-gradient(#1A1410, #0E0B09); border-top: 1px solid var(--bronze); box-shadow: 0 -10px 30px -10px #000; padding: 4px max(6px, env(safe-area-inset-right, 0px)) calc(4px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px)); }
+  .tabs button { flex-direction: column; gap: 3px; padding: 7px 2px 6px; font-size: .58rem; letter-spacing: .06em; flex: 1; }
+  .tabs button svg { width: 21px; height: 21px; }
+  .tabs button[aria-current="page"]::after { left: 30%; right: 30%; top: 0; bottom: auto; }
   .tabs .lg { display: none; }
   main { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
-  .toast { bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
+  .toast { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
   .stats { grid-template-columns: repeat(2, 1fr); }
-  .hero { grid-template-columns: 1fr; gap: 16px; }
-  .stage { height: 190px; }
-  .stage .av { width: 120px; height: 160px; }
+  .hero { grid-template-columns: 1fr; gap: 18px; }
+  .hero .frame { max-width: 220px; }
   .hero-day { font-size: var(--step-2); }
   .hero-read { font-size: var(--step-1); }
-  .days { gap: 5px; }
-  .tile { min-height: 54px; padding: 6px 5px; border-radius: 11px; }
+  .days { gap: 4px; }
+  .tile { min-height: 54px; padding: 6px 5px; }
   .tile .r { display: none; }
   .tile .n { font-size: var(--step-0); margin-top: auto; }
-  .tile .ck { width: 14px; height: 14px; right: 4px; top: 6px; }
+  .tile .ck { width: 14px; height: 14px; right: 3px; top: 5px; }
   .tile .ck svg { width: 9px; height: 9px; }
   .vic { grid-template-columns: 1fr; }
   .mepill span:not(.bubble) { display: none; }
   .mepill { padding: 3px; }
-  .card { padding: 16px; }
+  .card { padding: 18px 16px; }
 }
 @media (min-width: 641px) { .tabs .sm-l { display: none; } }
 @media (prefers-reduced-motion: reduce) {
@@ -380,7 +375,7 @@ code { font-size: .78rem; background: var(--surface-2); padding: 2px 6px; border
 
 <header id="top"></header>
 <main id="main" class="wrap" aria-live="polite">
-  <div class="loading"><p class="disp">Getting your quest ready…</p></div>
+  <div class="loading"><p class="disp">Lighting the lamps…</p></div>
 </main>
 <div id="toast" class="toast" hidden></div>
 <div id="reveal" class="reveal" hidden role="dialog" aria-modal="true" aria-labelledby="reveal-title"></div>
@@ -472,57 +467,35 @@ const VICTORIES = [
 ];
 
 /* ---------- Avatar parts ---------- */
-const SKINS = ["#F6D3B3", "#E9B58C", "#C98B5E", "#A2683F", "#7B4A2A", "#4F2F1C"];
-const HAIRC = ["#1E1A16", "#4A2E1A", "#7A4B22", "#B07A3A", "#D9B26A", "#9A9A9A"];
-const HAIRS = [["Short", "short"], ["Long", "long"], ["Bun", "bun"], ["Curly", "curly"], ["Braids", "braids"], ["Crop", "crop"]];
-const FACES = [["Round", "M32 52 A28 28 0 1 0 88 52 A28 28 0 1 0 32 52 Z", 28], ["Oval", "M35 52 A25 30 0 1 0 85 52 A25 30 0 1 0 35 52 Z", 25],
-  ["Square", "M33 45 Q33 24 60 24 Q87 24 87 45 L87 65 Q87 81 71 82 L49 82 Q33 81 33 65 Z", 27], ["Heart", "M60 24 C83 24 90 40 87 55 C84 69 71 80 60 84 C49 80 36 69 33 55 C30 40 37 24 60 24 Z", 28],
-  ["Long", "M36 48 Q36 21 60 21 Q84 21 84 48 L84 63 Q84 85 60 86 Q36 85 36 63 Z", 24]];
-const EYES = [["Round", "round"], ["Almond", "almond"], ["Big & bright", "big"], ["Happy", "happy"], ["Sleepy", "sleepy"]];
-const EYEC = ["#5A3519", "#1E1A2E", "#8A6630", "#3D7CC9", "#3E8E5A", "#6E7A86"];
-const BROWS = [["Soft arch", "M43 45 Q49 41 55 44", 2.4], ["Straight", "M43 44.5 L55 43.5", 2.6], ["Bold", "M42 45.5 Q49 40.5 56 44", 3.8], ["Thin", "M44 44.5 Q49 42 54 44", 1.5], ["Raised", "M43 43 Q49 37.5 55 41.5", 2.4]];
-const MOUTHS = [["Smile", "smile"], ["Big grin", "grin"], ["Smirk", "smirk"], ["Calm", "calm"], ["Laugh", "laugh"], ["Surprised", "o"]];
-// Face features. g: "f" adds lashes, tinted lips, a finer nose and softer brows; "m" gets bolder brows and a stronger nose.
-function faceSVG(L, skin, hc) {
-  const f = L.g === "f", ink = "#2A1E1E", iris = EYEC[L.eyeColor], kind = EYES[L.eyes][1];
-  const S = (d, c, w, extra = "") => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`;
-  const eye = (cx, side) => {
-    let o = "";
-    if (kind === "round") o = `<ellipse cx="${cx}" cy="54" rx="5.4" ry="6.4" fill="#fff"/><circle cx="${cx}" cy="55.4" r="3.6" fill="${iris}"/><circle cx="${cx}" cy="55.4" r="1.7" fill="#111"/><circle cx="${cx + 1.3}" cy="53.6" r="1.2" fill="#fff"/>` + S(`M${cx - 5.6} 53.2 Q${cx} 46.6 ${cx + 5.6} 53.2`, ink, 1.7);
-    if (kind === "almond") o = `<path d="M${cx - 6} 55 Q${cx} 48.5 ${cx + 6} 55 Q${cx} 59.6 ${cx - 6} 55 Z" fill="#fff"/><circle cx="${cx}" cy="54.8" r="3.1" fill="${iris}"/><circle cx="${cx}" cy="54.8" r="1.5" fill="#111"/><circle cx="${cx + 1.1}" cy="53.6" r="1" fill="#fff"/>` + S(`M${cx - 6.2} 55 Q${cx} 48.3 ${cx + 6.2} 55`, ink, 1.9);
-    if (kind === "big") o = `<ellipse cx="${cx}" cy="54" rx="6.4" ry="7.4" fill="#fff"/><circle cx="${cx}" cy="55" r="4.6" fill="${iris}"/><circle cx="${cx}" cy="55" r="2.2" fill="#111"/><circle cx="${cx + 1.8}" cy="52.8" r="1.6" fill="#fff"/><circle cx="${cx - 1.4}" cy="57.4" r=".8" fill="#fff"/>` + S(`M${cx - 6.6} 52.8 Q${cx} 45.6 ${cx + 6.6} 52.8`, ink, 1.8);
-    if (kind === "happy") o = S(`M${cx - 5} 56 Q${cx} 50 ${cx + 5} 56`, ink, 2.4);
-    if (kind === "sleepy") o = `<ellipse cx="${cx}" cy="55" rx="5.4" ry="5" fill="#fff"/><circle cx="${cx}" cy="56.2" r="3.2" fill="${iris}"/><circle cx="${cx}" cy="56.2" r="1.5" fill="#111"/><path d="M${cx - 6} 55 Q${cx} 48.6 ${cx + 6} 55 Z" fill="${skin}"/>` + S(`M${cx - 6} 55 L${cx + 6} 55`, ink, 1.7);
-    if (f) { const ox = cx + side * (kind === "big" ? 6.2 : 5.6), oy = kind === "happy" ? 55 : 53;
-      o += S(`M${ox} ${oy} l${side * 2.6} -2.2 M${ox - side * 1.4} ${oy - 1.7} l${side * 1.9} -2.6`, ink, 1.3); }
-    return o;
-  };
-  const [, browD, bw] = BROWS[L.brows], browC = shade(hc, -0.15), brW = bw + (f ? -0.3 : 0.6);
-  const brows = S(browD, browC, brW) + `<g transform="translate(120 0) scale(-1 1)">${S(browD, browC, brW)}</g>`;
-  const noseC = shade(skin, -0.32);
-  const nose = f ? S("M59.2 59.6 Q58.6 62 60.6 62.3", noseC, 1.6) : S("M58.6 58 Q57.2 62.6 60.4 63 Q62.4 63.1 63 61.6", noseC, 1.9);
-  const lip = L.beard ? shade(hc, 0.55) : f ? "#B84A5E" : shade(skin, -0.48), dark = "#5A1F24", mk = MOUTHS[L.mouth][1];
-  let mouth = "";
-  if (mk === "smile") mouth = S("M53 66 Q60 72 67 66", lip, f ? 2.8 : 2.5) + (f ? S("M57.4 70.4 Q60 71.5 62.6 70.4", lip, 1.5, 'opacity=".55"') : "");
-  if (mk === "grin") mouth = `<path d="M52.5 65 Q60 75.5 67.5 65 Q60 67 52.5 65 Z" fill="${dark}"/><path d="M54 65.8 Q60 67.4 66 65.8 L65.4 67.6 Q60 69 54.6 67.6 Z" fill="#fff"/>` + S("M52.5 65 Q60 75.5 67.5 65", lip, 1.4);
-  if (mk === "smirk") mouth = S("M54 67.5 Q61 69.5 67 64.5", lip, 2.5);
-  if (mk === "calm") mouth = S("M55.5 67 Q60 68.6 64.5 67", lip, 2.4) + (f ? S("M58 69.6 Q60 70.4 62 69.6", lip, 1.4, 'opacity=".55"') : "");
-  if (mk === "laugh") mouth = `<path d="M52 64.5 Q60 78 68 64.5 Z" fill="${dark}"/><ellipse cx="60" cy="71.4" rx="4" ry="2.2" fill="#E2747E"/><path d="M53.6 64.6 L66.4 64.6 L65.8 66.6 L54.2 66.6 Z" fill="#fff"/>` + S("M52 64.5 Q60 78 68 64.5 Z", lip, 1.3);
-  if (mk === "o") mouth = `<ellipse cx="60" cy="67.6" rx="3" ry="3.8" fill="${dark}" stroke="${lip}" stroke-width="1.3"/>`;
-  const blush = f ? 0.38 : 0.16;
-  return `<ellipse cx="42" cy="64" rx="${f ? 5.8 : 5}" ry="3.2" fill="#FF6B6B" opacity="${blush}"/><ellipse cx="78" cy="64" rx="${f ? 5.8 : 5}" ry="3.2" fill="#FF6B6B" opacity="${blush}"/>
-    <g class="eyes">${eye(49, -1)}${eye(71, 1)}</g>${brows}${nose}${mouth}`;
-}
-// [label, value, days needed]
+const SKINS = ["#F0D2B4", "#E0B189", "#C8935F", "#AB7547", "#875733", "#5B3A21"];
+const HAIRC = ["#16110D", "#2C1F17", "#463021", "#684730", "#8B6943", "#8E8983"];
+const HAIRS = [["Short", "short"], ["Long", "long"], ["Bun", "bun"], ["Curly", "curly"], ["Braids", "braids"], ["Close-cropped", "crop"]];
+// face geometry: forehead, cheek and jaw half-widths, chin y, chin half-width
+const FACES = [["Round", [31, 35, 27, 131, 12]], ["Oval", [29, 32, 22, 135, 9]], ["Square", [31, 33, 30, 133, 16]], ["Heart", [34, 33, 19, 135, 6]], ["Long", [28, 29, 22, 141, 9]]];
+const EYES = [["Almond", "almond"], ["Round", "round"], ["Deep-set", "deep"], ["Hooded", "hooded"], ["Upturned", "up"]];
+const EYEC = ["#3B2414", "#1C1410", "#6B4A26", "#5C7032", "#4E6F96", "#7A6F62"];
+// brows: peak lift, thickness, angular
+const BROWS = [["Natural arch", -4, 3.1, false], ["Straight", -1.4, 3, false], ["Thick", -3, 4.5, false], ["Fine", -3.6, 1.9, false], ["Angled", -5.2, 3, true]];
+const MOUTHS = [["Soft smile", "soft"], ["Warm smile", "warm"], ["Smirk", "smirk"], ["Neutral", "neutral"], ["Laugh", "laugh"], ["Parted", "parted"]];
+const BEARDS = [["Clean-shaven", "none"], ["Stubble", "stubble"], ["Trimmed", "trim"], ["Full", "full"], ["Long", "long"]];
+const COVERS = { m: [["Bare head", "none"], ["Headcloth", "cloth"], ["Turban", "turban"]],
+                 f: [["Uncovered", "none"], ["Veil", "veil"], ["Coin headdress", "coins"], ["Headscarf", "scarf"]] };
+// outer garment: men's mantle (simlah), women's shawl and veil. [label, color, stripe or embroidery color]
+const MANTLES = { m: [["Striped wool", "#D3C3A0", "#5E4430"], ["Brown wool", "#6B4E36", ""], ["Charcoal wool", "#38322C", ""], ["Natural wool", "#B9A784", ""], ["Black-striped", "#E2D8C2", "#25201B"]],
+                  f: [["Indigo", "#2D3D69", ""], ["Madder red", "#873328", ""], ["Saffron", "#B9852A", ""], ["Linen", "#E1D6BF", ""], ["Embroidered plum", "#4B2C45", "#C9A04B"]] };
+const JEWELS = [["None", "none"], ["Gold earrings", "ear"], ["Earrings & beads", "beads"], ["Nose ring", "nose"]];
+// [label, value, days needed, who] who: "m" men, "f" women, "" everyone
 const UNLOCK = {
-  tunic: [["Earth", "#7B5B3A", 0], ["Olive", "#5E7A35", 0], ["River", "#3B6491", 0], ["Linen", "#CDBE9F", 0], ["Scarlet", "#A8322D", 3],
-          ["Lydia's purple", "#6B3FA0", 12], ["Galilee teal", "#2E8B87", 18], ["Gold", "#C99A22", 25], ["Midnight", "#26304A", 33], ["White robe", "#EEF0EA", 45]],
-  sash:  [["Leather", "#5A3A22", 0], ["Rope", "#B79A6A", 0], ["Red", "#B23A32", 6], ["Royal blue", "#2D5BA6", 15], ["Belt of truth", "#E0A526", 30]],
-  hat:   [["None", "none", 0], ["Headband", "band", 0], ["Headwrap", "wrap", 5], ["Laurel", "laurel", 28], ["Helmet of salvation", "helmet", 50], ["Crown of life", "crown", 70]],
-  item:  [["None", "none", 0], ["Shepherd's staff", "staff", 3], ["Scroll", "scroll", 8], ["Sling", "sling", 14], ["Shofar", "shofar", 21],
-          ["Lamp", "lamp", 35], ["Shield of faith", "shield", 42], ["Sword of the Spirit", "sword", 56]]
+  tunic: [["Undyed wool", "#C6B392", 0, "m"], ["Earth brown", "#77583B", 0, "m"], ["Charcoal", "#38332E", 0, "m"], ["Indigo", "#33457A", 0, "f"], ["Madder red", "#8C392D", 0, "f"], ["Saffron", "#BE8E2E", 0, "f"],
+          ["Linen", "#DCD1B7", 0, ""], ["Olive", "#66673A", 0, ""], ["Scarlet", "#9A2A22", 3, ""], ["Lydia's purple", "#5C2A53", 12, ""], ["Galilee blue", "#2E5C70", 18, ""],
+          ["Gold-trimmed", "#AD8638", 25, ""], ["Midnight", "#1D2232", 33, ""], ["White robe", "#ECE6D8", 45, ""]],
+  sash:  [["Leather", "#4E3320", 0, ""], ["Rope", "#A88E62", 0, ""], ["Red", "#962F28", 6, ""], ["Royal blue", "#2B4C8C", 15, ""], ["Belt of truth", "#D2A546", 30, ""]],
+  hat:   [["None", "none", 0, ""], ["Headband", "band", 0, ""], ["Linen wrap", "wrap", 5, ""], ["Laurel", "laurel", 28, ""], ["Helmet of salvation", "helmet", 50, ""], ["Crown of life", "crown", 70, ""]],
+  item:  [["None", "none", 0, ""], ["Shepherd's staff", "staff", 3, ""], ["Scroll", "scroll", 8, ""], ["Sling", "sling", 14, ""], ["Shofar", "shofar", 21, ""],
+          ["Lamp", "lamp", 35, ""], ["Shield of faith", "shield", 42, ""], ["Sword of the Spirit", "sword", 56, ""]]
 };
-const UNLOCK_NAMES = { tunic: "tunic", sash: "sash", hat: "headgear", item: "item" };
+const UNLOCK_NAMES = { tunic: "robe", sash: "girdle", hat: "headgear", item: "item" };
+const allowedFor = (key, g) => UNLOCK[key].map((e, i) => [e, i]).filter(([e]) => !e[3] || e[3] === g);
 
 const NAMES_M = ["Gideon","Caleb","Boaz","Barnabas","Silas","Timothy","Elijah","Elisha","Josiah","Nehemiah","Obadiah","Jonah","Ezra","Hezekiah","Jabez","Enoch","Joel","Amos","Micah","Titus","Apollos","Stephen","Levi","Zacchaeus","Jethro","Hosea","Samson","Nathan","Asa","Jonathan","Uriah","Zerubbabel"];
 const NAMES_F = ["Ruth","Esther","Deborah","Hannah","Miriam","Naomi","Lydia","Priscilla","Phoebe","Dorcas","Rahab","Abigail","Martha","Elizabeth","Anna","Eunice","Lois","Rhoda","Junia","Sarah","Rebekah","Rachel","Leah","Jochebed","Zipporah","Damaris","Joanna","Susanna","Tabitha","Huldah","Jael","Keturah"];
@@ -552,82 +525,289 @@ const readingURL = (label, v) => `https://www.biblegateway.com/passage/?search=$
 /* ---------- avatar ---------- */
 function normLook(l, n) {
   l = l && typeof l === "object" ? l : {};
-  const pick = (v, arr, gated) => { let i = Number.isInteger(v) && v >= 0 && v < arr.length ? v : 0; if (gated && arr[i][2] > n) i = 0; return i; };
-  return { skin: pick(l.skin, SKINS), hair: pick(l.hair, HAIRS), hairColor: pick(l.hairColor, HAIRC), beard: l.beard === true,
-           tunic: pick(l.tunic, UNLOCK.tunic, 1), sash: pick(l.sash, UNLOCK.sash, 1), hat: pick(l.hat, UNLOCK.hat, 1), item: pick(l.item, UNLOCK.item, 1),
-           face: pick(l.face, FACES), eyes: pick(l.eyes, EYES), eyeColor: pick(l.eyeColor, EYEC), brows: pick(l.brows, BROWS), mouth: pick(l.mouth, MOUTHS), g: l.g === "f" ? "f" : "m" };
+  const g = l.g === "f" ? "f" : "m";
+  const pick = (v, arr) => Number.isInteger(v) && v >= 0 && v < arr.length ? v : 0;
+  const gated = (v, key) => { const ok = allowedFor(key, g).filter(([e]) => e[2] <= n).map(([, i]) => i); return ok.includes(v) ? v : ok[0]; };
+  const beard = g === "f" ? 0 : l.beard === true ? 3 : pick(l.beard, BEARDS);
+  return { g, skin: pick(l.skin, SKINS), hair: pick(l.hair, HAIRS), hairColor: pick(l.hairColor, HAIRC), beard,
+    tunic: gated(l.tunic, "tunic"), sash: gated(l.sash, "sash"), hat: gated(l.hat, "hat"), item: gated(l.item, "item"),
+    face: pick(l.face, FACES), eyes: pick(l.eyes, EYES), eyeColor: pick(l.eyeColor, EYEC), brows: pick(l.brows, BROWS), mouth: pick(l.mouth, MOUTHS),
+    cover: pick(l.cover, COVERS[g]), mantle: pick(l.mantle, MANTLES[g]), jewel: g === "f" ? pick(l.jewel, JEWELS) : 0 };
 }
-// opts: live (idle animation), cheer (celebrate), bust (crop to head and shoulders)
+const mixHex = (a, b, t) => {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const ch = s => [(s >> 16) & 255, (s >> 8) & 255, s & 255];
+  return "#" + ch(pa).map((v, i) => Math.round(v + (ch(pb)[i] - v) * t).toString(16).padStart(2, "0")).join("");
+};
+let AVN = 0;
+
+// opts.portrait / opts.bust / opts.vb draw the painted portrait; otherwise the small full-body figure (map, road).
 function avatarSVG(look, n, opts = {}) {
-  const L = normLook(look, n);
-  const skin = SKINS[L.skin], hc = HAIRC[L.hairColor], tunic = UNLOCK.tunic[L.tunic][1], sash = UNLOCK.sash[L.sash][1];
-  const hat = UNLOCK.hat[L.hat][1], item = UNLOCK.item[L.item][1], hair = HAIRS[L.hair][1];
-  const sk2 = shade(skin, -0.12), td = shade(tunic, -0.18), hc2 = shade(hc, 0.18), wood = "#8B5E34";
-  const P = (d, f, extra = "") => `<path d="${d}" fill="${f}" ${extra}/>`;
-  const C = (cx, cy, r, f, extra = "") => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${f}" ${extra}/>`;
-  const E = (cx, cy, rx, ry, f, extra = "") => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${f}" ${extra}/>`;
-  const R = (x, y, w, h, rx, f, extra = "") => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${f}" ${extra}/>`;
+  return opts.portrait || opts.bust || opts.vb ? portraitSVG(look, n, opts) : figureSVG(look, n, opts);
+}
 
-  // items carried in the right hand (move with the arm)
-  let rItem = "", lItem = "";
-  if (item === "staff") rItem = R(82, 50, 5, 98, 2.5, wood) + `<path d="M84.5 54 Q83 34 96 36 Q105 38 103 50" fill="none" stroke="${wood}" stroke-width="5" stroke-linecap="round"/>`;
-  if (item === "sword") rItem = R(82.5, 66, 5, 48, 2.5, "#DDE4EC") + R(85, 66, 2.5, 48, 1.2, "#B7C2CE") + R(75, 113, 20, 5, 2.5, "#E0A526") + R(82.5, 117, 5, 10, 2, "#6B4423");
-  if (item === "scroll") rItem = R(75, 112, 20, 22, 3, "#F4E7C6") + E(85, 112, 11, 3.5, "#B98A4B") + E(85, 134, 11, 3.5, "#B98A4B") + R(79, 119, 12, 1.6, 0.8, "#CDBB92") + R(79, 124, 9, 1.6, 0.8, "#CDBB92");
-  if (item === "sling") rItem = `<path d="M84 126 Q90 140 84 152" fill="none" stroke="#6B4A2A" stroke-width="2.5" stroke-linecap="round"/>` + C(84, 153, 4.5, "#9AA0A8");
-  if (item === "shofar") rItem = P("M78 124 Q96 124 101 104 Q103 96 109 97 Q112 99 109 104 Q104 128 82 131 Z", "#E8D3A6") + P("M101 104 Q103 96 109 97 Q112 99 109 104 Z", "#CDB27E");
-  if (item === "lamp") rItem = E(86, 130, 12, 5.5, "#C27C3E") + P("M95 128 Q102 126 104 122 L106 124 Q103 131 95 132 Z", "#C27C3E") + E(84, 127, 5, 1.6, "#8F5528")
-    + `<g class="flame">${P("M104 121 Q99 114 104 106 Q109 114 104 121 Z", "#FFB020")}${P("M104 120 Q102 116 104 111 Q106 116 104 120 Z", "#FFE27A")}</g>`;
-  if (item === "shield") lItem = P("M14 94 Q32 86 50 94 L48 116 Q44 130 32 136 Q20 130 16 116 Z", "#E0A526") + P("M18 97 Q32 90 46 97 L44 115 Q41 126 32 131 Q23 126 20 115 Z", "#F5C842")
-    + R(30, 98, 4, 28, 2, "#FFF6DC") + R(22, 108, 20, 4, 2, "#FFF6DC");
+function portraitSVG(look, n, opts = {}) {
+  const L = normLook(look, n), u = "p" + (++AVN), f = L.g === "f";
+  const skin = SKINS[L.skin], sL = shade(skin, 0.13), sD = shade(skin, -0.2), sDD = shade(skin, -0.38);
+  const hc = HAIRC[L.hairColor], hL = shade(hc, 0.22), hD = shade(hc, -0.35);
+  const tunic = UNLOCK.tunic[L.tunic][1], [, mantle, accent] = MANTLES[L.g][L.mantle];
+  const cover = COVERS[L.g][L.cover][1], hat = UNLOCK.hat[L.hat][1], hair = HAIRS[L.hair][1], beard = BEARDS[L.beard][1];
+  let [fw, cw, jw, cy, chw] = FACES[L.face][1];
+  if (f) { jw -= 3; chw -= 2; cw -= 1; cy -= 1; } else { jw += 2; chw += 1; }
+  const faceD = `M100 50 C${100 + fw * 0.62} 50 ${100 + fw} 58 ${100 + fw} 72 C${100 + fw} 83 ${100 + cw} 88 ${100 + cw} 98 C${100 + cw} 110 ${100 + jw + 3} 116 ${100 + jw} 122 C${100 + jw - 5} 129 ${100 + chw} ${cy} 100 ${cy} C${100 - chw} ${cy} ${100 - jw + 5} 129 ${100 - jw} 122 C${100 - jw - 3} 116 ${100 - cw} 110 ${100 - cw} 98 C${100 - cw} 88 ${100 - fw} 83 ${100 - fw} 72 C${100 - fw} 58 ${100 - fw * 0.62} 50 100 50 Z`;
+  const S = (d, c, w, extra = "") => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`;
+  const P = (d, fill, extra = "") => `<path d="${d}" fill="${fill}" ${extra}/>`;
+  const fold = (d, w = 2.4, o = 0.22) => S(d, "#000", w, `opacity="${o}" filter="url(#sb${u})"`);
+  const hi = (d, w = 2, o = 0.14) => S(d, "#fff", w, `opacity="${o}" filter="url(#sb${u})"`);
+  const sw = f ? 68 : 80; // shoulder half-width
 
-  // hair layers: back (behind head) and front (over head)
-  const cap = "M31 54 Q28 21 60 21 Q92 21 89 54 Q86 40 74 37 Q63 45 47 40 Q37 42 31 54 Z";
-  let hairBack = "", hairFront = "";
-  if (hair === "short") hairFront = P(cap, hc) + P("M47 40 Q58 43 66 39 Q60 46 47 40Z", hc2, 'opacity=".5"');
-  if (hair === "long") { hairBack = P("M28 52 Q26 20 60 20 Q94 20 92 52 L95 100 Q84 106 78 92 L78 56 L42 56 L42 92 Q36 106 25 100 Z", hc); hairFront = P(cap, hc); }
-  if (hair === "bun") hairFront = C(60, 19, 11, hc) + C(57, 16, 4, hc2, 'opacity=".45"') + P(cap, hc);
-  if (hair === "curly") hairFront = [[35, 44, 10], [42, 31, 11], [55, 25, 12], [69, 26, 12], [80, 33, 11], [86, 45, 10], [31, 55, 7], [89, 55, 7]].map(([x, y, r]) => C(x, y, r, hc)).join("")
-    + C(52, 23, 4, hc2, 'opacity=".45"') + C(73, 27, 4, hc2, 'opacity=".45"');
-  if (hair === "braids") { hairBack = [60, 70, 80, 90].map(y => C(29, y, 5.5, hc) + C(91, y, 5.5, hc)).join("") + C(29, 98, 3, sash) + C(91, 98, 3, sash); hairFront = P(cap, hc); }
-  if (hair === "crop") hairFront = P("M33 47 Q33 24 60 24 Q87 24 87 47 Q76 36 60 36 Q44 36 33 47 Z", hc, 'opacity=".92"');
+  const defs = `<defs>
+    <radialGradient id="sk${u}" cx="40%" cy="38%" r="70%"><stop offset="0" stop-color="${sL}"/><stop offset=".55" stop-color="${skin}"/><stop offset="1" stop-color="${sD}"/></radialGradient>
+    <linearGradient id="hr${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${hL}"/><stop offset=".5" stop-color="${hc}"/><stop offset="1" stop-color="${hD}"/></linearGradient>
+    <linearGradient id="tn${u}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${shade(tunic, 0.12)}"/><stop offset=".6" stop-color="${tunic}"/><stop offset="1" stop-color="${shade(tunic, -0.32)}"/></linearGradient>
+    <linearGradient id="mt${u}" x1="0" y1="0" x2="1" y2=".4"><stop offset="0" stop-color="${shade(mantle, 0.14)}"/><stop offset=".55" stop-color="${mantle}"/><stop offset="1" stop-color="${shade(mantle, -0.36)}"/></linearGradient>
+    <radialGradient id="ir${u}" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="${shade(EYEC[L.eyeColor], 0.35)}"/><stop offset=".7" stop-color="${EYEC[L.eyeColor]}"/><stop offset="1" stop-color="${shade(EYEC[L.eyeColor], -0.45)}"/></radialGradient>
+    <linearGradient id="gd${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4D58A"/><stop offset=".5" stop-color="#C99A3E"/><stop offset="1" stop-color="#8A6424"/></linearGradient>
+    <clipPath id="fc${u}"><path d="${faceD}"/></clipPath>
+    <filter id="sb${u}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.6"/></filter>
+    <filter id="bb${u}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+  </defs>`;
 
+  // ---- garments ----
+  const torso = `M${100 - 14} 148 Q${100 - sw * 0.45} 156 ${100 - sw + 14} 166 Q${100 - sw - 2} 176 ${100 - sw - 6} 204 L${100 - sw - 10} 240 L${100 + sw + 10} 240 L${100 + sw + 6} 204 Q${100 + sw + 2} 176 ${100 + sw - 14} 166 Q${100 + sw * 0.45} 156 ${100 + 14} 148 Z`;
+  let body = P(torso, `url(#tn${u})`);
+  if (f) {
+    // round neckline with an embroidered band
+    body += P("M84 150 Q100 166 116 150 L114 147 Q100 160 86 147 Z", skin) + S("M83 151 Q100 168 117 151", accent || "#C9A04B", 3.2, 'opacity=".9"')
+      + [...Array(7)].map((_, i) => { const t = (i + 1) / 8, x = 83 + 34 * t, y = 151 + 34 * t * (1 - t) * 1.0; return `<circle cx="${x.toFixed(1)}" cy="${(y + 0.4).toFixed(1)}" r=".9" fill="#F3E2B0" opacity=".8"/>`; }).join("");
+    // shawl over both shoulders
+    const shawlL = `M${100 - 20} 132 Q${100 - 24} 150 ${100 - sw + 10} 166 Q${100 - sw - 4} 178 ${100 - sw - 8} 206 L${100 - sw - 12} 240 L${100 - 22} 240 Q${100 - 20} 200 ${100 - 26} 172 Q${100 - 24} 150 ${100 - 20} 132 Z`;
+    body += P(shawlL, `url(#mt${u})`) + `<g transform="translate(200 0) scale(-1 1)">${P(shawlL, `url(#mt${u})`)}</g>`;
+    body += fold(`M${100 - sw + 6} 190 Q${100 - 40} 200 ${100 - 34} 236`) + fold(`M${100 + sw - 6} 186 Q${100 + 42} 204 ${100 + 36} 238`, 3, 0.28) + hi(`M${100 - sw + 8} 172 Q${100 - 46} 168 ${100 - 30} 160`);
+    if (accent) body += S(`M${100 - 22} 240 Q${100 - 20} 200 ${100 - 26} 172`, accent, 2.2, 'stroke-dasharray="2 2.5"') + S(`M${100 + 22} 240 Q${100 + 20} 200 ${100 + 26} 172`, accent, 2.2, 'stroke-dasharray="2 2.5"');
+  } else {
+    // slit neckline of the tunic, then the mantle over both shoulders
+    body += P("M90 148 L100 172 L110 148 Z", sD) + P("M91 148 L100 168 L109 148 Z", skin) + S("M89 147 L100 173 L111 147", shade(tunic, -0.4), 1.4);
+    const mantL = `M${100 - 16} 149 Q${100 - sw * 0.5} 156 ${100 - sw + 12} 166 Q${100 - sw - 3} 177 ${100 - sw - 7} 204 L${100 - sw - 11} 240 L${100 - 30} 240 Q${100 - 32} 205 ${100 - 26} 178 Q${100 - 22} 160 ${100 - 16} 149 Z`;
+    body += P(mantL, `url(#mt${u})`) + `<g transform="translate(200 0) scale(-1 1)">${P(mantL, `url(#mt${u})`)}</g>`;
+    if (accent) body += [-1, 1].map(s => S(`M${100 + s * 36} 240 Q${100 + s * 37} 206 ${100 + s * 31} 180`, accent, 3.2, 'opacity=".9"') + S(`M${100 + s * 44} 240 Q${100 + s * 46} 208 ${100 + s * 40} 182`, accent, 1.6, 'opacity=".8"')).join("");
+    body += fold(`M${100 - sw + 2} 196 Q${100 - 52} 206 ${100 - 46} 238`) + fold(`M${100 + sw - 2} 192 Q${100 + 54} 206 ${100 + 48} 238`, 3, 0.3) + hi(`M${100 - sw + 6} 172 Q${100 - 52} 166 ${100 - 30} 158`);
+  }
+  // neck
+  const nw = f ? 11 : 14;
+  const neck = P(`M${100 - nw} 114 L${100 - nw - 1} 152 Q100 160 ${100 + nw + 1} 152 L${100 + nw} 114 Z`, `url(#sk${u})`)
+    + P(`M${100 - nw} 118 Q100 ${cy + 10} ${100 + nw} 118 L${100 + nw} 132 Q100 ${cy + 16} ${100 - nw} 132 Z`, sDD, `opacity=".45" filter="url(#sb${u})"`)
+    + (f ? "" : S("M96 146 Q100 148 104 146", sD, 1.4, 'opacity=".5"'));
+
+  // ---- hair (back layer) ----
+  let hairBack = "";
+  if (hair === "long") hairBack = P(`M${100 - fw - 8} 70 Q${100 - fw - 12} 120 ${100 - fw - (f ? 10 : 6)} ${f ? 196 : 150} L${100 + fw + (f ? 10 : 6)} ${f ? 196 : 150} Q${100 + fw + 12} 120 ${100 + fw + 8} 70 Q100 30 ${100 - fw - 8} 70 Z`, `url(#hr${u})`);
+  if (hair === "curly") hairBack = P(`M${100 - fw - 12} 74 Q${100 - fw - 18} 110 ${100 - fw - 10} ${f ? 150 : 120} L${100 + fw + 10} ${f ? 150 : 120} Q${100 + fw + 18} 110 ${100 + fw + 12} 74 Q100 22 ${100 - fw - 12} 74 Z`, `url(#hr${u})`);
+  if (hair === "bun") hairBack = `<ellipse cx="100" cy="40" rx="15" ry="12" fill="url(#hr${u})"/>`;
+  if (COVERS[L.g][L.cover][1] !== "none" && hair !== "braids") hairBack = "";
+  // ---- head coverings (back layer) ----
+  let coverBack = "", coverFront = "";
+  const veilCol = `url(#mt${u})`;
+  if (cover === "veil" || cover === "coins") {
+    coverBack = P(`M${100 - fw - 14} 70 Q${100 - fw - 18} 130 ${100 - sw + 2} 172 L${100 + sw - 2} 172 Q${100 + fw + 18} 130 ${100 + fw + 14} 70 Q100 18 ${100 - fw - 14} 70 Z`, veilCol);
+    coverFront = P(`M${100 - fw - 14} 70 Q100 18 ${100 + fw + 14} 70 Q${100 + fw + 16} 110 ${100 + cw + 8} 140 L${100 + cw + 2} 140 Q${100 + fw + 4} 100 ${100 + fw - 2} 74 Q100 44 ${100 - fw + 2} 74 Q${100 - fw - 4} 100 ${100 - cw - 2} 140 L${100 - cw - 8} 140 Q${100 - fw - 16} 110 ${100 - fw - 14} 70 Z`, veilCol)
+      + fold(`M${100 + fw + 6} 80 Q${100 + fw + 10} 110 ${100 + cw + 4} 136`, 2.6, 0.32) + hi(`M${100 - fw - 8} 76 Q${100 - 24} 50 100 47`, 2.4, 0.18);
+    if (accent) coverFront += S(`M${100 - fw + 1} 75 Q100 45 ${100 + fw - 1} 75`, accent, 1.8, 'stroke-dasharray="2 2"');
+    if (cover === "coins") coverFront += `<path d="M${100 - fw + 2} 66 Q100 52 ${100 + fw - 2} 66" fill="none" stroke="#5A3B20" stroke-width="1.4"/>`
+      + [...Array(11)].map((_, i) => { const t = i / 10, x = (100 - fw + 2) * (1 - t) ** 2 + 2 * (1 - t) * t * 100 + t * t * (100 + fw - 2), y = 66 * (1 - t) ** 2 + 2 * (1 - t) * t * 52 + t * t * 66; return `<circle cx="${x.toFixed(1)}" cy="${(y + 3.2).toFixed(1)}" r="2.5" fill="url(#gd${u})" stroke="#7A5420" stroke-width=".5"/>`; }).join("");
+  }
+  if (cover === "scarf") {
+    coverBack = P(`M${100 - fw - 10} 72 Q${100 - fw - 12} 108 ${100 - cw - 4} 128 L${100 + cw + 4} 128 Q${100 + fw + 12} 108 ${100 + fw + 10} 72 Q100 22 ${100 - fw - 10} 72 Z`, veilCol);
+    coverFront = P(`M${100 - fw - 10} 72 Q100 22 ${100 + fw + 10} 72 Q${100 + fw + 10} 96 ${100 + cw + 2} 112 L${100 + fw - 1} 80 Q100 46 ${100 - fw + 1} 80 L${100 - cw - 2} 112 Q${100 - fw - 10} 96 ${100 - fw - 10} 72 Z`, veilCol)
+      + P(`M${100 - cw - 2} 112 Q${100 - jw} ${cy + 4} 100 ${cy + 7} Q${100 + jw} ${cy + 4} ${100 + cw + 2} 112 L${100 + cw + 4} 118 Q${100 + jw + 2} ${cy + 10} 100 ${cy + 12} Q${100 - jw - 2} ${cy + 10} ${100 - cw - 4} 118 Z`, `url(#mt${u})`)
+      + `<ellipse cx="100" cy="${cy + 12}" rx="6" ry="4.4" fill="${shade(mantle, -0.22)}"/>` + P(`M97 ${cy + 15} L92 ${cy + 34} L99 ${cy + 32} Z M103 ${cy + 15} L109 ${cy + 33} L102 ${cy + 32} Z`, shade(mantle, -0.12)) + hi(`M${100 - fw - 6} 76 Q${100 - 22} 50 100 48`, 2.2, 0.18);
+  }
+  if (cover === "cloth") {
+    const cloth = "#E4DAC4";
+    coverBack = P(`M${100 - fw - 12} 70 Q${100 - fw - 16} 120 ${100 - fw - 20} 168 L${100 + fw + 20} 168 Q${100 + fw + 16} 120 ${100 + fw + 12} 70 Q100 20 ${100 - fw - 12} 70 Z`, cloth) + fold(`M${100 + fw + 10} 90 Q${100 + fw + 14} 130 ${100 + fw + 16} 164`, 3, 0.25);
+    coverFront = P(`M${100 - fw - 12} 70 Q100 20 ${100 + fw + 12} 70 Q${100 + fw + 12} 92 ${100 + fw + 6} 112 L${100 + fw} 112 Q${100 + fw + 2} 88 ${100 + fw - 2} 72 Q100 52 ${100 - fw + 2} 72 Q${100 - fw - 2} 88 ${100 - fw} 112 L${100 - fw - 6} 112 Q${100 - fw - 12} 92 ${100 - fw - 12} 70 Z`, cloth)
+      + (accent ? S(`M${100 - fw - 6} 64 Q100 34 ${100 + fw + 6} 64`, accent, 1.4, 'opacity=".7"') : "")
+      + `<path d="M${100 - fw - 11} 62 Q100 40 ${100 + fw + 11} 62" fill="none" stroke="#231C17" stroke-width="5" stroke-linecap="round"/><path d="M${100 - fw - 11} 62 Q100 40 ${100 + fw + 11} 62" fill="none" stroke="#4A3D33" stroke-width="1.2" stroke-linecap="round" transform="translate(0 -1.4)"/>`
+      + hi(`M${100 - fw - 8} 76 Q${100 - 24} 50 100 47`, 2.4, 0.22);
+  }
+  if (cover === "turban") {
+    const tc = mantle;
+    coverFront = `<ellipse cx="100" cy="54" rx="${fw + 9}" ry="24" fill="url(#mt${u})"/>` + [0, 1, 2, 3].map(i => S(`M${100 - fw - 8 + i * 2} ${66 - i * 7} Q100 ${44 - i * 7} ${100 + fw + 8 - i * 2} ${62 - i * 7}`, shade(tc, -0.35), 1.4, 'opacity=".6"')).join("")
+      + S(`M${100 - fw - 6} 70 Q100 56 ${100 + fw + 6} 70`, shade(tc, -0.4), 3, 'opacity=".55"') + hi(`M${100 - fw} 50 Q${100 - 10} 34 ${100 + 6} 34`, 3, 0.2);
+  }
+
+  // ---- face ----
+  const ears = [-1, 1].map(s => `<ellipse cx="${100 + s * (cw + 1.5)}" cy="98" rx="4.6" ry="9" fill="${skin}"/>` + S(`M${100 + s * (cw + 2.6)} 92 Q${100 + s * (cw + 4)} 98 ${100 + s * (cw + 2.2)} 104`, sD, 1.2, 'opacity=".7"')).join("");
+  const shading = `<g clip-path="url(#fc${u})">
+      <ellipse cx="${100 + cw + 2}" cy="100" rx="17" ry="56" fill="${sDD}" opacity=".42" filter="url(#bb${u})"/>
+      <ellipse cx="100" cy="${cy + 2}" rx="${jw + 4}" ry="10" fill="${sDD}" opacity=".35" filter="url(#bb${u})"/>
+      <ellipse cx="${100 + cw - 6}" cy="110" rx="9" ry="12" fill="${sD}" opacity=".35" filter="url(#bb${u})"/>
+      <ellipse cx="${100 - cw + 6}" cy="110" rx="7" ry="10" fill="${sD}" opacity=".2" filter="url(#bb${u})"/>
+      <ellipse cx="88" cy="62" rx="16" ry="9" fill="#fff" opacity=".13" filter="url(#bb${u})"/>
+      <ellipse cx="${100 - cw + 9}" cy="100" rx="6" ry="4" fill="#fff" opacity=".1" filter="url(#bb${u})"/>
+      <ellipse cx="100" cy="${cy - 5}" rx="5" ry="3" fill="#fff" opacity=".12" filter="url(#bb${u})"/>
+      ${f ? `<ellipse cx="80" cy="106" rx="9" ry="5" fill="#C9574B" opacity=".2" filter="url(#bb${u})"/><ellipse cx="120" cy="106" rx="9" ry="5" fill="#C9574B" opacity=".18" filter="url(#bb${u})"/>` : ""}
+      ${beard === "stubble" || (beard !== "none" && !f) ? `<path d="M${100 - cw} 102 Q${100 - jw - 2} 126 100 ${cy + 2} Q${100 + jw + 2} 126 ${100 + cw} 102 L${100 + cw} 140 L${100 - cw} 140 Z" fill="${hc}" opacity="${beard === "stubble" ? 0.28 : 0.18}" filter="url(#sb${u})"/>` : ""}
+      ${beard === "stubble" ? `<path d="M88 116 Q100 111 112 116 L112 118 Q100 114 88 118 Z" fill="${hc}" opacity=".3" filter="url(#sb${u})"/>` : ""}
+    </g>`;
+  const face = P(faceD, `url(#sk${u})`) + shading + S(faceD, sDD, 0.8, 'opacity=".35"');
+
+  // eyes
+  const kind = EYES[L.eyes][1], ink = "#1A120D";
+  const eye = (cx, s) => {
+    let up = -6.2, lo = 3.4, tilt = 0;
+    if (kind === "round") { up = -7.4; lo = 4.6; }
+    if (kind === "almond") { up = -5.8; lo = 3; tilt = -0.8; }
+    if (kind === "deep") { up = -5.4; lo = 3; }
+    if (kind === "hooded") { up = -5.6; lo = 3.2; }
+    if (kind === "up") { up = -6; lo = 3; tilt = -2.2; }
+    if (!f) { up *= 0.92; }
+    const y = 92, ox = cx + s * 8.5, oy = y + tilt, ix = cx - s * 7.5, iy = y + 0.8;
+    const top = `M${ix} ${iy} Q${cx - s} ${y + up * 1.3} ${ox} ${oy}`, open = `${top} Q${cx} ${y + lo * 1.35} ${ix} ${iy} Z`;
+    const cid = `e${s > 0 ? "r" : "l"}${u}`;
+    let o = `<clipPath id="${cid}"><path d="${open}"/></clipPath>`;
+    if (kind === "deep") o += `<ellipse cx="${cx}" cy="${y - 5}" rx="11" ry="5" fill="${sDD}" opacity=".45" filter="url(#sb${u})"/>`;
+    o += P(`M${ix - s * 1} ${iy + 1} Q${cx} ${y + lo * 2.4} ${ox + s} ${oy + 1}`, sD, 'opacity=".35" filter="url(#sb' + u + ')"');
+    o += P(open, "#EFE7DA") + `<g clip-path="url(#${cid})"><circle cx="${cx}" cy="${y - 0.4}" r="4.3" fill="url(#ir${u})"/><circle cx="${cx}" cy="${y - 0.4}" r="4.3" fill="none" stroke="${shade(EYEC[L.eyeColor], -0.6)}" stroke-width=".7"/>
+      <circle cx="${cx}" cy="${y - 0.4}" r="1.9" fill="#0B0806"/><path d="${top}" fill="none" stroke="${sDD}" stroke-width="3.4" opacity=".35"/></g>
+      <circle cx="${cx - 1.5}" cy="${y - 2.2}" r="1" fill="#fff" opacity=".92"/>`;
+    if (kind === "hooded") o += P(`M${ix} ${iy - 0.3} Q${cx - s} ${y + up * 1.3 - 3.5} ${ox} ${oy - 0.3} Q${cx} ${y + up * 0.85} ${ix} ${iy - 0.3} Z`, skin);
+    o += S(`M${ix} ${iy - 3.2} Q${cx - s} ${y + up * 1.3 - (kind === "hooded" ? 6 : 4)} ${ox} ${oy - 3}`, sDD, 1.1, 'opacity=".45"');
+    o += S(top, ink, f ? 2.1 : 1.5);
+    o += S(`M${ix + s * 1.5} ${iy + 0.6} Q${cx} ${y + lo * 1.35} ${ox} ${oy + 0.4}`, f ? ink : sDD, f ? 1 : 0.8, `opacity="${f ? 0.6 : 0.45}"`);
+    if (f) {
+      o += S(`M${ox} ${oy} l${s * 2.8} -1.6`, ink, 1.6);
+      for (let k = 0; k < 4; k++) { const t = 0.5 + k * 0.15, p = qpt({ x: ix, y: iy }, { x: cx - s, y: y + up * 1.3 }, { x: ox, y: oy }, t); o += S(`M${p.x.toFixed(1)} ${p.y.toFixed(1)} l${(s * (0.6 + k * 0.5)).toFixed(1)} -2.4`, ink, 0.8); }
+    }
+    return o;
+  };
+  const eyes = `<g class="pt-eyes">${eye(85, -1)}${eye(115, 1)}</g>`;
+
+  // brows
+  const [, peak, thick0, angular] = BROWS[L.brows], thick = thick0 * (f ? 0.8 : 1.3), pk = peak - (f ? 1 : 0), bc = shade(hc, -0.05);
+  const brow = s => {
+    const cx = 100 + s * 15, ix = cx - s * 9, py = 81 + pk, px = cx + s * 3, tx = cx + s * 11.5, ty = 83.5;
+    const topE = angular ? `L${px} ${py - thick * 0.5} L${tx} ${ty - 0.2}` : `Q${px} ${py - thick * 0.8} ${tx} ${ty - 0.2}`;
+    const botE = angular ? `L${px} ${py + thick * 0.5} L${ix} ${82 + thick * 0.25}` : `Q${px} ${py + thick * 0.55} ${ix} ${82 + thick * 0.25}`;
+    return P(`M${ix} ${82 - thick * 0.75} ${topE} ${botE} Z`, bc) + S(`M${ix + s * 2} ${82} Q${px} ${py} ${tx - s * 2} ${ty - 0.6}`, hL, 0.5, 'opacity=".5"');
+  };
+  const brows = brow(-1) + brow(1);
+
+  // nose
+  const nwid = f ? 5 : 6.6;
+  const nose = S(`M104 86 Q106.5 98 107 106`, sD, 2.6, `opacity=".45" filter="url(#sb${u})"`)
+    + `<ellipse cx="100.5" cy="106" rx="4.2" ry="3" fill="#fff" opacity=".14" filter="url(#sb${u})"/>`
+    + S(`M${100 - nwid} 109.5 Q${100 - nwid + 1} 105.5 ${100 - 1.8} 108.6`, sDD, 1.1, 'opacity=".8"') + S(`M${100 + nwid} 109.5 Q${100 + nwid - 1} 105.5 ${100 + 1.8} 108.6`, sDD, 1.1, 'opacity=".8"')
+    + `<ellipse cx="${100 - 2.8}" cy="110" rx="1.6" ry=".8" fill="${sDD}" opacity=".75"/><ellipse cx="${100 + 2.8}" cy="110" rx="1.6" ry=".8" fill="${sDD}" opacity=".75"/>`
+    + `<ellipse cx="100" cy="112.5" rx="6" ry="1.6" fill="${sD}" opacity=".35" filter="url(#sb${u})"/>`;
+
+  // mouth
+  const mk = MOUTHS[L.mouth][1], w = f ? 9 : 10.5;
+  const lipU = f ? mixHex(skin, "#8E2F33", 0.55) : mixHex(skin, "#7E3A32", 0.32), lipLo = f ? mixHex(skin, "#B34A4C", 0.5) : mixHex(skin, "#9A5045", 0.25);
+  let cl = 0, cr = 0, open = 0, teeth = false;
+  if (mk === "soft") { cl = cr = -1.6; }
+  if (mk === "warm") { cl = cr = -2.8; open = 1.6; teeth = true; }
+  if (mk === "smirk") { cl = 0.4; cr = -2.6; }
+  if (mk === "laugh") { cl = cr = -3; open = 5; teeth = true; }
+  if (mk === "parted") { open = 1.8; }
+  const my = 119, full = f ? 1.6 : 0.4;
+  const lx = 100 - w, ly = my + cl, rx = 100 + w, ry = my + cr;
+  let mouth = "";
+  mouth += `<ellipse cx="100" cy="${my + 7 + open}" rx="6" ry="2" fill="${sDD}" opacity=".3" filter="url(#sb${u})"/>`;
+  if (open) mouth += P(`M${lx} ${ly} Q100 ${my + 1} ${rx} ${ry} Q100 ${my + 2 + open * 1.4} ${lx} ${ly} Z`, "#3A1614") + (teeth ? P(`M${lx + 2.5} ${ly + 0.6} Q100 ${my + 1.6} ${rx - 2.5} ${ry + 0.6} Q100 ${my + 2.4 + Math.min(open, 2.4)} ${lx + 2.5} ${ly + 0.6} Z`, "#EDE5D6") : "");
+  mouth += P(`M${lx} ${ly} Q${100 - 4} ${my - 3} ${100 - 1.4} ${my - 2.2} Q100 ${my - 1.6} ${100 + 1.4} ${my - 2.2} Q${100 + 4} ${my - 3} ${rx} ${ry} Q100 ${my + 0.6} ${lx} ${ly} Z`, lipU);
+  mouth += P(`M${lx + 1} ${ly + 0.4} Q100 ${my + 0.8 + open * 1.4} ${rx - 1} ${ry + 0.4} Q${100 + 3} ${my + 4.6 + full + open} 100 ${my + 5 + full + open} Q${100 - 3} ${my + 4.6 + full + open} ${lx + 1} ${ly + 0.4} Z`, lipLo);
+  mouth += S(`M${lx} ${ly} Q100 ${my + 0.8 + (open ? 0 : 0.2)} ${rx} ${ry}`, shade(lipU, -0.45), 0.9);
+  mouth += `<ellipse cx="${100 - 1}" cy="${my + 2.6 + full + open}" rx="3" ry="1" fill="#fff" opacity="${f ? 0.28 : 0.14}"/>`;
+  if (cl < -1 || cr < -1) mouth += S(`M${lx - 1} ${ly - 0.6} q-1.4 1.6 -0.4 3.2`, sD, 0.9, 'opacity=".5"') + S(`M${rx + 1} ${ry - 0.6} q1.4 1.6 0.4 3.2`, sD, 0.9, 'opacity=".5"');
+
+  // beard
+  let beardSVG = "";
+  if (!f && (beard === "trim" || beard === "full" || beard === "long")) {
+    const drop = beard === "trim" ? 2 : beard === "full" ? 8 : 26, bulge = beard === "trim" ? 1 : beard === "full" ? 4 : 5;
+    const outer = `M${100 - cw - 0.5} 96 C${100 - cw - bulge} 114 ${100 - jw - bulge} 126 ${100 - chw - 4} ${cy + drop - 4} Q100 ${cy + drop + (beard === "long" ? 8 : 3)} ${100 + chw + 4} ${cy + drop - 4} C${100 + jw + bulge} 126 ${100 + cw + bulge} 114 ${100 + cw + 0.5} 96`;
+    const inner = `L${100 + cw - 4} 98 Q${100 + cw - 8} 110 ${100 + 13} 113 Q${100 + 7} 112 100 113 Q${100 - 7} 112 ${100 - 13} 113 Q${100 - cw + 8} 110 ${100 - cw + 4} 98 Z`;
+    beardSVG = P(outer + inner, `url(#hr${u})`) + P(`M${100 - 12} 117 Q${100 - 7} 112 100 114 Q${100 + 7} 112 ${100 + 12} 117 Q${100 + 6} 115.4 100 116.4 Q${100 - 6} 115.4 ${100 - 12} 117 Z`, hc)
+      + [...Array(9)].map((_, i) => { const x = 100 - jw + i * (jw / 4); return S(`M${x.toFixed(1)} ${(cy - 4).toFixed(1)} q${(i - 4) * 0.4} ${drop / 2 + 4} ${(i - 4) * 0.6} ${drop + 2}`, i % 2 ? hL : hD, 0.7, 'opacity=".5"'); }).join("")
+      + P(`M${100 - w + 1} ${my + 1} Q100 ${my + 5} ${100 + w - 1} ${my + 1} Q100 ${my + 9} ${100 - w + 1} ${my + 1} Z`, hc, 'opacity=".6"');
+  }
+
+  // ---- hair (front) ----
+  let hairFront = "";
+  const covered = cover !== "none";
+  const hairline = `M${100 - fw - 2} 82 Q${100 - fw - 4} 50 100 ${f ? 40 : 42} Q${100 + fw + 4} 50 ${100 + fw + 2} 82`;
+  if (!covered || cover === "veil" || cover === "coins" || cover === "scarf") {
+    if (hair === "short" && !covered) hairFront = P(`${hairline} L${100 + fw - 1} 84 Q${100 + fw - 2} 66 ${100 + 12} 62 Q100 64 ${100 - 10} 61 Q${100 - fw + 1} 64 ${100 - fw + 1} 84 Z`, `url(#hr${u})`) + S(`M${100 - 16} 50 Q${100 - 6} 46 ${100 + 10} 50`, hL, 1, 'opacity=".5"');
+    if (hair === "crop" && !covered) hairFront = P(`M${100 - fw} 74 Q${100 - fw - 1} 50 100 46 Q${100 + fw + 1} 50 ${100 + fw} 74 Q${100 + fw - 3} 62 100 60 Q${100 - fw + 3} 62 ${100 - fw} 74 Z`, hc, 'opacity=".9"');
+    if (hair === "long" || hair === "bun" || hair === "braids") hairFront = P(`${hairline} L${100 + fw} 96 Q${100 + fw - 2} 66 ${100 + 2} 58 L100 60 L${100 - 2} 58 Q${100 - fw + 2} 66 ${100 - fw} 96 Z`, `url(#hr${u})`) + S("M100 46 L100 60", hD, 0.9, 'opacity=".7"') + S(`M${100 - 14} 52 Q${100 - 22} 60 ${100 - fw + 2} 78`, hL, 0.9, 'opacity=".5"');
+    if (hair === "curly") hairFront = P(`${hairline} Q${100 + fw - 4} 64 ${100 + 6} 60 Q100 62 ${100 - 6} 60 Q${100 - fw + 4} 64 ${100 - fw - 2} 82 Z`, `url(#hr${u})`) + [[-22, 50], [-10, 44], [4, 44], [18, 48], [-28, 62], [26, 60]].map(([dx, y]) => `<circle cx="${100 + dx}" cy="${y}" r="${f ? 6 : 5.4}" fill="url(#hr${u})"/>`).join("");
+    if (hair === "braids") hairFront += [-1, 1].map(s => [...Array(7)].map((_, i) => `<ellipse cx="${100 + s * (cw - 1) + s * Math.sin(i) * 0.6}" cy="${118 + i * 12}" rx="5" ry="6.4" fill="url(#hr${u})" stroke="${hD}" stroke-width=".6"/>`).join("") + `<circle cx="${100 + s * (cw - 1)}" cy="${118 + 7 * 12 - 2}" r="2.6" fill="${accent || "#962F28"}"/>`).join("");
+    if (covered && cover !== "scarf") hairFront = hairFront ? `<g clip-path="url(#fc${u})">${hairFront}</g>` : "";
+    if (cover === "scarf") hairFront = "";
+  }
+
+  // ---- unlockable headgear ----
   let hatSVG = "";
-  if (hat === "band") hatSVG = P("M31 41 Q60 31 89 41 L89 47 Q60 37 31 47 Z", sash);
-  if (hat === "wrap") { const c = "#ECE1C8"; hairFront = ""; hairBack = "";
-    hatSVG = P("M27 54 Q24 17 60 17 Q96 17 93 54 L96 94 Q86 98 82 88 L84 54 Q60 42 36 54 L38 88 Q34 98 24 94 Z", c) + P("M29 40 Q60 29 91 40 L91 48 Q60 37 29 48 Z", sash) + P("M36 54 Q60 42 84 54 L84 60 Q60 48 36 60Z", "#D9CBAA"); }
-  if (hat === "laurel") { const leaves = []; for (let i = 0; i < 6; i++) { const t = i / 5, x1 = 33 + t * 18, x2 = 87 - t * 18, y = 46 - Math.sin(t * Math.PI / 2) * 14;
-      leaves.push(E(x1, y, 6, 3, i % 2 ? "#4E9A3A" : "#6CC04F", `transform="rotate(${-50 + t * 40} ${x1} ${y})"`), E(x2, y, 6, 3, i % 2 ? "#4E9A3A" : "#6CC04F", `transform="rotate(${50 - t * 40} ${x2} ${y})"`)); }
-    hatSVG = leaves.join(""); }
-  if (hat === "helmet") hatSVG = P("M28 52 Q27 16 60 16 Q93 16 92 52 L86 52 Q86 30 60 30 Q34 30 34 52 Z", "#AEB8C4") + P("M28 48 Q28 16 60 16 Q92 16 92 48 Q60 36 28 48 Z", "#C7D0DA")
-    + P("M55 17 Q58 0 76 4 Q68 9 66 17 Z", "#D9363E") + R(28, 46, 64, 6, 3, "#9AA6B4");
-  if (hat === "crown") hatSVG = P("M37 33 L40 11 L50 24 L60 7 L70 24 L80 11 L83 33 Z", "#F5B301") + R(36, 30, 48, 8, 3, "#E09E00") + C(60, 34, 3, "#E11D48") + C(47, 34, 2.4, "#2F7BF0") + C(73, 34, 2.4, "#0E9C8D") + C(60, 7, 2.4, "#FFE27A") + C(40, 11, 2, "#FFE27A") + C(80, 11, 2, "#FFE27A");
+  if (hat === "band") hatSVG = S(`M${100 - fw - 1} 68 Q100 56 ${100 + fw + 1} 68`, UNLOCK.sash[L.sash][1], 3.2);
+  if (hat === "wrap") hatSVG = P(`M${100 - fw - 6} 72 Q100 34 ${100 + fw + 6} 72 Q100 58 ${100 - fw - 6} 72 Z`, "#E6DCC6") + S(`M${100 - fw - 5} 70 Q100 50 ${100 + fw + 5} 70`, UNLOCK.sash[L.sash][1], 2.4);
+  if (hat === "laurel") hatSVG = [...Array(14)].map((_, i) => { const s = i < 7 ? -1 : 1, k = i % 7, t = k / 6, x = 100 + s * (fw + 4) * (1 - t * 0.85), y = 70 - Math.sin(t * Math.PI / 2) * 18; return `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="5" ry="2.2" fill="${k % 2 ? "#5E7A36" : "#7E9A45"}" transform="rotate(${(s * (60 - t * 50)).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`; }).join("");
+  if (hat === "helmet") hatSVG = P(`M${100 - fw - 8} 80 Q${100 - fw - 9} 32 100 30 Q${100 + fw + 9} 32 ${100 + fw + 8} 80 L${100 + fw + 2} 84 L${100 + fw} 70 Q100 62 ${100 - fw} 70 L${100 - fw - 2} 84 Z`, "#8E969E")
+    + P(`M${100 - fw - 8} 64 Q100 52 ${100 + fw + 8} 64 L${100 + fw + 8} 70 Q100 58 ${100 - fw - 8} 70 Z`, "#C9A04B") + P(`M96 30 Q100 8 112 12 Q104 18 104 30 Z`, "#8E2A24") + hi(`M${100 - fw - 4} 60 Q${100 - 18} 36 100 34`, 3, 0.35);
+  if (hat === "crown") hatSVG = P(`M${100 - 22} 58 L${100 - 24} 36 L${100 - 12} 48 L100 30 L${100 + 12} 48 L${100 + 24} 36 L${100 + 22} 58 Z`, `url(#gd${u})`) + `<rect x="${100 - 23}" y="54" width="46" height="7" rx="2" fill="url(#gd${u})"/>`
+    + `<circle cx="100" cy="57.5" r="2.4" fill="#8E2A24"/><circle cx="${100 - 12}" cy="57.5" r="1.8" fill="#2B4C8C"/><circle cx="${100 + 12}" cy="57.5" r="1.8" fill="#4E7A3A"/>`;
 
-  const [, facePath, hw] = FACES[L.face], outline = shade(skin, -0.24);
-  const beard = L.beard ? P("M33 56 Q34 86 60 88 Q86 86 87 56 Q82 70 72 70 Q60 75 48 70 Q38 70 33 56 Z", hc) : "";
-  const vb = opts.vb || (opts.bust ? "18 6 84 84" : "0 0 120 160");
+  // ---- jewelry ----
+  const jk = f ? JEWELS[L.jewel][1] : "none";
+  let jewelHead = "", jewelBody = "";
+  if (jk === "ear" || jk === "beads") jewelHead += [-1, 1].map(s => `<circle cx="${100 + s * (cw + 2)}" cy="109" r="3.4" fill="none" stroke="url(#gd${u})" stroke-width="1.4"/>`).join("");
+  if (jk === "beads") jewelBody += [...Array(13)].map((_, i) => { const t = i / 12, x = 82 + 36 * t, y = 156 + Math.sin(t * Math.PI) * 9; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.9" fill="${i % 3 === 1 ? "#2D6E7E" : i % 3 === 2 ? "#8E2A24" : `url(#gd${u})`}"/>`; }).join("");
+  if (jk === "nose") jewelHead += `<circle cx="${100 - 4.6}" cy="111" r="2.2" fill="none" stroke="url(#gd${u})" stroke-width="1"/>` + [-1, 1].map(s => `<circle cx="${100 + s * (cw + 2)}" cy="108" r="1.6" fill="url(#gd${u})"/>`).join("");
+
+  const vb = opts.vb || (opts.bust ? "46 30 108 108" : "0 0 200 240");
   const d = opts.live ? ` style="--d:${(-Math.random() * 4).toFixed(2)}s"` : "";
-  return `<svg class="av${opts.live ? " live" : ""}${opts.cheer ? " cheer" : ""}" viewBox="${vb}" aria-hidden="true"${d}>
-    ${opts.bust || opts.vb ? "" : E(60, 152, 30, 5, "#000", 'opacity=".12"')}
-    <g class="a-body">
-      ${R(46, 126, 11, 22, 5.5, sk2)}${R(63, 126, 11, 22, 5.5, sk2)}
-      ${E(51, 148, 9, 4, "#5A3A22")}${E(69, 148, 9, 4, "#5A3A22")}
-      ${P("M38 94 Q40 82 52 80 L68 80 Q80 82 82 94 L89 134 Q60 141 31 134 Z", tunic)}
-      ${P("M68 80 Q80 82 82 94 L89 134 Q76 138 66 139 Q74 110 68 80 Z", "#000", 'opacity=".08"')}
-      ${P("M31 131 Q60 138 89 131 L89 134 Q60 141 31 134 Z", td)}
-      ${P("M36 106 Q60 113 84 106 L85 114 Q60 121 35 114 Z", sash)}${R(62, 114, 5, 12, 2.5, sash)}
-      ${R(54, 72, 12, 12, 5, sk2)}${P("M52 80 L60 90 L68 80 Z", sk2)}
-      <g class="arm-l">${R(30, 86, 13, 34, 6.5, tunic)}${R(30, 112, 13, 5, 2, td)}${C(36.5, 121, 6.5, skin)}${lItem}</g>
-      <g class="arm-r">${R(77, 86, 13, 34, 6.5, tunic)}${R(77, 112, 13, 5, 2, td)}${rItem}${C(83.5, 121, 6.5, skin)}</g>
-      <g class="a-head">
-        ${hairBack}
-        <circle cx="${60 - hw - 1}" cy="58" r="7" fill="${skin}" stroke="${outline}" stroke-width="1.3"/><circle cx="${60 + hw + 1}" cy="58" r="7" fill="${skin}" stroke="${outline}" stroke-width="1.3"/>
-        <circle cx="${60 - hw - 1}" cy="58" r="3.3" fill="${sk2}"/><circle cx="${60 + hw + 1}" cy="58" r="3.3" fill="${sk2}"/>
-        <path d="${facePath}" fill="${skin}" stroke="${outline}" stroke-width="1.4"/>
-        ${beard}
-        ${faceSVG(L, skin, hc)}
-        ${hairFront}${hatSVG}
-      </g>
-    </g></svg>`;
+  return `<svg class="pt av${opts.live ? " live" : ""}${opts.cheer ? " cheer" : ""}" viewBox="${vb}" aria-hidden="true"${d}>${defs}
+    <g class="pt-body">${hairBack}${coverBack}${neck}${body}${jewelBody}
+    <g class="pt-head">${ears}${face}${eyes}${brows}${nose}${beardSVG}${mouth}${hairFront}${coverFront}${hatSVG}${jewelHead}</g></g></svg>`;
+}
+
+// Small full-body figure for the map and the road (viewBox 60 x 80, feet at the bottom).
+function figureSVG(look, n, opts = {}) {
+  const L = normLook(look, n), f = L.g === "f";
+  const skin = SKINS[L.skin], hc = HAIRC[L.hairColor], tunic = UNLOCK.tunic[L.tunic][1], sash = UNLOCK.sash[L.sash][1];
+  const [, mantle, accent] = MANTLES[L.g][L.mantle], cover = COVERS[L.g][L.cover][1], item = UNLOCK.item[L.item][1], hat = UNLOCK.hat[L.hat][1];
+  const P = (d, fill, extra = "") => `<path d="${d}" fill="${fill}" ${extra}/>`;
+  const td = shade(tunic, -0.3), md = shade(mantle, -0.3);
+  let o = `<ellipse cx="30" cy="78" rx="12" ry="2" fill="#000" opacity=".3"/>`;
+  if (item === "staff") o += `<rect x="40.5" y="6" width="1.8" height="72" rx=".9" fill="#7A5230"/><path d="M41.4 7 Q41 1 45.5 1.6 Q48.5 2.4 47.6 6" fill="none" stroke="#7A5230" stroke-width="1.8" stroke-linecap="round"/>`;
+  if (item === "sword") o += `<rect x="41" y="30" width="1.6" height="18" fill="#D8DEE4"/><rect x="38.6" y="47" width="6.4" height="1.6" rx=".8" fill="#C9A04B"/>`;
+  o += `<g class="fg-body">`;
+  o += P("M26.5 76 h3 v2 h-4 z", "#3E2A1A") + P("M30.5 76 h3 l1 2 h-4 z", "#3E2A1A");
+  o += P(f ? "M24 24 Q30 21 36 24 L40 50 L43 77 Q30 79 17 77 L20 50 Z" : "M23 24 Q30 21 37 24 L40 48 L41 74 Q30 76 19 74 L20 48 Z", tunic) + P(f ? "M30 22 L36 24 L40 50 L43 77 Q36 78.4 31 78.6 Z" : "M30 22 L37 24 L40 48 L41 74 Q36 75.4 31 75.6 Z", td, 'opacity=".55"');
+  if (!f) o += P("M23 75 h7 v2 h-7z M31 75 h7 v2 h-7z", skin, 'opacity=".9"');
+  o += `<rect x="${f ? 21 : 21}" y="42" width="18" height="2.6" rx="1" fill="${sash}"/>`;
+  if (f) o += P("M23.5 12 Q30 3 36.5 12 L39 28 Q41 42 39 54 L33 50 L30 30 L27 50 L21 54 Q19 42 21 28 Z", mantle) + P("M36.5 12 L39 28 Q41 42 39 54 L34 50 Q36 34 33 18 Z", md, 'opacity=".6"');
+  else o += P("M23 24 Q27 22 31 23 L35 48 Q30 52 25 50 L22 36 Z", mantle) + P("M31 23 L37 25 L39 46 L35 48 Z", md) + (accent ? `<path d="M26 23.5 L30 50 M28.5 23 L33 49" stroke="${accent}" stroke-width=".8" opacity=".9"/>` : "");
+  o += `<rect x="19" y="26" width="3.6" height="20" rx="1.8" fill="${f ? mantle : tunic}"/><circle cx="20.8" cy="47.5" r="1.8" fill="${skin}"/>`;
+  o += `<rect x="37.6" y="26" width="3.6" height="20" rx="1.8" fill="${f ? mantle : tunic}" transform="rotate(-8 39.4 26)"/><circle cx="41.6" cy="46.6" r="1.8" fill="${skin}"/>`;
+  o += `<g class="fg-head">`;
+  o += `<rect x="28" y="17" width="4" height="5" fill="${shade(skin, -0.15)}"/><ellipse cx="30" cy="13" rx="4.6" ry="5.6" fill="${skin}"/>`;
+  if (!f && L.beard >= 2) o += P("M25.6 13.5 Q26 19.6 30 20.4 Q34 19.6 34.4 13.5 Q32 16.4 30 16.2 Q28 16.4 25.6 13.5 Z", hc);
+  if (f) o += cover === "none" ? P("M25 13 Q24.6 6.4 30 6.6 Q35.4 6.4 35 13 L36 24 L34 24 L33.6 11 Q30 9 26.4 11 L26 24 L24 24 Z", hc) : P("M24.4 14 Q24 6 30 5.6 Q36 6 35.6 14 L36.4 20 L34.4 20 L34 12 Q30 9.6 26 12 L25.6 20 L23.6 20 Z", mantle);
+  else if (cover === "cloth") o += P("M24.6 13 Q24.4 6 30 6 Q35.6 6 35.4 13 L36.4 22 L34.4 21 L34 11.4 Q30 9.6 26 11.4 L25.6 21 L23.6 22 Z", "#E4DAC4") + `<rect x="24.6" y="8.6" width="10.8" height="1.4" rx=".7" fill="#231C17"/>`;
+  else if (cover === "turban") o += `<ellipse cx="30" cy="9" rx="5.8" ry="4" fill="${mantle}"/>`;
+  else o += P("M25.4 12 Q25 6.6 30 6.6 Q35 6.6 34.6 12 Q32 9.4 30 9.6 Q28 9.4 25.4 12 Z", hc);
+  if (hat === "crown") o += P("M26.4 7 L26 3 L28.2 5 L30 2 L31.8 5 L34 3 L33.6 7 Z", "#D9AE55");
+  if (hat === "helmet") o += P("M24.6 12 Q24.4 5 30 4.8 Q35.6 5 35.4 12 L34 12 Q30 9 26 12 Z", "#8E969E") + `<rect x="29.2" y="1.6" width="1.6" height="3.6" fill="#8E2A24"/>`;
+  if (hat === "laurel") o += `<path d="M25.4 9.6 Q30 6.4 34.6 9.6" fill="none" stroke="#6E8A3E" stroke-width="1.6" stroke-dasharray="1.4 .6"/>`;
+  o += `</g>`;
+  if (item === "scroll") o += `<rect x="40" y="43" width="4" height="6" rx=".8" fill="#E9DAB6"/><rect x="39.6" y="42.4" width="4.8" height="1.2" rx=".6" fill="#9C7A45"/><rect x="39.6" y="48.4" width="4.8" height="1.2" rx=".6" fill="#9C7A45"/>`;
+  if (item === "sling") o += `<path d="M41.6 48 Q43 54 41 58" fill="none" stroke="#6B4A2A" stroke-width=".8"/><circle cx="41" cy="58.6" r="1.3" fill="#8F8F8F"/>`;
+  if (item === "shofar") o += P("M40 46 Q46 46 47.6 40 Q48.4 38 49.6 38.6 Q48.4 47 41 48.4 Z", "#E1CC9C");
+  if (item === "lamp") o += `<ellipse cx="42.6" cy="48.6" rx="3.4" ry="1.6" fill="#B87333"/><path class="flame" d="M45.6 46.6 Q44.4 44.6 45.6 42.4 Q46.8 44.6 45.6 46.6 Z" fill="#FFB52E"/>`;
+  if (item === "shield") o += P("M14 30 Q20.6 27 26 30 L25.4 39 Q24 44 20 46 Q16 44 14.6 39 Z", "#B8892B") + `<rect x="19.2" y="31" width="1.6" height="12" fill="#F1E7CC"/><rect x="16" y="35" width="8" height="1.6" fill="#F1E7CC"/>`;
+  o += `</g>`;
+  const d = opts.live ? ` style="--d:${(-Math.random() * 4).toFixed(2)}s"` : "";
+  return `<svg class="fg av${opts.live ? " live" : ""}${opts.cheer ? " cheer" : ""}" viewBox="0 0 60 80" aria-hidden="true"${d}>${o}</svg>`;
 }
 
 /* ---------- icons ---------- */
@@ -918,7 +1098,7 @@ function viewToday() {
   const pace = target ? (s.n >= target ? `<span class="chip ok">${icon("check")} On pace</span>` : `<span class="chip behind">${plural(target - s.n, "day")} behind</span>`) : "";
 
   let hero;
-  const stage = `<div class="stage">${avatarSVG(me.look, s.n, { live: true, cheer })}</div>`;
+  const stage = `<div class="frame${cheer ? " glow" : ""}">${avatarSVG(me.look, s.n, { portrait: true, live: true, cheer })}<div class="frame-fig">${avatarSVG(me.look, s.n, { live: true })}</div></div>`;
   if (focus === null) {
     hero = `<div class="hero">${stage}<div class="stack">
       <p class="eyebrow">Quest complete</p><h2 class="hero-day">You read the whole New Testament!</h2>
@@ -1052,30 +1232,34 @@ function viewVictories() {
 }
 
 function viewEditor(onboarding) {
-  const d = state.draft, n = onboarding ? 0 : stats(state.me).n;
+  const d = state.draft, n = onboarding ? 0 : stats(state.me).n, g = d.gender;
+  d.look.g = g;
   const taken = takenAliases();
-  const names = d.gender === "f" ? NAMES_F : NAMES_M;
+  const names = g === "f" ? NAMES_F : NAMES_M;
   const alias = (d.name + (d.place ? " " + d.place : "")).trim();
   const aliasTaken = taken.has(alias.toLowerCase());
-  const swatches = (key, arr, label) => arr.map((c, i) => `<button class="sw-opt" style="background:${c}" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}" aria-label="${label} ${i + 1}"></button>`).join("");
-  const unl = key => UNLOCK[key].map(([label, val, need], i) => {
+  const swatches = (key, arr, label) => arr.map((c, i) => `<button class="sw-opt" style="background:${Array.isArray(c) ? c[1] : c}" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}" aria-label="${Array.isArray(c) ? esc(c[0]) : `${label} ${i + 1}`}" title="${Array.isArray(c) ? esc(c[0]) : ""}"></button>`).join("");
+  const unl = key => allowedFor(key, g).map(([[label, val, need], i]) => {
     const locked = need > n;
     if (key === "tunic" || key === "sash") return `<button class="sw-opt ${locked ? "lock" : ""}" style="background:${val}" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}" ${locked ? `data-day="${need}d" aria-disabled="true"` : ""} title="${esc(label)}${locked ? ` (unlocks after ${need} days)` : ""}" aria-label="${esc(label)}${locked ? `, locked until ${need} days` : ""}"></button>`;
     return `<button class="opt ${locked ? "lock" : ""}" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}" ${locked ? 'aria-disabled="true"' : ""}>${locked ? `<span class="lk">${icon("lock")}</span>` : ""}${esc(label)}${locked ? ` · ${need}d` : ""}</button>`;
   }).join("");
   const teams = state.config.teams;
+  const L = normLook(d.look, n);
   return `${onboarding ? `<section class="card stack"><p class="eyebrow">${esc(state.config.groupName)}</p><h2>Create your character</h2>
-      <p class="muted" style="max-width:68ch">Together we're reading the whole New Testament, Matthew to Revelation, in 70 days: about 4 chapters a day. Pick a Bible name so you stay anonymous, style your character, and join a team. Reading unlocks new gear.</p></section>` : ""}
+      <p class="muted" style="max-width:68ch">Together we're reading the whole New Testament, Matthew to Revelation, in 70 days: about 4 chapters a day. Choose a Bible name so you stay anonymous, dress your character the way people dressed in the first century, and join a team. Reading unlocks new gear.</p></section>` : ""}
   <section class="card editor">
-    <div class="preview"><div class="stage">${avatarSVG(d.look, n, { live: true })}</div>
-      <div class="alias">${esc(alias || "Pick a name")}</div>
+    <div class="preview"><div class="frame big">${avatarSVG(d.look, n, { portrait: true, live: true })}<div class="frame-fig">${avatarSVG(d.look, n, { live: true })}</div></div>
+      <div class="alias">${esc(alias || "Choose a name")}</div>
+      <p class="small muted" style="text-align:center">${g === "f" ? "Sister" : "Brother"}${L.cover ? " · " + COVERS[g][L.cover][0] : ""} · ${MANTLES[g][L.mantle][0]} ${g === "f" ? "shawl" : "mantle"}</p>
       ${aliasTaken ? `<p class="small" style="color:var(--rose)">Someone already has that name. Add a hometown or pick another.</p>` : ""}
-      <button class="btn go" data-save="1" ${!d.name || aliasTaken || state.readOnly ? "disabled" : ""}>${onboarding ? "Join the quest" : "Save changes"}</button>
+      <button class="btn go" data-save="1" ${!d.name || aliasTaken || state.readOnly ? "disabled" : ""}>${onboarding ? "Begin the quest" : "Save changes"}</button>
       ${!onboarding ? `<p class="small muted" style="text-align:center">${state.readOnly ? "Saving is turned off for you." : "Saves to the group leaderboard."}</p>` : ""}
     </div>
-    <div class="stack" style="gap:22px">
+    <div class="stack" style="gap:26px">
+      <div class="group"><h3 class="ghead">Identity</h3>
       <div class="field"><span class="lbl">Bible name</span>
-        <div class="seg" role="group" aria-label="Name list"><button data-gender="m" aria-pressed="${d.gender === "m"}">Brothers</button><button data-gender="f" aria-pressed="${d.gender === "f"}">Sisters</button></div>
+        <div class="seg" role="group" aria-label="Brothers or sisters"><button data-gender="m" aria-pressed="${g === "m"}">Brothers</button><button data-gender="f" aria-pressed="${g === "f"}">Sisters</button></div>
         <div class="opts">${names.map(nm => { const t = taken.has((nm + (d.place ? " " + d.place : "")).toLowerCase());
           return `<button class="opt" data-name="${esc(nm)}" aria-pressed="${d.name === nm}" ${t ? "disabled" : ""}>${esc(nm)}</button>`; }).join("")}</div>
         <div class="row"><label for="place" class="small">Hometown (optional)</label>
@@ -1083,24 +1267,37 @@ function viewEditor(onboarding) {
           <button class="btn sm" data-random="1">Random name</button></div>
       </div>
       ${teams.length ? `<div class="field"><span class="lbl">Team</span><div class="opts">${teams.map((t, i) => `<button class="opt" data-team="${esc(t)}" aria-pressed="${d.team === t}"><span class="dot" style="background:${TEAM_COLORS[i]}"></span>${esc(t)}</button>`).join("")}</div></div>` : ""}
-      ${featurePicker("face", FACES, "Face shape", "22 14 76 76", d, n)}
-      ${featurePicker("eyes", EYES, "Eyes", "34 37 52 26", d, n)}
-      <div class="field"><span class="lbl">Eye color</span><div class="opts">${EYEC.map((c, i) => `<button class="sw-opt" style="background:${c}" data-look="eyeColor" data-val="${i}" aria-pressed="${d.look.eyeColor === i}" aria-label="Eye color ${i + 1}"></button>`).join("")}</div></div>
-      ${featurePicker("brows", BROWS, "Eyebrows", "34 33 52 26", d, n)}
-      ${featurePicker("mouth", MOUTHS, "Mouth", "40 52 40 26", d, n)}
-      <div class="two">
-        <div class="field"><span class="lbl">Skin</span><div class="opts">${swatches("skin", SKINS, "Skin")}</div></div>
-        <div class="field"><span class="lbl">Hair color</span><div class="opts">${swatches("hairColor", HAIRC, "Hair color")}</div></div>
       </div>
-      <div class="field"><span class="lbl">Hair</span><div class="opts">${HAIRS.map(([l], i) => `<button class="opt" data-look="hair" data-val="${i}" aria-pressed="${d.look.hair === i}">${l}</button>`).join("")}
-        <button class="opt" data-beard="1" aria-pressed="${d.look.beard === true}">Beard</button></div></div>
+      <div class="group"><h3 class="ghead">Face</h3>
       <div class="two">
-        <div class="field"><span class="lbl">Tunic</span><div class="opts">${unl("tunic")}</div></div>
-        <div class="field"><span class="lbl">Sash</span><div class="opts">${unl("sash")}</div></div>
+        <div class="field"><span class="lbl">Skin</span><div class="opts">${swatches("skin", SKINS, "Skin tone")}</div></div>
+        <div class="field"><span class="lbl">Eye color</span><div class="opts">${swatches("eyeColor", EYEC, "Eye color")}</div></div>
       </div>
+      ${featurePicker("face", FACES, "Face shape", "50 34 100 112", d, n)}
+      ${featurePicker("eyes", EYES, "Eyes", "66 76 68 30", d, n)}
+      ${featurePicker("brows", BROWS, "Eyebrows", "66 70 68 28", d, n)}
+      ${featurePicker("mouth", MOUTHS, "Mouth", "80 104 40 26", d, n)}
+      ${g === "m" ? featurePicker("beard", BEARDS, "Beard", "54 74 92 92", d, n) : ""}
+      </div>
+      <div class="group"><h3 class="ghead">Hair &amp; head covering</h3>
+      <div class="field"><span class="lbl">Hair color</span><div class="opts">${swatches("hairColor", HAIRC, "Hair color")}</div></div>
+      ${featurePicker("hair", HAIRS, "Hair", "40 24 120 130", { look: { ...d.look, cover: 0 } }, n)}
+      ${featurePicker("cover", COVERS[g], g === "f" ? "Veil or head covering" : "Head covering", "40 14 120 140", d, n)}
+      </div>
+      <div class="group"><h3 class="ghead">Clothing</h3>
+      <div class="field"><span class="lbl">${g === "f" ? "Shawl and veil" : "Mantle (outer cloak)"}</span><div class="opts">${swatches("mantle", MANTLES[g])}</div>
+        <p class="small muted">${g === "f" ? "Women's garments were often dyed with indigo, madder root and saffron, with embroidered edges." : "Men usually wore undyed or earth-toned wool, often with woven stripes."}</p></div>
+      <div class="two">
+        <div class="field"><span class="lbl">Robe</span><div class="opts">${unl("tunic")}</div></div>
+        <div class="field"><span class="lbl">Girdle (belt)</span><div class="opts">${unl("sash")}</div></div>
+      </div>
+      ${g === "f" ? featurePicker("jewel", JEWELS, "Jewelry", "56 70 88 100", d, n) : ""}
+      </div>
+      <div class="group"><h3 class="ghead">Gear</h3>
       <div class="field"><span class="lbl">Headgear</span><div class="opts">${unl("hat")}</div></div>
       <div class="field"><span class="lbl">Item</span><div class="opts">${unl("item")}</div>
         <p class="small muted">Locked gear shows how many days of reading it takes. You have ${plural(n, "day")}.</p></div>
+      </div>
       ${!onboarding && state.backend === "firebase" && state.account ? `<div class="field acct"><span class="lbl">Account</span>
         <p class="small muted">Signed in${state.account.email ? ` as ${esc(state.account.email)}` : ""}. Only you see this.</p>
         <p class="small muted">Account ID (your leader may ask for it): <code>${esc(state.account.uid)}</code></p>
@@ -1111,7 +1308,7 @@ function viewEditor(onboarding) {
 
 function featurePicker(key, list, title, vb, d, n) {
   return `<div class="field"><span class="lbl">${title}</span><div class="feats">${list.map(([label], i) =>
-    `<button class="feat" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}"><span class="fprev">${avatarSVG({ ...d.look, [key]: i, hat: key === "face" ? 0 : d.look.hat }, n, { vb })}</span><span>${esc(label)}</span></button>`).join("")}</div></div>`;
+    `<button class="feat" data-look="${key}" data-val="${i}" aria-pressed="${state.draft.look[key] === i}"><span class="fprev">${avatarSVG({ ...d.look, [key]: i, hat: 0 }, n, { vb })}</span><span>${esc(label)}</span></button>`).join("")}</div></div>`;
 }
 
 function startHint(v) {
@@ -1169,7 +1366,7 @@ function render(force) {
   state.renderPending = false;
   $("#top").innerHTML = headerHTML();
   main.classList.toggle("enter", state.enter); state.enter = false;
-  if (state.phase === "loading") { main.innerHTML = `<div class="loading">${avatarSVG({}, 0, { live: true })}<p class="disp">Getting your quest ready…</p></div>`; return; }
+  if (state.phase === "loading") { main.innerHTML = `<div class="loading">${avatarSVG({}, 0, { live: true })}<p class="disp">Lighting the lamps…</p></div>`; return; }
   if (state.phase === "signin") { main.innerHTML = viewSignIn(); return; }
   if (state.phase === "join") { main.innerHTML = viewEditor(true); return; }
   if (state.tab === "me" && !state.draft && state.me) state.draft = draftFrom(state.me);
@@ -1195,10 +1392,12 @@ function draftFrom(p) {
 }
 function newDraft() { return newDraftFor(Math.random() < 0.5 ? "m" : "f"); }
 function newDraftFor(g) {
-  const r = arr => arr[Math.floor(Math.random() * arr.length)];
-  return { gender: g, name: "", place: "", team: "", look: { g, skin: Math.floor(Math.random() * SKINS.length), hair: g === "f" ? r([1, 2, 4]) : r([0, 3, 5]), hairColor: Math.floor(Math.random() * 4),
-    beard: false, tunic: Math.floor(Math.random() * 4), sash: 0, hat: 0, item: 0, face: g === "f" ? r([1, 3]) : r([0, 2, 4]), eyes: g === "f" ? r([1, 2]) : r([0, 1]),
-    eyeColor: Math.floor(Math.random() * 3), brows: g === "f" ? r([0, 3]) : r([1, 2]), mouth: r([0, 1, 3]) } };
+  const r = arr => arr[Math.floor(Math.random() * arr.length)], f = g === "f";
+  const tunics = allowedFor("tunic", g).filter(([e]) => e[2] === 0).map(([, i]) => i);
+  return { gender: g, name: "", place: "", team: "", look: { g, skin: 1 + Math.floor(Math.random() * 4), hair: f ? r([1, 4, 2]) : r([0, 3, 5]), hairColor: Math.floor(Math.random() * 4),
+    beard: f ? 0 : r([2, 3, 3, 4, 1]), tunic: r(tunics), sash: 0, hat: 0, item: 0, face: f ? r([1, 3]) : r([0, 2, 4]), eyes: f ? r([0, 4]) : r([0, 2, 3]),
+    eyeColor: Math.floor(Math.random() * 3), brows: f ? r([0, 3]) : r([1, 2]), mouth: r([0, 3]), cover: f ? r([1, 2, 3]) : r([0, 1, 1]),
+    mantle: f ? Math.floor(Math.random() * 3) : r([0, 1, 4]), jewel: f ? r([1, 2]) : 0 } };
 }
 
 /* ---------- celebrations ---------- */
@@ -1209,11 +1408,11 @@ function toast(msg) {
 }
 function confetti(x, y, count = 36) {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const cols = ["#F0562A", "#FF9A3C", "#F5B301", "#0E9C8D", "#2F7BF0", "#7C4DFF", "#E11D48"];
+  const cols = ["#F2D58C", "#D9AE55", "#E0913A", "#FFF1C9", "#F6B860"];
   for (let i = 0; i < count; i++) {
     const b = document.createElement("div"); b.className = "confetti";
     const a = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.1, sp = 90 + Math.random() * 160;
-    b.style.cssText = `left:${x}px;top:${y}px;background:${cols[i % cols.length]};--dx:${Math.cos(a) * sp}px;--dy:${Math.sin(a) * sp + 160 + Math.random() * 120}px;--r:${(Math.random() - 0.5) * 900}deg;animation-delay:${Math.random() * 0.08}s`;
+    b.style.cssText = `left:${x}px;top:${y}px;background:${cols[i % cols.length]};color:${cols[i % cols.length]};--dx:${Math.cos(a) * sp}px;--dy:${Math.sin(a) * sp + 160 + Math.random() * 120}px;--r:${(Math.random() - 0.5) * 900}deg;animation-delay:${Math.random() * 0.08}s`;
     document.body.appendChild(b); setTimeout(() => b.remove(), 1700);
   }
 }
@@ -1254,10 +1453,10 @@ function toggleDay(day, el) {
     const vic = VICTORIES.find(v => v.day === after.n);
     if (vic) queueReveal({ kicker: "Victory Moment unlocked", title: vic.title, text: `${vic.ref} is ready for you. A story of God bringing his people through.`, art: victoryMedal(VICTORIES.indexOf(vic)), action: "Read the story", onAct: () => setTab("victories") });
     BADGES.filter(b => b.test(after) && !b.test(before)).forEach(b => queueReveal({ kicker: "Badge earned", title: b.name, text: b.desc + ".", art: medalIcon(b) }));
-    for (const [k, arr] of Object.entries(UNLOCK)) arr.forEach(([label, , need], i) => {
-      if (need === after.n && need > before.n) {
+    for (const [k, arr] of Object.entries(UNLOCK)) arr.forEach(([label, , need, who], i) => {
+      if (need === after.n && need > before.n && (!who || who === normLook(state.me.look, 0).g)) {
         const look = { ...normLook(state.me.look, after.n), [k]: i };
-        queueReveal({ kicker: `New ${UNLOCK_NAMES[k]} unlocked`, title: label, text: `You read ${plural(after.n, "day")}. Try it on!`, art: avatarSVG(look, after.n, { live: true }), action: "Wear it",
+        queueReveal({ kicker: `New ${UNLOCK_NAMES[k]} unlocked`, title: label, text: `You read ${plural(after.n, "day")}. Try it on!`, art: `<div class="frame mid">${avatarSVG(look, after.n, { portrait: true, live: true })}<div class="frame-fig">${avatarSVG(look, after.n, { live: true })}</div></div>`, action: "Wear it",
           onAct: () => { state.me = { ...state.me, look }; saveMe(); toast(`Wearing ${label}`); render(true); } });
       }
     });
@@ -1318,14 +1517,16 @@ document.addEventListener("click", e => {
   const d = state.draft;
   if (!d) return;
   if (ds.gender) {
-    if (state.phase === "join" && d.gender !== ds.gender) { const fresh = newDraftFor(ds.gender).look; ["hair", "face", "eyes", "brows", "beard"].forEach(k => { d.look[k] = fresh[k]; }); }
+    if (d.gender !== ds.gender) {
+      const fresh = newDraftFor(ds.gender).look;
+      ["cover", "mantle", "tunic", "jewel", "beard"].concat(state.phase === "join" ? ["hair", "face", "eyes", "brows"] : []).forEach(k => { d.look[k] = fresh[k]; });
+    }
     d.gender = ds.gender; d.name = ""; d.look.g = ds.gender;
   }
   else if (ds.name) d.name = ds.name;
   else if (ds.team) d.team = d.team === ds.team ? "" : ds.team;
-  else if (ds.beard) d.look.beard = !d.look.beard;
   else if (ds.look) {
-    if (t.getAttribute("aria-disabled") === "true") { const need = UNLOCK[ds.look][+ds.val][2]; toast(`Read ${need} days to unlock this`); return; }
+    if (t.getAttribute("aria-disabled") === "true") { const need = (UNLOCK[ds.look] || [])[+ds.val]?.[2] ?? 0; toast(`Read ${need} days to unlock this`); return; }
     d.look[ds.look] = +ds.val;
   } else if (ds.random) {
     const taken = takenAliases(), names = d.gender === "f" ? NAMES_F : NAMES_M;
@@ -1405,12 +1606,12 @@ function viewSignIn() {
       <div class="or"><span>or get a link by email</span></div>
       <form id="emailform" class="row" style="flex-wrap:nowrap"><input type="email" id="si-email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address" style="flex:1;min-width:0">
       <button class="btn dark" type="submit" ${a.busy ? "disabled" : ""}>Send link</button></form>`;
-  return `<section class="card signin"><div class="stage">${avatarSVG(SIGNIN_LOOK, 0, { live: true })}</div>
+  return `<section class="card signin"><div class="frame">${avatarSVG(SIGNIN_LOOK, 0, { portrait: true, live: true })}<div class="frame-fig">${avatarSVG(SIGNIN_LOOK, 0, { live: true })}</div></div>
     <div class="stack" style="gap:14px"><p class="eyebrow">New Testament in 70 days</p><h2>Join the NT70 Quest</h2>
       <p class="muted">Sign in so your character and progress follow you on any device. The group only ever sees the Bible name you pick.</p>
       ${body}${a.error ? `<p class="small" style="color:var(--rose)">${esc(a.error)}</p>` : ""}</div></section>`;
 }
-const SIGNIN_LOOK = { g: "f", skin: 2, hair: 4, hairColor: 0, tunic: 2, sash: 1, face: 3, eyes: 2, eyeColor: 0, brows: 0, mouth: 1 };
+const SIGNIN_LOOK = { g: "f", skin: 2, hair: 4, hairColor: 1, tunic: 3, sash: 1, face: 1, eyes: 0, eyeColor: 0, brows: 0, mouth: 0, cover: 1, mantle: 1, jewel: 1 };
 
 async function authAction(kind) {
   const a = state.auth;
