@@ -1,8 +1,929 @@
-<!DOCTYPE html>
-<html>
-    <body>
-        <h1>This is a Header</h1>
-        <p>This is a paragraph</p>
-        <p>This is a second paragraph</p>
-    </body>
-</html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>NT70 Reading Quest</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Pixelify+Sans:wght@500;700&display=swap">
+<style>
+/* Layout: one column of chunky "blocks" (hard borders, offset shadows) on a pale sky ground; plan laid out as 10 weeks x 7 days. */
+:root {
+  --bg: #E3EBEE;
+  --panel: #FFFFFF;
+  --panel-2: #F1F5F2;
+  --ink: #1B2430;
+  --muted: #56616D;
+  --line: #1B2430;
+  --grass: #3E8E2E;
+  --grass-hi: #63B843;
+  --dirt: #84552D;
+  --gold: #C98C12;
+  --lapis: #2D5BA6;
+  --ruby: #B0352E;
+  --violet: #6A46A6;
+  --on-accent: #FFFFFF;
+  --sec-g: #3E8E2E;
+  --sec-a: #2D5BA6;
+  --sec-p: #B37A0F;
+  --sec-l: #6A46A6;
+  --sec-r: #B0352E;
+  --font-display: "Pixelify Sans", "Courier New", monospace;
+  --font-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.6rem;
+  --step-3: 2.2rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121820; --panel: #1C2430; --panel-2: #232D3A; --ink: #E7EDF2; --muted: #A3AFBB; --line: #0A0E13;
+    --grass: #5CB53F; --grass-hi: #7ED35C; --dirt: #B07A4E; --gold: #F0B93D; --lapis: #6C95E3; --ruby: #E0675E; --violet: #A88AE6;
+    --on-accent: #0E131A;
+    --sec-g: #5CB53F; --sec-a: #6C95E3; --sec-p: #E3A92E; --sec-l: #A88AE6; --sec-r: #E0675E;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121820; --panel: #1C2430; --panel-2: #232D3A; --ink: #E7EDF2; --muted: #A3AFBB; --line: #0A0E13;
+  --grass: #5CB53F; --grass-hi: #7ED35C; --dirt: #B07A4E; --gold: #F0B93D; --lapis: #6C95E3; --ruby: #E0675E; --violet: #A88AE6;
+  --on-accent: #0E131A;
+  --sec-g: #5CB53F; --sec-a: #6C95E3; --sec-p: #E3A92E; --sec-l: #A88AE6; --sec-r: #E0675E;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: var(--step-0); line-height: 1.5;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
+h1, h2, h3, .px { font-family: var(--font-display); font-weight: 700; letter-spacing: .01em; text-wrap: balance; margin: 0; line-height: 1.15; }
+h2 { font-size: var(--step-2); }
+h3 { font-size: var(--step-1); }
+p { margin: 0; }
+a { color: var(--lapis); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.wrap { max-width: 960px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Header */
+#top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--panel); border-bottom: 3px solid var(--line); }
+.bar { display: flex; align-items: center; gap: 12px; padding-block: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+.brand-mark { width: 34px; height: 34px; flex: none; }
+.brand h1 { font-size: var(--step-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand small { display: block; font-family: var(--font-body); font-weight: 400; font-size: var(--step--1); color: var(--muted); letter-spacing: 0; }
+.mepill { display: flex; align-items: center; gap: 8px; background: var(--panel-2); border: 2px solid var(--line); padding: 2px 10px 2px 4px; cursor: pointer; min-width: 0; }
+.mepill .av { width: 26px; height: 38px; }
+.mepill span { font-weight: 700; font-size: var(--step--1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+.tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 0; border-top: 2px solid var(--line); }
+.tabs button { background: none; border: 0; border-right: 2px solid var(--line); padding: 8px 4px; font-family: var(--font-display); font-weight: 500; font-size: var(--step-0); cursor: pointer; }
+.tabs button:last-child { border-right: 0; }
+.tabs button[aria-current="page"] { background: var(--grass); color: var(--on-accent); }
+.tabs button:hover:not([aria-current="page"]) { background: var(--panel-2); }
+
+main { padding-block: 20px 64px; display: grid; gap: 20px; }
+
+/* Blocks */
+.blk { background: var(--panel); border: 3px solid var(--line); box-shadow: 5px 5px 0 var(--line); padding: 18px; min-width: 0; }
+.blk.flat { box-shadow: none; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.stack { display: grid; gap: 12px; }
+.muted { color: var(--muted); }
+.small { font-size: var(--step--1); }
+.eyebrow { font-family: var(--font-display); font-size: var(--step--1); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.note { border: 2px dashed var(--muted); padding: 10px 14px; background: var(--panel-2); }
+.note.warn { border-color: var(--ruby); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 3px solid var(--line); background: var(--panel); box-shadow: 3px 3px 0 var(--line); padding: 10px 16px; font-family: var(--font-display); font-weight: 700; font-size: var(--step-0); cursor: pointer; text-decoration: none; color: var(--ink); transition: transform .06s, box-shadow .06s; }
+.btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--line); }
+.btn.go { background: var(--grass); color: var(--on-accent); }
+.btn.gold { background: var(--gold); color: var(--on-accent); }
+.btn.big { font-size: var(--step-1); padding: 14px 22px; }
+.btn.sm { padding: 6px 10px; font-size: var(--step--1); box-shadow: 2px 2px 0 var(--line); }
+.btn.danger { background: var(--ruby); color: var(--on-accent); }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 2px solid var(--line); padding: 1px 8px; font-size: var(--step--1); font-weight: 700; background: var(--panel-2); }
+.chip.sec-g { background: var(--sec-g); color: var(--on-accent); }
+.chip.sec-a { background: var(--sec-a); color: var(--on-accent); }
+.chip.sec-p { background: var(--sec-p); color: var(--on-accent); }
+.chip.sec-l { background: var(--sec-l); color: var(--on-accent); }
+.chip.sec-r { background: var(--sec-r); color: var(--on-accent); }
+.chip.ok { background: var(--grass); color: var(--on-accent); }
+.chip.behind { background: var(--ruby); color: var(--on-accent); }
+
+/* Today */
+.hero { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; }
+.hero .av { width: 92px; height: 134px; }
+.hero-day { font-size: var(--step-3); }
+.hero-read { font-size: var(--step-2); font-family: var(--font-display); font-weight: 500; line-height: 1.2; margin-top: 4px; }
+.ground { height: 12px; background: linear-gradient(var(--grass-hi) 0 4px, var(--dirt) 4px); border: 2px solid var(--line); margin-top: -2px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stat { border: 3px solid var(--line); background: var(--panel); padding: 10px 12px; }
+.stat b { display: block; font-family: var(--font-display); font-size: var(--step-2); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: var(--step--1); color: var(--muted); }
+.meter { height: 16px; border: 2px solid var(--line); background: var(--panel-2); position: relative; overflow: hidden; }
+.meter i { position: absolute; inset: 0 auto 0 0; background: repeating-linear-gradient(90deg, var(--grass) 0 10px, var(--grass-hi) 10px 12px); }
+.catch { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Badges */
+.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.badge { display: grid; grid-template-columns: 34px 1fr; gap: 8px; align-items: center; border: 2px solid var(--line); padding: 6px 8px; background: var(--panel-2); }
+.badge.locked { opacity: .45; filter: grayscale(1); }
+.badge svg { width: 34px; height: 34px; }
+.badge b { display: block; font-size: var(--step--1); line-height: 1.2; }
+.badge span { font-size: 0.72rem; color: var(--muted); line-height: 1.2; display: block; }
+
+/* Plan grid */
+.week { display: grid; gap: 6px; }
+.week + .week { margin-top: 14px; }
+.week-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; align-items: baseline; }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.tile { position: relative; border: 3px solid var(--line); background: var(--panel); min-height: 64px; padding: 4px 5px; text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+.tile .n { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); line-height: 1; }
+.tile .r { font-size: 0.7rem; line-height: 1.15; overflow-wrap: anywhere; }
+.tile::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 5px; background: var(--sc); }
+.tile.done { background: var(--sc); color: var(--on-accent); }
+.tile.done::after { content: ""; position: absolute; right: 4px; top: 8px; width: 14px; height: 14px; background: var(--on-accent); -webkit-mask: var(--check) center/contain no-repeat; mask: var(--check) center/contain no-repeat; }
+.tile.today { outline: 3px solid var(--gold); outline-offset: 2px; }
+.tile.sel { box-shadow: inset 0 0 0 3px var(--gold); }
+.tile.vic { border-style: double; border-width: 5px; }
+.sec-g { --sc: var(--sec-g); } .sec-a { --sc: var(--sec-a); } .sec-p { --sc: var(--sec-p); } .sec-l { --sc: var(--sec-l); } .sec-r { --sc: var(--sec-r); }
+:root { --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 6' shape-rendering='crispEdges'%3E%3Cpath d='M6 0h1v2H6zM5 2h1v1H5zM4 3h1v1H4zM3 4h1v1H3zM2 5h1v1H2zM1 4h1v1H1zM0 3h1v1H0z'/%3E%3C/svg%3E"); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Group */
+.teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.team { border: 3px solid var(--line); padding: 12px; background: var(--panel-2); display: grid; gap: 8px; }
+.team h3 { display: flex; align-items: center; gap: 8px; }
+.team .sw { width: 16px; height: 16px; border: 2px solid var(--line); flex: none; }
+.team .meter i { background: var(--tc); }
+.track-wrap { overflow-x: auto; border: 3px solid var(--line); background: linear-gradient(var(--panel-2), var(--panel)); }
+.track { display: grid; grid-template-columns: repeat(71, 30px); align-items: end; width: max-content; padding-top: 8px; }
+.tcol { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.tcol .ppl { display: flex; flex-direction: column-reverse; align-items: center; min-height: 48px; }
+.tcol .av { width: 22px; height: 32px; }
+.tcol .more { font-size: 0.65rem; font-weight: 700; }
+.tblock { width: 30px; height: 26px; border-top: 4px solid var(--grass-hi); background: var(--dirt); border-right: 1px solid rgba(0,0,0,.25); font-family: var(--font-display); font-size: 0.65rem; color: #fff; display: flex; align-items: center; justify-content: center; }
+.tblock.mile { background: var(--gold); color: #1B2430; }
+.tblock.me { box-shadow: inset 0 0 0 2px #fff; }
+.board { display: grid; gap: 8px; }
+.prow { display: grid; grid-template-columns: 28px 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; border: 2px solid var(--line); padding: 6px 10px; background: var(--panel); }
+.prow.me { background: var(--panel-2); border-width: 3px; }
+.prow .rank { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); text-align: center; font-variant-numeric: tabular-nums; }
+.prow .av { width: 32px; height: 46px; }
+.prow .who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prow .who span { font-size: var(--step--1); color: var(--muted); }
+.prow .nums { text-align: right; font-variant-numeric: tabular-nums; font-size: var(--step--1); }
+.prow .nums b { font-family: var(--font-display); font-size: var(--step-1); display: block; line-height: 1.1; }
+
+/* Victories */
+.vics { display: grid; gap: 16px; }
+.vic { display: grid; grid-template-columns: 64px 1fr; gap: 16px; }
+.vic .medal { width: 64px; height: 64px; }
+.vic.locked { background: var(--panel-2); }
+.vic.locked .medal { filter: grayscale(1); opacity: .5; }
+.vic h3 { margin-bottom: 2px; }
+.vic blockquote { margin: 10px 0; padding: 8px 12px; border-left: 6px solid var(--gold); background: var(--panel-2); font-style: italic; }
+.vic .q { margin-top: 10px; padding: 10px 12px; border: 2px solid var(--line); }
+.vic .q b { font-family: var(--font-display); }
+.vic .body { display: grid; gap: 8px; max-width: 68ch; }
+
+/* Editor */
+.editor { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; }
+.preview { display: grid; justify-items: center; gap: 8px; align-content: start; position: sticky; top: 140px; }
+.preview .stage { width: 100%; display: grid; justify-items: center; padding-top: 16px; background: var(--panel-2); border: 3px solid var(--line); }
+.preview .av { width: 120px; height: 175px; }
+.preview .stage .ground { width: 100%; border-width: 3px 0 0 0; margin: 0; height: 18px; }
+.preview .alias { font-family: var(--font-display); font-size: var(--step-1); text-align: center; }
+.field { display: grid; gap: 8px; }
+.field > label, .field > .lbl { font-family: var(--font-display); font-weight: 700; }
+.opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.opt { border: 2px solid var(--line); background: var(--panel); padding: 4px 9px; cursor: pointer; font-size: var(--step--1); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+.opt[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+.opt[disabled] { cursor: not-allowed; opacity: .5; text-decoration: line-through; }
+.opt.lock { opacity: .55; }
+.sw-opt { width: 34px; height: 34px; border: 3px solid var(--line); cursor: pointer; padding: 0; position: relative; }
+.sw-opt[aria-pressed="true"] { outline: 3px solid var(--gold); outline-offset: 2px; }
+.sw-opt.lock::after { content: attr(data-day); position: absolute; inset: 0; background: rgba(20,24,30,.72); color: #fff; font-size: 0.6rem; font-weight: 700; display: grid; place-items: center; }
+select, input[type="date"], input[type="text"] { font: inherit; color: var(--ink); background: var(--panel); border: 2px solid var(--line); padding: 8px 10px; max-width: 100%; }
+.seg { display: inline-flex; justify-self: start; border: 2px solid var(--line); }
+.seg button { border: 0; background: var(--panel); padding: 6px 14px; cursor: pointer; font-weight: 700; }
+.seg button + button { border-left: 2px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 20; background: var(--ink); color: var(--panel); border: 3px solid var(--line); padding: 10px 16px; font-family: var(--font-display); font-weight: 700; box-shadow: 4px 4px 0 var(--gold); max-width: calc(100vw - 32px); text-align: center; }
+.burst { position: fixed; z-index: 21; pointer-events: none; width: 8px; height: 8px; }
+@keyframes fly { to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+.burst { animation: fly .8s steps(8) forwards; }
+@keyframes bob { 50% { transform: translateY(-3px); } }
+.hero .av { animation: bob 1.6s steps(2) infinite; }
+@media (prefers-reduced-motion: reduce) { .burst, .hero .av { animation: none; } .burst { display: none; } }
+
+.loading { display: grid; justify-items: center; gap: 12px; padding: 60px 0; }
+.lead-grid { display: grid; gap: 16px; max-width: 560px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 720px) {
+  .editor { grid-template-columns: 1fr; }
+  .preview { position: static; }
+  .two { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .hero { grid-template-columns: 1fr; justify-items: start; }
+  .hero .av { width: 64px; height: 93px; }
+  .tabs button { font-size: var(--step--1); padding: 8px 2px; }
+  .tabs { grid-template-columns: repeat(3, 1fr); }
+  .tabs button { border-bottom: 2px solid var(--line); }
+  .tile { min-height: 52px; padding: 3px; }
+  .tile .r { display: none; }
+  .tile .n { font-size: var(--step-0); margin-top: 6px; }
+  .tile.done::after { width: 10px; height: 10px; right: 2px; top: 6px; }
+  .vic { grid-template-columns: 1fr; }
+  .mepill span { display: none; }
+}
+</style>
+
+<header id="top"></header>
+<main id="main" class="wrap" aria-live="polite">
+  <div class="loading"><p class="px">Opening the scroll…</p></div>
+</main>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+(() => {
+"use strict";
+
+/* ---------- Bible data ---------- */
+const BOOKS = [
+  ["Matthew",28,"g","Mt"],["Mark",16,"g","Mk"],["Luke",24,"g","Lk"],["John",21,"g","Jn"],["Acts",28,"a","Acts"],
+  ["Romans",16,"p","Rom"],["1 Corinthians",16,"p","1Co"],["2 Corinthians",13,"p","2Co"],["Galatians",6,"p","Gal"],["Ephesians",6,"p","Eph"],
+  ["Philippians",4,"p","Php"],["Colossians",4,"p","Col"],["1 Thessalonians",5,"p","1Th"],["2 Thessalonians",3,"p","2Th"],["1 Timothy",6,"p","1Ti"],
+  ["2 Timothy",4,"p","2Ti"],["Titus",3,"p","Tit"],["Philemon",1,"p","Phm"],["Hebrews",13,"l","Heb"],["James",5,"l","Jas"],
+  ["1 Peter",5,"l","1Pe"],["2 Peter",3,"l","2Pe"],["1 John",5,"l","1Jn"],["2 John",1,"l","2Jn"],["3 John",1,"l","3Jn"],["Jude",1,"l","Jude"],["Revelation",22,"r","Rev"]
+];
+const SECTIONS = { g: "Gospels", a: "Acts", p: "Paul's letters", l: "Hebrews & general letters", r: "Revelation" };
+const CHAPTERS = [];
+BOOKS.forEach(([b, n, s, ab]) => { for (let c = 1; c <= n; c++) CHAPTERS.push({ b, c, s, ab, one: n === 1 }); });
+const DAYS = 70, TOTAL = CHAPTERS.length; // 260 chapters
+
+function groupChapters(ch) {
+  const g = [];
+  ch.forEach(x => { const last = g[g.length - 1]; if (last && last.b === x.b) last.z = x.c; else g.push({ b: x.b, ab: x.ab, a: x.c, z: x.c, one: x.one }); });
+  return g;
+}
+const fmtLong = g => g.map(x => x.one ? x.b : (x.a === x.z ? `${x.b} ${x.a}` : `${x.b} ${x.a}–${x.z}`)).join("; ");
+const fmtShort = g => g.map(x => x.one ? x.ab : (x.a === x.z ? `${x.ab} ${x.a}` : `${x.ab} ${x.a}–${x.z}`)).join(", ");
+
+const PLAN = [];
+for (let d = 1; d <= DAYS; d++) {
+  const from = Math.round(TOTAL * (d - 1) / DAYS), to = Math.round(TOTAL * d / DAYS);
+  const ch = CHAPTERS.slice(from, to), g = groupChapters(ch);
+  PLAN.push({ day: d, from, to, count: ch.length, sec: ch[0].s, label: fmtLong(g), short: fmtShort(g) });
+}
+
+/* ---------- Victory Moments: one per week ---------- */
+const VICTORIES = [
+  { day: 7, title: "Trapped at the Red Sea", ref: "Exodus 14",
+    story: "Pharaoh's chariots were behind them and the sea was in front of them. Israel panicked. Moses told them to stand firm, God split the sea, and the whole nation walked through on dry ground.",
+    verse: "The LORD will fight for you; you need only to be still.", verseRef: "Exodus 14:14",
+    nt: "Hebrews 11:29 says they crossed \"by faith.\"",
+    q: "What feels like \"army behind, sea in front\" for you right now? What would trusting God look like there?" },
+  { day: 14, title: "Hands Held High", ref: "Exodus 17:8–16",
+    story: "The Amalekites attacked. While Moses held up his hands, Israel was winning. When he got tired, Aaron and Hur sat him on a rock and held his arms up until sunset, and Joshua won the battle.",
+    verse: "Moses built an altar and called it The LORD is my Banner.", verseRef: "Exodus 17:15",
+    nt: "Galatians 6:2: carry each other's burdens.",
+    q: "Who in this group could you \"hold up\" this week? Who holds you up?" },
+  { day: 21, title: "The Walls of Jericho", ref: "Joshua 6",
+    story: "God's battle plan made no sense: march around the city once a day for six days, seven times on the seventh, then shout. Israel obeyed one day at a time, and the walls fell.",
+    verse: "Be strong and courageous… for the LORD your God will be with you wherever you go.", verseRef: "Joshua 1:9",
+    nt: "Hebrews 11:30: by faith the walls of Jericho fell.",
+    q: "Jericho was won by showing up every day. What has three weeks of daily reading changed for you?" },
+  { day: 28, title: "Gideon's 300", ref: "Judges 6–7",
+    story: "Gideon was hiding in a winepress when God called him a mighty warrior. God cut his army from 32,000 to 300 so nobody could brag. With trumpets, jars and torches, they watched the enemy run.",
+    verse: "The LORD is with you, mighty warrior.", verseRef: "Judges 6:12",
+    nt: "2 Corinthians 12:9: God's power is made perfect in weakness.",
+    q: "Where do you feel small or outnumbered? How could God use exactly that?" },
+  { day: 35, title: "David and Goliath", ref: "1 Samuel 17",
+    story: "For forty days a giant mocked Israel and every soldier was afraid. A shepherd boy remembered how God had rescued him from a lion and a bear, picked up five stones, and walked out to meet him.",
+    verse: "The battle is the LORD's.", verseRef: "1 Samuel 17:47",
+    nt: "1 John 4:4: the one who is in you is greater than the one who is in the world.",
+    q: "You're halfway. What \"giant\" are you facing, and what past \"lions and bears\" remind you God is faithful?" },
+  { day: 42, title: "The Singers Went First", ref: "2 Chronicles 20",
+    story: "Three armies marched against King Jehoshaphat. He admitted, \"We do not know what to do, but our eyes are on you.\" He sent worshippers out in front of the army, and God turned the enemies against each other.",
+    verse: "The battle is not yours, but God's.", verseRef: "2 Chronicles 20:15",
+    nt: "Romans 8:31: if God is for us, who can be against us?",
+    q: "How could praise change the way you walk into a hard week?" },
+  { day: 49, title: "Fire on Mount Carmel", ref: "1 Kings 18",
+    story: "Elijah stood alone against 450 prophets of Baal. They shouted all day and nothing happened. Elijah soaked his altar with water, prayed a short prayer, and fire fell from heaven.",
+    verse: "How long will you waver between two opinions?", verseRef: "1 Kings 18:21",
+    nt: "James 5:17–18: Elijah was a human being just like us, and his prayers were powerful.",
+    q: "Where are you tempted to sit on the fence? What would choosing fully look like?" },
+  { day: 56, title: "A Letter Laid Before God", ref: "2 Kings 19",
+    story: "The king of Assyria sent Hezekiah a letter full of threats. Hezekiah took it to the temple, spread it out before the LORD and prayed. That night the Assyrian army was struck down and the king went home.",
+    verse: "…so that all the kingdoms of the earth may know that you alone, LORD, are God.", verseRef: "2 Kings 19:19",
+    nt: "Philippians 4:6–7: don't be anxious; bring everything to God in prayer.",
+    q: "What message, worry or pressure could you \"spread out before God\" today?" },
+  { day: 63, title: "Rebuilding the Wall", ref: "Nehemiah 4 & 6",
+    story: "Enemies mocked and threatened the workers rebuilding Jerusalem's wall. They kept a tool in one hand and a weapon in the other, prayed, and finished the whole wall in just 52 days.",
+    verse: "Don't be afraid of them. Remember the Lord, who is great and awesome.", verseRef: "Nehemiah 4:14",
+    nt: "Galatians 6:9: let us not become weary in doing good.",
+    q: "You've already outlasted the 52-day wall. What keeps you going when you're tired or teased?" },
+  { day: 70, title: "Not Even the Smell of Smoke", ref: "Daniel 3",
+    story: "Shadrach, Meshach and Abednego refused to bow to the king's statue, even facing a blazing furnace. A fourth figure walked with them in the fire, and they came out without even the smell of smoke.",
+    verse: "The God we serve is able to deliver us… But even if he does not… we will not serve your gods.", verseRef: "Daniel 3:17–18",
+    nt: "1 Corinthians 15:57: thanks be to God, who gives us the victory through our Lord Jesus Christ.",
+    q: "You finished the New Testament. What will you keep standing for after these 70 days?" }
+];
+
+/* ---------- Avatar parts ---------- */
+const SKINS = ["#F6D3B3", "#E9B58C", "#C98B5E", "#A2683F", "#7B4A2A", "#4F2F1C"];
+const HAIRC = ["#1E1A16", "#4A2E1A", "#7A4B22", "#B07A3A", "#D9B26A", "#9A9A9A"];
+const HAIRS = [["Short", "short"], ["Long", "long"], ["Bun", "bun"], ["Curly", "curly"], ["Braids", "braids"], ["Crop", "crop"]];
+// [label, value, days needed]
+const UNLOCK = {
+  tunic: [["Earth", "#7B5B3A", 0], ["Olive", "#5E7A35", 0], ["River", "#3B6491", 0], ["Linen", "#CDBE9F", 0], ["Scarlet", "#A8322D", 3],
+          ["Lydia's purple", "#6B3FA0", 12], ["Galilee teal", "#2E8B87", 18], ["Gold", "#C99A22", 25], ["Midnight", "#26304A", 33], ["White robe", "#EEF0EA", 45]],
+  sash:  [["Leather", "#5A3A22", 0], ["Rope", "#B79A6A", 0], ["Red", "#B23A32", 6], ["Royal blue", "#2D5BA6", 15], ["Belt of truth", "#E0A526", 30]],
+  hat:   [["None", "none", 0], ["Headband", "band", 0], ["Headwrap", "wrap", 5], ["Laurel", "laurel", 28], ["Helmet of salvation", "helmet", 50], ["Crown of life", "crown", 70]],
+  item:  [["None", "none", 0], ["Shepherd's staff", "staff", 3], ["Scroll", "scroll", 8], ["Sling", "sling", 14], ["Shofar", "shofar", 21],
+          ["Lamp", "lamp", 35], ["Shield of faith", "shield", 42], ["Sword of the Spirit", "sword", 56]]
+};
+const UNLOCK_NAMES = { tunic: "tunic", sash: "sash", hat: "headgear", item: "item" };
+
+const NAMES_M = ["Gideon","Caleb","Boaz","Barnabas","Silas","Timothy","Elijah","Elisha","Josiah","Nehemiah","Obadiah","Jonah","Ezra","Hezekiah","Jabez","Enoch","Joel","Amos","Micah","Titus","Apollos","Stephen","Levi","Zacchaeus","Jethro","Hosea","Samson","Nathan","Asa","Jonathan","Uriah","Zerubbabel"];
+const NAMES_F = ["Ruth","Esther","Deborah","Hannah","Miriam","Naomi","Lydia","Priscilla","Phoebe","Dorcas","Rahab","Abigail","Martha","Elizabeth","Anna","Eunice","Lois","Rhoda","Junia","Sarah","Rebekah","Rachel","Leah","Jochebed","Zipporah","Damaris","Joanna","Susanna","Tabitha","Huldah","Jael","Keturah"];
+const PLACES = ["", "of Bethel", "of Bethlehem", "of Nazareth", "of Galilee", "of Jericho", "of Hebron", "of Zion", "of Shiloh", "of Bethany", "of Capernaum", "of Emmaus", "of Joppa", "of Tarsus", "of Antioch", "of Philippi", "of Corinth", "of Ephesus", "of Patmos", "of Berea"];
+const VERSIONS = ["NIV", "NLT", "ESV", "CSB", "NKJV", "KJV", "NIRV", "ICB", "MSG"];
+const TEAM_COLORS = ["var(--lapis)", "var(--ruby)", "var(--grass)", "var(--gold)"];
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad = n => String(n).padStart(2, "0");
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseISO = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ""); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
+const daysBetween = (a, b) => Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) - Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())) / 864e5);
+const todayISO = () => iso(new Date());
+const fmtDate = d => d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+const lsGet = k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const shade = (hex, amt) => {
+  const n = parseInt(hex.slice(1), 16), ch = [n >> 16, (n >> 8) & 255, n & 255];
+  return "#" + ch.map(v => Math.max(0, Math.min(255, Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt))).toString(16).padStart(2, "0")).join("");
+};
+const readingURL = (label, v) => `https://www.biblegateway.com/passage/?search=${encodeURIComponent(label)}&version=${encodeURIComponent(v)}`;
+
+/* ---------- avatar ---------- */
+function normLook(l, n) {
+  l = l && typeof l === "object" ? l : {};
+  const pick = (v, arr, gated) => { let i = Number.isInteger(v) && v >= 0 && v < arr.length ? v : 0; if (gated && arr[i][2] > n) i = 0; return i; };
+  return { skin: pick(l.skin, SKINS), hair: pick(l.hair, HAIRS), hairColor: pick(l.hairColor, HAIRC), beard: l.beard === true,
+           tunic: pick(l.tunic, UNLOCK.tunic, 1), sash: pick(l.sash, UNLOCK.sash, 1), hat: pick(l.hat, UNLOCK.hat, 1), item: pick(l.item, UNLOCK.item, 1) };
+}
+function avatarSVG(look, n) {
+  const L = normLook(look, n);
+  const skin = SKINS[L.skin], hc = HAIRC[L.hairColor], tunic = UNLOCK.tunic[L.tunic][1], sash = UNLOCK.sash[L.sash][1];
+  const hat = UNLOCK.hat[L.hat][1], item = UNLOCK.item[L.item][1], hair = HAIRS[L.hair][1];
+  const o = [], r = (x, y, w, h, f) => o.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${f}"/>`);
+  const td = shade(tunic, -0.22), sandal = "#4A3020";
+  // held behind the hand
+  if (item === "staff") { r(18, 4, 1, 28, "#7A5230"); r(18, 3, 3, 1, "#7A5230"); r(20, 4, 1, 2, "#7A5230"); }
+  if (item === "sword") { r(18, 6, 1, 12, "#D5DCE3"); r(19, 6, 1, 12, "#9EA9B4"); r(17, 18, 4, 1, "#C9962A"); r(18, 19, 2, 2, "#5A3A22"); }
+  // hair that falls behind
+  if (hair === "long") { r(5, 3, 1, 10, hc); r(14, 3, 1, 10, hc); }
+  // head
+  r(6, 3, 8, 8, skin);
+  // body
+  r(6, 11, 8, 11, tunic); r(9, 11, 2, 2, skin); r(6, 17, 8, 1, sash); r(11, 18, 1, 2, sash);
+  r(6, 22, 8, 7, td); r(6, 28, 8, 1, shade(tunic, -0.4));
+  r(7, 29, 2, 2, skin); r(11, 29, 2, 2, skin); r(6, 31, 4, 1, sandal); r(10, 31, 4, 1, sandal);
+  // arms
+  r(2, 11, 4, 7, tunic); r(2, 17, 4, 1, td); r(2, 18, 4, 3, skin);
+  r(14, 11, 4, 7, tunic); r(14, 17, 4, 1, td); r(14, 18, 4, 3, skin);
+  // face
+  r(7, 7, 1, 1, "#FFFFFF"); r(8, 7, 1, 1, "#2A2320"); r(11, 7, 1, 1, "#2A2320"); r(12, 7, 1, 1, "#FFFFFF");
+  r(9, 8, 2, 1, shade(skin, -0.15));
+  if (L.beard) { r(6, 9, 8, 2, hc); r(6, 8, 1, 1, hc); r(13, 8, 1, 1, hc); r(9, 9, 2, 1, "#5A2F25"); }
+  else r(9, 9, 2, 1, shade(skin, -0.35));
+  // hair
+  const top = () => { r(6, 3, 8, 2, hc); r(6, 5, 1, 2, hc); r(13, 5, 1, 2, hc); };
+  if (hair === "short") top();
+  if (hair === "long") { r(6, 3, 8, 2, hc); r(6, 5, 1, 5, hc); r(13, 5, 1, 5, hc); }
+  if (hair === "bun") { top(); r(8, 1, 4, 2, hc); }
+  if (hair === "curly") { r(5, 2, 10, 3, hc); r(6, 1, 2, 1, hc); r(9, 1, 2, 1, hc); r(12, 1, 2, 1, hc); r(5, 5, 1, 3, hc); r(14, 5, 1, 3, hc); }
+  if (hair === "braids") { top(); r(5, 5, 1, 9, hc); r(14, 5, 1, 9, hc); r(5, 14, 1, 1, sash); r(14, 14, 1, 1, sash); }
+  if (hair === "crop") r(6, 3, 8, 1, hc);
+  // headgear
+  if (hat === "band") r(6, 4, 8, 1, sash);
+  if (hat === "wrap") { const c = "#D8CBAE"; r(5, 2, 10, 3, c); r(5, 5, 1, 7, c); r(14, 5, 1, 7, c); r(5, 4, 10, 1, sash); }
+  if (hat === "laurel") { r(5, 3, 10, 1, "#4E9A3A"); r(5, 4, 1, 1, "#4E9A3A"); r(14, 4, 1, 1, "#4E9A3A"); r(7, 2, 1, 1, "#6CC04F"); r(12, 2, 1, 1, "#6CC04F"); }
+  if (hat === "helmet") { r(5, 1, 10, 3, "#A7B0BA"); r(6, 1, 8, 1, "#C9D0D7"); r(5, 4, 1, 4, "#8C96A1"); r(14, 4, 1, 4, "#8C96A1"); r(9, 0, 2, 1, "#B23A32"); }
+  if (hat === "crown") { r(6, 1, 8, 2, "#E0A526"); r(6, 0, 1, 1, "#E0A526"); r(9, 0, 2, 1, "#E0A526"); r(13, 0, 1, 1, "#E0A526"); r(9, 1, 2, 1, "#B23A32"); }
+  // held in front
+  if (item === "scroll") { r(17, 16, 4, 5, "#EAD9B0"); r(17, 16, 4, 1, "#9C7A45"); r(17, 20, 4, 1, "#9C7A45"); r(18, 18, 2, 1, "#B5A27A"); }
+  if (item === "sling") { r(18, 20, 1, 7, "#6B4A2A"); r(17, 27, 3, 2, "#8F8F8F"); }
+  if (item === "shofar") { r(17, 19, 3, 1, "#D9C08C"); r(19, 18, 2, 1, "#D9C08C"); r(20, 16, 1, 2, "#E6D3A6"); r(21, 15, 1, 2, "#E6D3A6"); }
+  if (item === "lamp") { r(17, 20, 4, 2, "#B87333"); r(20, 19, 1, 1, "#B87333"); r(17, 18, 1, 2, "#F2BE45"); r(17, 17, 1, 1, "#F28C28"); }
+  if (item === "shield") { r(0, 12, 5, 8, "#B8892B"); r(0, 12, 5, 1, "#8A6A1E"); r(2, 13, 1, 6, "#F3EEDD"); r(1, 15, 3, 1, "#F3EEDD"); }
+  return `<svg class="av" viewBox="0 0 22 32" shape-rendering="crispEdges" aria-hidden="true">${o.join("")}</svg>`;
+}
+const MARK = `<svg class="brand-mark" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><rect width="8" height="8" fill="var(--dirt)"/><rect width="8" height="2" fill="var(--grass-hi)"/><rect x="1" y="3" width="6" height="4" fill="#EAD9B0"/><rect x="1" y="3" width="6" height="1" fill="#9C7A45"/><rect x="2" y="5" width="4" height="1" fill="#9C7A45"/></svg>`;
+function gem(color, lit) {
+  const c = lit ? color : "var(--muted)";
+  return `<svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><rect x="2" y="0" width="4" height="1" fill="var(--line)"/><rect x="1" y="1" width="6" height="1" fill="var(--line)"/><rect x="0" y="2" width="8" height="3" fill="var(--line)"/><rect x="1" y="5" width="6" height="1" fill="var(--line)"/><rect x="2" y="6" width="4" height="1" fill="var(--line)"/><rect x="3" y="7" width="2" height="1" fill="var(--line)"/><rect x="2" y="1" width="4" height="1" fill="${c}"/><rect x="1" y="2" width="6" height="3" fill="${c}"/><rect x="2" y="5" width="4" height="1" fill="${c}"/><rect x="3" y="6" width="2" height="1" fill="${c}"/><rect x="2" y="2" width="2" height="1" fill="#FFFFFF" opacity=".6"/></svg>`;
+}
+
+/* ---------- player model ---------- */
+function normPlayer(d, id) {
+  if (!d || typeof d !== "object") return null;
+  const done = {};
+  if (d.done && typeof d.done === "object") for (const [k, v] of Object.entries(d.done)) {
+    const n = +k; if (Number.isInteger(n) && n >= 1 && n <= DAYS && typeof v === "string" && parseISO(v)) done[n] = v;
+  }
+  return { id, alias: typeof d.alias === "string" && d.alias.trim() ? d.alias.slice(0, 40) : "Traveler",
+    gender: d.gender === "f" ? "f" : "m", team: typeof d.team === "string" ? d.team.slice(0, 30) : "",
+    look: d.look && typeof d.look === "object" ? d.look : {}, done,
+    createdAt: typeof d.createdAt === "string" ? d.createdAt : "", updatedAt: typeof d.updatedAt === "string" ? d.updatedAt : "" };
+}
+function stats(p) {
+  const days = Object.keys(p.done).map(Number), doneSet = new Set(days);
+  const chapters = days.reduce((s, d) => s + PLAN[d - 1].count, 0);
+  const dates = new Set(Object.values(p.done));
+  let cur = 0; const d = new Date(); if (!dates.has(iso(d))) d.setDate(d.getDate() - 1);
+  while (dates.has(iso(d))) { cur++; d.setDate(d.getDate() - 1); }
+  let best = 0, run = 0, prev = null;
+  [...dates].map(parseISO).sort((a, b) => a - b).forEach(x => { run = prev && daysBetween(prev, x) === 1 ? run + 1 : 1; best = Math.max(best, run); prev = x; });
+  return { n: days.length, doneSet, chapters, streak: cur, best };
+}
+const through = (s, chap) => PLAN.filter(d => d.from < chap).every(d => s.doneSet.has(d.day));
+const BADGES = [
+  { name: "First Steps", desc: "Finish day 1 of your quest", color: "var(--grass)", test: s => s.n >= 1 },
+  { name: "Kindled", desc: "3-day streak", color: "var(--gold)", test: s => s.best >= 3 },
+  { name: "Week Warrior", desc: "7-day streak", color: "var(--ruby)", test: s => s.best >= 7 },
+  { name: "Gospel Runner", desc: "Matthew through John", color: "var(--sec-g)", test: s => through(s, 89) },
+  { name: "Acts of Courage", desc: "Read through Acts", color: "var(--sec-a)", test: s => through(s, 117) },
+  { name: "Steadfast", desc: "14-day streak", color: "var(--violet)", test: s => s.best >= 14 },
+  { name: "Halfway Hero", desc: "35 days done", color: "var(--lapis)", test: s => s.n >= 35 },
+  { name: "Letter Carrier", desc: "Read through Philemon", color: "var(--sec-p)", test: s => through(s, 204) },
+  { name: "Unshakable", desc: "30-day streak", color: "var(--dirt)", test: s => s.best >= 30 },
+  { name: "Hall of Faith", desc: "Read through Jude", color: "var(--sec-l)", test: s => through(s, 238) },
+  { name: "Finisher", desc: "The whole New Testament", color: "var(--gold)", test: s => s.n >= DAYS }
+];
+
+/* ---------- state ---------- */
+const DEFAULT_CONFIG = { start: "", groupName: "Youth Group", version: "NIV", teams: ["Tribe of Judah", "Tribe of Benjamin"] };
+const TABS = [["today", "Today"], ["plan", "Plan"], ["group", "Group"], ["victories", "Victories"], ["me", "My Avatar"], ["leader", "Leader"]];
+const state = {
+  phase: "loading", mode: "local", db: null, user: null, uid: null,
+  me: null, players: {}, playersLoaded: false, config: { ...DEFAULT_CONFIG },
+  canLead: false, isOwner: false, readOnly: false, writeError: null,
+  tab: "today", sel: null, draft: null, confirmRemove: null, renderPending: false
+};
+function normConfig(c) {
+  c = c && typeof c === "object" ? c : {};
+  const teams = Array.isArray(c.teams) ? c.teams.filter(t => typeof t === "string" && t.trim()).map(t => t.trim().slice(0, 30)).slice(0, 4) : DEFAULT_CONFIG.teams;
+  return { start: parseISO(c.start) ? c.start : "", groupName: typeof c.groupName === "string" && c.groupName.trim() ? c.groupName.slice(0, 40) : DEFAULT_CONFIG.groupName,
+           version: VERSIONS.includes(c.version) ? c.version : "NIV", teams };
+}
+const planDay = () => { const s = parseISO(state.config.start); return s ? daysBetween(s, new Date()) + 1 : null; };
+const allPlayers = () => {
+  const map = { ...state.players }; if (state.me) map[state.me.id] = state.me;
+  return Object.values(map).map(p => ({ ...p, s: stats(p) }));
+};
+const takenAliases = () => new Set(allPlayers().filter(p => !state.me || p.id !== state.me.id).map(p => p.alias.toLowerCase()));
+const nextUndone = s => { for (let d = 1; d <= DAYS; d++) if (!s.doneSet.has(d)) return d; return null; };
+
+/* ---------- saving ---------- */
+let saveTimer = null, writing = false, dirty = false;
+function saveMe() {
+  if (state.mode === "local") { lsSet("nt70.me", state.me); return; }
+  clearTimeout(saveTimer); saveTimer = setTimeout(flush, 350);
+}
+async function flush() {
+  saveTimer = null;
+  if (writing) { dirty = true; return; }
+  writing = true; dirty = false;
+  const me = state.me;
+  try {
+    await state.db.doc("players/" + state.uid).set({ alias: me.alias, gender: me.gender, team: me.team, look: me.look, done: me.done,
+      createdAt: me.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
+    state.writeError = null;
+  } catch (e) {
+    if (e && e.code === "invalid_argument") state.readOnly = true;
+    state.writeError = (e && e.code) || "unavailable";
+    render(true);
+  }
+  writing = false;
+  if (dirty) flush();
+}
+const savePending = () => writing || dirty || saveTimer !== null;
+
+/* ---------- views ---------- */
+function headerHTML() {
+  const tabs = TABS.filter(([k]) => k !== "leader" || state.canLead);
+  const me = state.me;
+  return `<div class="wrap bar">
+      <div class="brand">${MARK}<h1>NT70 Quest<small>${esc(state.config.groupName)} · New Testament in 70 days</small></h1></div>
+      ${me ? `<button class="mepill" data-tab="me" aria-label="Edit my avatar">${avatarSVG(me.look, stats(me).n)}<span>${esc(me.alias)}</span></button>` : ""}
+    </div>
+    ${state.phase === "ready" ? `<nav class="tabs wrap" style="padding:0" aria-label="Sections">${tabs.map(([k, l]) => `<button data-tab="${k}" ${state.tab === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>` : ""}`;
+}
+
+function viewToday() {
+  const me = state.me, s = stats(me), pd = planDay(), start = parseISO(state.config.start);
+  const target = pd !== null && pd >= 1 && pd <= DAYS ? pd : null;
+  const focus = target && !s.doneSet.has(target) ? target : nextUndone(s);
+  const behind = target ? PLAN.slice(0, target - 1).filter(d => !s.doneSet.has(d.day)) : [];
+  let banner = "";
+  if (!start) banner = state.canLead
+    ? `<div class="note">Set the group's start date under <a href="#leader" data-tab="leader">Leader</a> so everyone shares one calendar. Until then, start with Day 1.</div>`
+    : `<div class="note">Your leader hasn't set the start date yet. You can begin with Day 1 now.</div>`;
+  else if (pd < 1) banner = `<div class="note">The quest starts ${fmtDate(start)}, in ${plural(1 - pd, "day")}. Reading ahead is allowed.</div>`;
+  else if (pd > DAYS) banner = `<div class="note">The 70 days ended ${fmtDate(new Date(start.getFullYear(), start.getMonth(), start.getDate() + DAYS - 1))}. Finish any days you missed.</div>`;
+  const pace = target ? (s.n >= target ? `<span class="chip ok">On pace</span>` : `<span class="chip behind">${plural(target - s.n, "day")} behind</span>`) : "";
+
+  let hero;
+  if (focus === null) {
+    hero = `<div class="hero"><div>${avatarSVG(me.look, s.n)}<div class="ground"></div></div><div class="stack">
+      <p class="eyebrow">Quest complete</p><h2 class="hero-day">You read the whole New Testament!</h2>
+      <p>260 chapters, Matthew to Revelation. Your Crown of Life is unlocked on the My Avatar page.</p></div></div>`;
+  } else {
+    const p = PLAN[focus - 1];
+    const ahead = target && focus !== target ? (focus > target ? "Today's reading is done. Read ahead:" : "Next up:") : (target ? "Today's reading" : "Up next");
+    const dateLine = start ? ` · ${fmtDate(new Date(start.getFullYear(), start.getMonth(), start.getDate() + focus - 1))}` : "";
+    hero = `<div class="hero"><div>${avatarSVG(me.look, s.n)}<div class="ground"></div></div><div class="stack">
+      <div><p class="eyebrow">${ahead}${dateLine}</p><h2 class="hero-day">Day ${focus}</h2><p class="hero-read">${esc(p.label)}</p></div>
+      <div class="row"><span class="chip sec-${p.sec}">${SECTIONS[p.sec]}</span><span class="small muted">${plural(p.count, "chapter")}</span>${pace}</div>
+      <div class="row">
+        <a class="btn" href="${readingURL(p.label, state.config.version)}" target="_blank" rel="noopener">Open in Bible (${esc(state.config.version)})</a>
+        <button class="btn go big" data-toggle="${focus}" ${state.readOnly ? "disabled" : ""}>I read Day ${focus}</button>
+      </div></div></div>`;
+  }
+  const nv = VICTORIES.find(v => v.day > s.n);
+  return `${banner}
+  ${state.readOnly ? `<div class="note warn">You can look around, but your progress can't be saved yet. Ask your leader to give you <b>Contributor</b> access to this page.</div>` : ""}
+  ${state.writeError && !state.readOnly ? `<div class="note warn">Your last check-off didn't save (${esc(state.writeError)}). Check your connection and tap it again.</div>` : ""}
+  <section class="blk">${hero}</section>
+  <section class="stats" aria-label="Your progress">
+    <div class="stat"><b>${s.n}<span class="small">/70</span></b><span>days done</span></div>
+    <div class="stat"><b>${s.chapters}</b><span>of 260 chapters</span></div>
+    <div class="stat"><b>${s.streak}</b><span>day streak (best ${s.best})</span></div>
+    <div class="stat"><b>${Math.round(s.chapters / TOTAL * 100)}%</b><span>of the New Testament</span></div>
+  </section>
+  <div class="meter" role="img" aria-label="${s.chapters} of 260 chapters"><i style="width:${s.chapters / TOTAL * 100}%"></i></div>
+  ${behind.length ? `<section class="blk stack"><h3>Catch up</h3><p class="small muted">Tap a day to mark it read. Each one gets you closer to the group.</p>
+    <div class="catch">${behind.map(d => `<button class="btn sm" data-toggle="${d.day}" ${state.readOnly ? "disabled" : ""}>Day ${d.day} · ${esc(d.short)}</button>`).join("")}</div></section>` : ""}
+  ${nv ? `<section class="blk row" style="justify-content:space-between">
+      <div><p class="eyebrow">Next Victory Moment · Day ${nv.day}</p><h3>${esc(nv.title)}</h3><p class="small muted">${plural(nv.day - s.n, "more day")} to unlock this story from ${esc(nv.ref)}.</p></div>
+      <button class="btn sm" data-tab="victories">See victories</button></section>` : ""}
+  <section class="blk stack"><h3>Badges</h3><div class="badges">${BADGES.map(b => { const on = b.test(s); return `<div class="badge ${on ? "" : "locked"}">${gem(b.color, on)}<div><b>${b.name}</b><span>${b.desc}</span></div></div>`; }).join("")}</div></section>`;
+}
+
+function viewPlan() {
+  const s = stats(state.me), pd = planDay(), start = parseISO(state.config.start);
+  const sel = state.sel ? PLAN[state.sel - 1] : null;
+  let detail = "";
+  if (sel) {
+    const isDone = s.doneSet.has(sel.day);
+    const date = start ? fmtDate(new Date(start.getFullYear(), start.getMonth(), start.getDate() + sel.day - 1)) : "";
+    detail = `<section class="blk stack" id="daydetail"><div class="row" style="justify-content:space-between"><div>
+        <p class="eyebrow">Day ${sel.day}${date ? " · " + date : ""}${isDone ? " · read " + fmtDate(parseISO(state.me.done[sel.day])) : ""}</p>
+        <h2>${esc(sel.label)}</h2></div><span class="chip sec-${sel.sec}">${SECTIONS[sel.sec]}</span></div>
+      <div class="row"><a class="btn" href="${readingURL(sel.label, state.config.version)}" target="_blank" rel="noopener">Open in Bible</a>
+      <button class="btn ${isDone ? "" : "go"}" data-toggle="${sel.day}" ${state.readOnly ? "disabled" : ""}>${isDone ? "Mark as not read" : "I read this"}</button>
+      <button class="btn sm" data-sel="">Close</button></div></section>`;
+  }
+  let weeks = "";
+  for (let w = 0; w < 10; w++) {
+    const v = VICTORIES[w];
+    weeks += `<div class="week"><div class="week-head"><h3>Week ${w + 1}</h3><span class="small muted">Victory: ${esc(v.title)}</span></div><div class="days">`;
+    for (let i = 1; i <= 7; i++) {
+      const p = PLAN[w * 7 + i - 1];
+      weeks += `<button class="tile sec-${p.sec} ${s.doneSet.has(p.day) ? "done" : ""} ${pd === p.day ? "today" : ""} ${state.sel === p.day ? "sel" : ""} ${p.day % 7 === 0 ? "vic" : ""}"
+        data-sel="${p.day}" aria-label="Day ${p.day}: ${esc(p.label)}${s.doneSet.has(p.day) ? ", read" : ""}"><span class="n">${p.day}</span><span class="r">${esc(p.short)}</span></button>`;
+    }
+    weeks += `</div></div>`;
+  }
+  return `${detail}<section class="blk stack">
+    <div class="row" style="justify-content:space-between"><h2>The 70-day map</h2><span class="small muted">${s.n}/70 days · about 4 chapters a day</span></div>
+    <div class="legend">${Object.entries(SECTIONS).map(([k, l]) => `<span class="chip sec-${k}">${l}</span>`).join("")}</div>
+    <p class="small muted">Tap any day to open its reading or check it off. A gold outline marks today; a double border marks a Victory Moment.</p>
+    <div>${weeks}</div></section>`;
+}
+
+function viewGroup() {
+  const list = allPlayers().sort((a, b) => b.s.n - a.s.n || b.s.streak - a.s.streak || a.alias.localeCompare(b.alias));
+  const teams = state.config.teams;
+  const teamHTML = teams.length ? `<section class="blk stack"><h2>Team standings</h2><p class="small muted">Ranked by average progress, so small teams can still win.</p><div class="teams">${
+    teams.map((t, i) => {
+      const mem = list.filter(p => p.team === t), avg = mem.length ? mem.reduce((a, p) => a + p.s.chapters, 0) / mem.length / TOTAL * 100 : 0;
+      return { t, i, mem, avg, ch: mem.reduce((a, p) => a + p.s.chapters, 0) };
+    }).sort((a, b) => b.avg - a.avg).map((x, rank) => `<div class="team" style="--tc:${TEAM_COLORS[x.i]}">
+      <h3><span class="sw" style="background:${TEAM_COLORS[x.i]}"></span>${rank === 0 && x.avg > 0 ? "1st · " : ""}${esc(x.t)}</h3>
+      <div class="meter"><i style="width:${x.avg}%"></i></div>
+      <p class="small"><b>${Math.round(x.avg)}%</b> average · ${x.ch} chapters · ${plural(x.mem.length, "member")}</p></div>`).join("")}</div></section>` : "";
+  const cols = Array.from({ length: DAYS + 1 }, () => []);
+  list.forEach(p => cols[p.s.n].push(p));
+  const myN = state.me ? stats(state.me).n : -1;
+  const track = `<div class="track-wrap" id="track"><div class="track">${cols.map((ps, i) => `<div class="tcol"><div class="ppl">${ps.slice(0, 5).map(p => `<span title="${esc(p.alias)}">${avatarSVG(p.look, p.s.n)}</span>`).join("")}${ps.length > 5 ? `<span class="more">+${ps.length - 5}</span>` : ""}</div>
+      <div class="tblock ${i && i % 7 === 0 ? "mile" : ""} ${i === myN ? "me" : ""}" ${i === myN ? 'id="trackme"' : ""}>${i === 0 ? "GO" : (i % 7 === 0 ? i : "")}</div></div>`).join("")}</div></div>`;
+  const pd = planDay();
+  const rows = list.map((p, idx) => {
+    const isMe = state.me && p.id === state.me.id;
+    const ti = teams.indexOf(p.team);
+    const pace = pd && pd >= 1 ? (p.s.n >= Math.min(pd, DAYS) ? "on pace" : `${Math.min(pd, DAYS) - p.s.n} behind`) : "";
+    const rm = state.isOwner && !isMe ? (state.confirmRemove === p.id
+      ? `<button class="btn sm danger" data-remove="${esc(p.id)}">Confirm remove</button>`
+      : `<button class="btn sm" data-askremove="${esc(p.id)}" aria-label="Remove ${esc(p.alias)}">Remove</button>`) : "";
+    return `<div class="prow ${isMe ? "me" : ""}"><span class="rank">${idx + 1}</span>${avatarSVG(p.look, p.s.n)}
+      <div class="who"><b>${esc(p.alias)}${isMe ? " (you)" : ""}</b><span>${ti >= 0 ? `<span class="sw" style="display:inline-block;width:9px;height:9px;background:${TEAM_COLORS[ti]};border:1px solid var(--line)"></span> ${esc(p.team)} · ` : ""}${p.s.streak}-day streak${pace ? " · " + pace : ""}</span></div>
+      <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} ch ${rm}</div></div>`;
+  }).join("");
+  return `${state.mode === "local" ? `<div class="note">You're playing solo on this device, so only your own avatar shows here. Open the group's shared link while signed in to claude.ai to join everyone else.</div>` : ""}
+  ${teamHTML}
+  <section class="blk stack"><h2>The road to Revelation</h2><p class="small muted">Every block is one day of reading. Gold blocks are Victory Moments. Scroll sideways to see everyone.</p>${track}</section>
+  <section class="blk stack"><div class="row" style="justify-content:space-between"><h2>Leaderboard</h2><span class="small muted">${plural(list.length, "reader")}</span></div><div class="board">${rows || '<p class="muted">Nobody has joined yet.</p>'}</div></section>`;
+}
+
+function viewVictories() {
+  const n = stats(state.me).n;
+  return `<section class="blk stack"><h2>Victory Moments</h2>
+    <p class="muted" style="max-width:68ch">Every 7 days of reading unlocks a story where God's people faced a battle or a hard situation and God brought them through. Use them for group discussion each week.${state.canLead && state.mode === "shared" ? " As a leader you can read ahead on all of them." : ""}</p></section>
+  <div class="vics">${VICTORIES.map((v, i) => {
+    const open = n >= v.day || (state.canLead && state.mode === "shared");
+    const medal = `<svg class="medal" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><rect x="5" y="0" width="2" height="5" fill="var(--ruby)"/><rect x="9" y="0" width="2" height="5" fill="var(--lapis)"/><rect x="4" y="5" width="8" height="10" fill="var(--line)"/><rect x="3" y="6" width="10" height="8" fill="var(--line)"/><rect x="5" y="6" width="6" height="8" fill="var(--gold)"/><rect x="4" y="7" width="8" height="6" fill="var(--gold)"/><text x="8" y="12.5" font-size="6" text-anchor="middle" fill="#1B2430" font-family="Pixelify Sans, monospace" font-weight="700">${i + 1}</text></svg>`;
+    if (!open) return `<article class="blk vic locked">${medal}<div class="body"><p class="eyebrow">Week ${i + 1} · unlocks after ${v.day} days read</p><h3>${esc(v.title)}</h3><p class="small muted">${plural(v.day - n, "more day")} to go. Keep reading to unlock this story from ${esc(v.ref)}.</p></div></article>`;
+    return `<article class="blk vic">${medal}<div class="body"><p class="eyebrow">Week ${i + 1} · ${esc(v.ref)}</p><h3>${esc(v.title)}</h3>
+      <p>${esc(v.story)}</p><blockquote>"${esc(v.verse)}" <span class="small">(${esc(v.verseRef)})</span></blockquote>
+      <p class="small"><b>New Testament connection:</b> ${esc(v.nt)}</p>
+      <div class="q"><b>Talk about it:</b> ${esc(v.q)}</div>
+      <div class="row"><a class="btn sm" href="${readingURL(v.ref, state.config.version)}" target="_blank" rel="noopener">Read ${esc(v.ref)}</a></div></div></article>`;
+  }).join("")}</div>`;
+}
+
+function viewEditor(onboarding) {
+  const d = state.draft, n = onboarding ? 0 : stats(state.me).n;
+  const taken = takenAliases();
+  const names = d.gender === "f" ? NAMES_F : NAMES_M;
+  const alias = (d.name + (d.place ? " " + d.place : "")).trim();
+  const aliasTaken = taken.has(alias.toLowerCase());
+  const swatches = (key, arr) => arr.map((c, i) => `<button class="sw-opt" style="background:${c}" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}" aria-label="${key} ${i + 1}"></button>`).join("");
+  const unl = key => UNLOCK[key].map(([label, val, need], i) => {
+    const locked = need > n;
+    if (key === "tunic" || key === "sash") return `<button class="sw-opt ${locked ? "lock" : ""}" style="background:${val}" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}" ${locked ? `data-day="Day ${need}" aria-disabled="true"` : ""} title="${esc(label)}${locked ? ` (unlocks after ${need} days)` : ""}" aria-label="${esc(label)}${locked ? `, locked until ${need} days` : ""}"></button>`;
+    return `<button class="opt ${locked ? "lock" : ""}" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}" ${locked ? 'aria-disabled="true"' : ""}>${esc(label)}${locked ? ` · ${need}d` : ""}</button>`;
+  }).join("");
+  const teams = state.config.teams;
+  return `${onboarding ? `<section class="blk stack"><p class="eyebrow">${esc(state.config.groupName)}</p><h2>Make your character</h2>
+      <p class="muted" style="max-width:68ch">Together we're reading the whole New Testament, Matthew to Revelation, in 70 days: about 4 chapters a day. Pick a Bible name so you stay anonymous, build your avatar, and join a team. Reading unlocks new gear.</p></section>` : ""}
+  <section class="blk editor">
+    <div class="preview"><div class="stage">${avatarSVG(d.look, n)}<div class="ground"></div></div>
+      <div class="alias">${esc(alias || "Pick a name")}</div>
+      ${aliasTaken ? `<p class="small" style="color:var(--ruby)">Someone already has that name. Add a hometown or pick another.</p>` : ""}
+      <button class="btn go" data-save="1" ${!d.name || aliasTaken || state.readOnly ? "disabled" : ""}>${onboarding ? "Join the quest" : "Save changes"}</button>
+      ${!onboarding ? `<p class="small muted" style="text-align:center">${state.readOnly ? "Saving is turned off for you." : "Saves to the group leaderboard."}</p>` : ""}
+    </div>
+    <div class="stack" style="gap:20px">
+      <div class="field"><span class="lbl">Bible name</span>
+        <div class="seg" role="group" aria-label="Name list"><button data-gender="m" aria-pressed="${d.gender === "m"}">Brothers</button><button data-gender="f" aria-pressed="${d.gender === "f"}">Sisters</button></div>
+        <div class="opts">${names.map(nm => { const full = (nm + (d.place ? " " + d.place : "")).toLowerCase(); const t = taken.has(full);
+          return `<button class="opt" data-name="${esc(nm)}" aria-pressed="${d.name === nm}" ${t ? "disabled" : ""}>${esc(nm)}</button>`; }).join("")}</div>
+        <div class="row"><label for="place" class="small">Hometown (optional)</label>
+          <select id="place">${PLACES.map(p => `<option value="${esc(p)}" ${d.place === p ? "selected" : ""}>${p ? esc(p) : "None"}</option>`).join("")}</select>
+          <button class="btn sm" data-random="1">Random name</button></div>
+      </div>
+      ${teams.length ? `<div class="field"><span class="lbl">Team</span><div class="opts">${teams.map((t, i) => `<button class="opt" data-team="${esc(t)}" aria-pressed="${d.team === t}"><span class="sw" style="display:inline-block;width:10px;height:10px;background:${TEAM_COLORS[i]};border:1px solid var(--line)"></span>${esc(t)}</button>`).join("")}</div></div>` : ""}
+      <div class="two">
+        <div class="field"><span class="lbl">Skin</span><div class="opts">${swatches("skin", SKINS)}</div></div>
+        <div class="field"><span class="lbl">Hair color</span><div class="opts">${swatches("hairColor", HAIRC)}</div></div>
+      </div>
+      <div class="field"><span class="lbl">Hair</span><div class="opts">${HAIRS.map(([l], i) => `<button class="opt" data-look="hair" data-val="${i}" aria-pressed="${d.look.hair === i}">${l}</button>`).join("")}
+        <button class="opt" data-beard="1" aria-pressed="${d.look.beard === true}">Beard</button></div></div>
+      <div class="two">
+        <div class="field"><span class="lbl">Tunic</span><div class="opts">${unl("tunic")}</div></div>
+        <div class="field"><span class="lbl">Sash</span><div class="opts">${unl("sash")}</div></div>
+      </div>
+      <div class="field"><span class="lbl">Headgear</span><div class="opts">${unl("hat")}</div></div>
+      <div class="field"><span class="lbl">Item</span><div class="opts">${unl("item")}</div>
+        <p class="small muted">Locked gear shows how many days of reading it takes. You have ${plural(n, "day")}.</p></div>
+    </div>
+  </section>`;
+}
+
+function viewLeader() {
+  const c = state.config;
+  const shared = state.mode === "shared";
+  return `<section class="blk stack"><h2>Leader settings</h2>
+    <p class="muted small" style="max-width:68ch">${shared ? "These settings apply to everyone in the group." : "You're in solo mode, so these settings only apply on this device."}</p>
+    <form class="lead-grid" id="leadform">
+      <div class="field"><label for="cfg-name">Group name</label><input type="text" id="cfg-name" maxlength="40" value="${esc(c.groupName)}"></div>
+      <div class="field"><label for="cfg-start">Day 1 date</label><input type="date" id="cfg-start" value="${esc(c.start)}">
+        <span class="small muted">${c.start ? `Day 70 lands on ${fmtDate(new Date(parseISO(c.start).getFullYear(), parseISO(c.start).getMonth(), parseISO(c.start).getDate() + 69))}.` : "Not set yet."}</span></div>
+      <div class="field"><label for="cfg-version">Bible version for reading links</label>
+        <select id="cfg-version">${VERSIONS.map(v => `<option ${c.version === v ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+      <div class="field"><span class="lbl">Teams (up to 4, leave blank to turn teams off)</span>
+        ${[0, 1, 2, 3].map(i => `<input type="text" id="cfg-team${i}" maxlength="30" aria-label="Team ${i + 1}" value="${esc(c.teams[i] || "")}" placeholder="Team ${i + 1}">`).join("")}</div>
+      <div class="row"><button class="btn go" type="submit">Save settings</button><span class="small muted" id="leadmsg"></span></div>
+    </form></section>
+  ${shared ? `<section class="blk stack"><h3>Inviting the group</h3><ol class="small" style="margin:0;padding-left:20px;max-width:68ch">
+      <li>Use the Share menu on this page and give the group <b>Contributor</b> access, so each person can save their own progress.</li>
+      <li>Send them the link. Everyone needs to be signed in to claude.ai.</li>
+      <li>Each person picks an anonymous Bible name. Real names never appear on this page.</li>
+      <li>As the owner you can remove a player from the Group leaderboard.</li></ol></section>` : ""}`;
+}
+
+/* ---------- render ---------- */
+function render(force) {
+  const main = $("#main"), ae = document.activeElement;
+  if (!force && ae && main.contains(ae) && /^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName)) { state.renderPending = true; return; }
+  state.renderPending = false;
+  $("#top").innerHTML = headerHTML();
+  if (state.phase === "loading") { main.innerHTML = `<div class="loading">${avatarSVG({}, 0).replace('class="av"', 'class="av" style="width:60px;height:88px"')}<p class="px">Opening the scroll…</p></div>`; return; }
+  if (state.phase === "join") { main.innerHTML = viewEditor(true); return; }
+  if (state.tab === "me" && !state.draft && state.me) state.draft = draftFrom(state.me);
+  const v = { today: viewToday, plan: viewPlan, group: viewGroup, victories: viewVictories, me: () => viewEditor(false), leader: viewLeader }[state.tab] || viewToday;
+  main.innerHTML = v();
+  if (state.tab === "group") { const t = $("#track"), m = $("#trackme"); if (t && m) t.scrollLeft = Math.max(0, m.offsetLeft - t.clientWidth / 2); }
+}
+document.addEventListener("focusout", () => setTimeout(() => { if (state.renderPending) render(); }, 0));
+
+function setTab(t) {
+  if (!TABS.some(([k]) => k === t) || (t === "leader" && !state.canLead)) t = "today";
+  if (t === "me" && state.me) state.draft = draftFrom(state.me);
+  state.tab = t; state.confirmRemove = null; render(true); window.scrollTo(0, 0);
+}
+function draftFrom(p) {
+  const L = normLook(p.look, stats(p).n);
+  const all = [...NAMES_M, ...NAMES_F];
+  const place = PLACES.find(pl => pl && p.alias.endsWith(" " + pl)) || "";
+  const name = place ? p.alias.slice(0, -(place.length + 1)) : p.alias;
+  return { gender: p.gender, name: all.includes(name) ? name : "", place, team: p.team, look: { ...L } };
+}
+function newDraft() {
+  const g = Math.random() < 0.5 ? "m" : "f";
+  return { gender: g, name: "", place: "", team: "", look: { skin: Math.floor(Math.random() * SKINS.length), hair: g === "f" ? 1 : 0, hairColor: Math.floor(Math.random() * 4), beard: false, tunic: Math.floor(Math.random() * 4), sash: 0, hat: 0, item: 0 } };
+}
+
+/* ---------- celebrations ---------- */
+let toastTimer = null;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3200);
+}
+function burst(x, y) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cols = ["var(--grass-hi)", "var(--gold)", "var(--lapis)", "var(--ruby)"];
+  for (let i = 0; i < 18; i++) {
+    const b = document.createElement("div"); b.className = "burst";
+    const a = Math.random() * Math.PI * 2, d = 50 + Math.random() * 70;
+    b.style.cssText = `left:${x}px;top:${y}px;background:${cols[i % 4]};--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d - 30}px`;
+    document.body.appendChild(b); setTimeout(() => b.remove(), 900);
+  }
+}
+function unlockedAt(n) {
+  const out = [];
+  for (const [k, arr] of Object.entries(UNLOCK)) arr.forEach(([l, , need]) => { if (need === n && n > 0) out.push(`${l} (${UNLOCK_NAMES[k]})`); });
+  return out;
+}
+
+/* ---------- actions ---------- */
+function toggleDay(day, el) {
+  if (state.readOnly || !state.me) return;
+  const before = stats(state.me);
+  const done = { ...state.me.done };
+  if (done[day]) delete done[day]; else done[day] = todayISO();
+  state.me = { ...state.me, done };
+  const after = stats(state.me);
+  if (after.n > before.n) {
+    const newBadges = BADGES.filter(b => b.test(after) && !b.test(before)).map(b => b.name);
+    const gear = unlockedAt(after.n);
+    const vic = VICTORIES.find(v => v.day === after.n);
+    let msg = `Day ${day} done: +${PLAN[day - 1].count} chapters!`;
+    if (vic) msg = `Victory Moment unlocked: ${vic.title}!`;
+    else if (newBadges.length) msg = `Badge earned: ${newBadges.join(", ")}!`;
+    else if (gear.length) msg = `Unlocked ${gear.join(", ")}!`;
+    toast(msg);
+    if (el) { const r = el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2); }
+  }
+  saveMe(); render(true);
+}
+
+async function joinOrSave() {
+  const d = state.draft; if (!d || !d.name) return;
+  const alias = (d.name + (d.place ? " " + d.place : "")).trim();
+  if (takenAliases().has(alias.toLowerCase())) return;
+  const base = state.me || { id: state.uid || "local", done: {}, createdAt: new Date().toISOString() };
+  const n = stats({ done: base.done || {} }).n;
+  state.me = { ...base, alias, gender: d.gender, team: state.config.teams.includes(d.team) ? d.team : "", look: normLook(d.look, n) };
+  const joining = state.phase === "join";
+  if (joining) { state.phase = "ready"; state.tab = "today"; }
+  saveMe(); render(true);
+  toast(joining ? `Welcome, ${alias}! Day 1 is ready.` : "Avatar saved");
+}
+
+async function saveConfig(e) {
+  e.preventDefault();
+  const cfg = normConfig({
+    groupName: $("#cfg-name").value, start: $("#cfg-start").value, version: $("#cfg-version").value,
+    teams: [0, 1, 2, 3].map(i => $("#cfg-team" + i).value)
+  });
+  const msg = $("#leadmsg");
+  if (state.mode === "local") { state.config = cfg; lsSet("nt70.config", cfg); document.activeElement.blur(); render(true); toast("Settings saved"); return; }
+  try { msg.textContent = "Saving…"; await state.db.doc("config/plan").set(cfg); state.config = cfg; document.activeElement.blur(); render(true); toast("Settings saved for the group"); }
+  catch (err) { msg.textContent = err && err.code === "invalid_argument" ? "Only editors can change these settings." : "Couldn't save. Try again in a moment."; }
+}
+
+async function removePlayer(id) {
+  try { await state.db.doc("players/" + id).delete(); delete state.players[id]; state.confirmRemove = null; render(true); toast("Player removed"); }
+  catch { toast("Couldn't remove that player"); }
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, a"); if (!t) return;
+  const ds = t.dataset;
+  if (ds.tab) { e.preventDefault(); setTab(ds.tab); return; }
+  if (ds.toggle) { toggleDay(+ds.toggle, t); return; }
+  if ("sel" in ds) { state.sel = ds.sel ? +ds.sel : null; render(true); if (state.sel) { const d = $("#daydetail"); if (d) d.scrollIntoView({ block: "nearest" }); } return; }
+  if (ds.askremove) { state.confirmRemove = ds.askremove; render(true); return; }
+  if (ds.remove) { removePlayer(ds.remove); return; }
+  const d = state.draft;
+  if (!d) return;
+  if (ds.gender) { d.gender = ds.gender; d.name = ""; }
+  else if (ds.name) d.name = ds.name;
+  else if (ds.team) d.team = d.team === ds.team ? "" : ds.team;
+  else if (ds.beard) d.look.beard = !d.look.beard;
+  else if (ds.look) {
+    if (t.getAttribute("aria-disabled") === "true") { const need = UNLOCK[ds.look][+ds.val][2]; toast(`Read ${need} days to unlock this`); return; }
+    d.look[ds.look] = +ds.val;
+  } else if (ds.random) {
+    const taken = takenAliases(), names = d.gender === "f" ? NAMES_F : NAMES_M;
+    for (let i = 0; i < 60; i++) {
+      const nm = names[Math.floor(Math.random() * names.length)], pl = Math.random() < 0.6 ? PLACES[1 + Math.floor(Math.random() * (PLACES.length - 1))] : "";
+      if (!taken.has((nm + (pl ? " " + pl : "")).toLowerCase())) { d.name = nm; d.place = pl; break; }
+    }
+  } else if (ds.save) { joinOrSave(); return; }
+  else return;
+  render(true);
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "place" && state.draft) { state.draft.place = e.target.value; e.target.blur(); render(true); }
+});
+document.addEventListener("submit", e => { if (e.target.id === "leadform") saveConfig(e); });
+
+/* ---------- boot ---------- */
+function startLocal() {
+  state.mode = "local"; state.canLead = true;
+  state.config = normConfig(lsGet("nt70.config") || DEFAULT_CONFIG);
+  const me = normPlayer(lsGet("nt70.me"), "local");
+  state.me = me; state.playersLoaded = true;
+  state.phase = me ? "ready" : "join";
+  if (!me) state.draft = newDraft();
+  const h = (location.hash || "").slice(1); if (me && h) state.tab = TABS.some(([k]) => k === h) ? h : "today";
+  render(true);
+}
+
+async function boot() {
+  render(true);
+  const c = window.claude;
+  if (!c || typeof c.use !== "function") { startLocal(); return; }
+  let db = null, user = null;
+  try { [db, user] = await Promise.all([c.use("db"), c.use("user")]); } catch {}
+  const uid = user ? await user.id().catch(() => null) : null;
+  if (!db || !uid) { startLocal(); return; }
+  state.mode = "shared"; state.db = db; state.user = user; state.uid = uid;
+  const [canEdit, isOwner, canWrite] = await Promise.all([user.canEdit().catch(() => false), user.isOwner().catch(() => false), user.can("data.write").catch(() => null)]);
+  state.canLead = canEdit || isOwner; state.isOwner = isOwner; if (canWrite === false) state.readOnly = true;
+  const h = (location.hash || "").slice(1); if (h) state.tab = TABS.some(([k]) => k === h) ? h : "today";
+
+  db.doc("config/plan").onSnapshot(snap => {
+    state.config = normConfig(snap.exists ? snap.data() : DEFAULT_CONFIG);
+    if (state.phase !== "loading") render();
+  }, () => {});
+
+  db.collection("players").onSnapshot(snap => {
+    const players = {};
+    snap.docs.forEach(d => { const p = normPlayer(d.data(), d.id); if (p) players[d.id] = p; });
+    state.players = players;
+    const mine = players[uid];
+    if (mine && !savePending()) state.me = mine;
+    if (!state.playersLoaded && !snap.metadata.fromCache) {
+      state.playersLoaded = true;
+      if (state.me) state.phase = "ready";
+      else { state.phase = "join"; state.draft = newDraft(); }
+    } else if ((state.phase === "loading" || state.phase === "join") && mine) { state.me = mine; state.phase = "ready"; }
+    if (state.phase === "ready" && state.tab === "me" && !state.draft) state.draft = draftFrom(state.me);
+    render();
+  }, err => {
+    if (state.phase === "loading") { startLocal(); toast("Couldn't reach the group. Playing solo for now."); }
+  });
+
+  setTimeout(() => { if (state.phase === "loading" && !state.playersLoaded) { state.playersLoaded = true; state.phase = state.me ? "ready" : "join"; if (!state.me) state.draft = newDraft(); render(true); } }, 8000);
+}
+boot();
+})();
+</script>
+
+</body></html>
