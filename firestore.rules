@@ -4,6 +4,16 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function isLeader() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    // Username accounts sign in as <username>@users.nt70-quest.web.app (no real email).
+    function isUser(u) { return signedIn() && request.auth.token.email == u + '@users.nt70-quest.web.app'; }
+    function myUsername() { return request.auth.token.email.split('@')[0]; }
+    // A leader-approved transfer lets the new account remove the character it took over.
+    function claimedBy(uid) {
+      return signedIn() && request.auth.token.email != null
+        && request.auth.token.email.matches('.*@users[.]nt70-quest[.]web[.]app')
+        && exists(/databases/$(database)/documents/transfers/$(myUsername()))
+        && get(/databases/$(database)/documents/transfers/$(myUsername())).data.from == uid;
+    }
     function validPlayer() {
       let d = request.resource.data;
       return d.keys().hasOnly(['alias', 'gender', 'team', 'look', 'done', 'createdAt', 'updatedAt'])
@@ -19,13 +29,20 @@ service cloud.firestore {
       // Players update themselves; leaders may only move someone to another tribe.
       allow update: if signedIn() && ((request.auth.uid == uid && validPlayer())
         || (isLeader() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['team'])));
-      allow delete: if signedIn() && (request.auth.uid == uid || isLeader());
+      allow delete: if signedIn() && (request.auth.uid == uid || isLeader() || claimedBy(uid));
     }
 
     // Group settings (start date, tribe names): public so the welcome page can show the dates; only leaders write.
     match /config/{doc} {
       allow read: if true;
       allow write: if isLeader();
+    }
+
+    // Account recovery: a leader points an old character at a new username; that username claims it.
+    match /transfers/{u} {
+      allow read: if isLeader() || isUser(u);
+      allow create, update: if isLeader();
+      allow delete: if isLeader() || isUser(u);
     }
 
     // Leaders are added by hand in the Firebase console (see SETUP.md).

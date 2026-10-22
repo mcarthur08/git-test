@@ -142,6 +142,17 @@ Also check **Authentication › Settings › Authorized domains** in Firebase. `
 
 From then on, share **https://nt70-quest.web.app** with the group. GitHub Pages keeps working, but the Firebase address is the one to use. Accounts and progress are the same on both.
 
+## Forgotten passwords (username accounts)
+
+Username accounts have no real email, so a forgotten password can't be reset. Move the person's progress to a new account instead:
+
+1. They open the site, tap **Username › New here**, and create a **new** username and password.
+2. In the app, open **Group**, find their **old** character on the leaderboard, and tap **Recover**.
+3. Type the **new** username and tap **Move**.
+4. The next time they sign in with the new username, their character, reading progress and tribe move over and the old entry disappears.
+
+This needs the latest `firestore.rules` published (step 5).
+
 ## Good to know
 
 - **Ages.** Google accounts need the user to be 13 or older, unless a parent manages the account through Family Link. Email-link sign-in works with any email address. Check your church's policy on collecting youth emails and parental consent.

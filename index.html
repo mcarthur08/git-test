@@ -261,7 +261,7 @@ main.enter > *:nth-child(4) { animation-delay: .18s; } main.enter > *:nth-child(
 .sw-opt:hover { transform: scale(1.08); }
 .sw-opt[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--gold), 0 0 12px -2px rgba(242,213,140,.7); }
 .sw-opt.lock::after { content: attr(data-day); position: absolute; inset: -2px; border-radius: 50%; background: rgba(10,8,6,.7); color: var(--ink); font-size: .58rem; font-weight: 800; display: grid; place-items: center; }
-select, input[type="date"], input[type="text"], input[type="email"] { font: inherit; color: var(--ink); background: #0F0C0A; border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; max-width: 100%; }
+select, input[type="date"], input[type="text"], input[type="email"], input[type="password"] { font: inherit; color: var(--ink); background: #0F0C0A; border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; max-width: 100%; }
 .seg { display: inline-flex; justify-self: start; background: #0F0C0A; border: 1px solid var(--line); border-radius: 6px; padding: 3px; }
 .seg button { border: 0; background: none; border-radius: 4px; padding: 7px 18px; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); transition: background .2s, color .2s; }
 .seg button[aria-pressed="true"] { background: linear-gradient(#3A2E22, #2A2119); color: var(--gold-hi); box-shadow: 0 0 0 1px var(--bronze); }
@@ -362,6 +362,7 @@ select, input[type="date"], input[type="text"], input[type="email"] { font: inhe
 .team h3 { gap: 10px; }
 .tribe-line { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
 .tribe-line div { display: grid; }
+.recover { grid-column: 1 / -1; display: grid; gap: 6px; padding: 10px; border-radius: 6px; border: 1px dashed rgba(217,174,85,.45); background: rgba(217,174,85,.06); }
 .tmove { font-size: .75rem; padding: 4px 6px; max-width: 150px; }
 /* Sign-in */
 .signin { display: grid; grid-template-columns: 250px 1fr; gap: 28px; align-items: center; max-width: 780px; width: 100%; justify-self: center; }
@@ -1357,9 +1358,16 @@ function viewGroup() {
     const rm = state.isOwner && !isMe ? (state.confirmRemove === p.id
       ? `<button class="btn sm danger" data-remove="${esc(p.id)}">Confirm remove</button>`
       : `<button class="btn sm" data-askremove="${esc(p.id)}" aria-label="Remove ${esc(p.alias)}">Remove</button>`) : "";
-    return `<div class="prow ${isMe ? "me" : ""}"><span class="rank">${idx + 1}</span><span class="bubble">${avatarSVG(p.look, p.s.n, { bust: true })}</span>
+    const canRecover = state.backend === "firebase" && state.canLead && !isMe;
+    const rec = !canRecover ? "" : state.recoverFor === p.id
+      ? `<div class="recover"><label class="small" for="rec-name">New username for ${esc(p.alias)}</label>
+          <div class="row" style="flex-wrap:nowrap"><input type="text" id="rec-name" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="e.g. jordan.smith2" style="flex:1;min-width:0">
+          <button class="btn sm go" data-recover-go="${esc(p.id)}">Move</button><button class="btn sm" data-recover="">Cancel</button></div>
+          <span class="small muted">Their progress moves the next time they sign in with that username.</span></div>`
+      : `<button class="btn sm" data-recover="${esc(p.id)}" aria-label="Recover ${esc(p.alias)} to a new account">Recover</button>`;
+    return `<div class="prow ${isMe ? "me" : ""}${state.recoverFor === p.id ? " recovering" : ""}"><span class="rank">${idx + 1}</span><span class="bubble">${avatarSVG(p.look, p.s.n, { bust: true })}</span>
       <div class="who"><b>${esc(p.alias)}${isMe ? " (you)" : ""}</b><span>${ti >= 0 ? `<span class="dot" style="background:${TEAM_COLORS[ti]}"></span>${esc(teams[ti])} · ` : ""}${p.s.streak > 0 ? `${p.s.streak}-day streak` : "no streak"}${pace ? " · " + pace : ""}</span></div>
-      <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters ${mv}${rm}</div></div>`;
+      <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters ${mv}${state.recoverFor === p.id ? "" : rec}${rm}</div>${state.recoverFor === p.id ? rec : ""}</div>`;
   }).join("");
   return `${state.mode === "local" ? `<div class="note">You're playing solo on this device, so only your own character shows here. Open the group's shared link and sign in to join everyone else.</div>` : ""}
   ${teamHTML}
@@ -1458,7 +1466,7 @@ function viewEditor(onboarding) {
         <p class="small muted">Locked gear shows how many days of reading it takes. You have ${plural(n, "day")}.</p></div>
       </div>
       ${!onboarding && state.backend === "firebase" && state.account ? `<div class="field acct"><span class="lbl">Account</span>
-        <p class="small muted">Signed in${state.account.email ? ` as ${esc(state.account.email)}` : ""}. Only you see this.</p>
+        <p class="small muted">${usernameOf(state.account.email) ? `Signed in with the username <b>${esc(usernameOf(state.account.email))}</b>. Keep your password somewhere safe. If you forget it, make a new username and ask a leader to Recover your progress.` : `Signed in${state.account.email ? ` as ${esc(state.account.email)}` : ""}.`} Only you see this.</p>
         <p class="small muted">Account ID (your leader may ask for it): <code>${esc(state.account.uid)}</code></p>
         <div><button class="btn sm" data-auth="signout">Sign out</button></div></div>` : ""}
       <div class="save-bar">
@@ -1642,6 +1650,36 @@ function ensureTeam() {
   state.me = { ...state.me, team: String(ti) }; saveMe();
   queueReveal(tribeReveal(ti, state.me.alias));
 }
+/* ---- account recovery: a leader points an old character at a new username; that account claims it on sign-in ---- */
+async function startRecover(fromId) {
+  const u = cleanUsername(($("#rec-name") || {}).value);
+  if (u.length < 3) { toast("Enter the new username they signed up with"); return; }
+  const old = state.players[fromId];
+  try {
+    await state.db.doc("transfers/" + u).set({ from: fromId, alias: old ? old.alias : "", at: new Date().toISOString() });
+    state.recoverFor = null; render(true);
+    toast(`Ready: when ${u} signs in, ${old ? old.alias : "their"} progress moves over`);
+  } catch (e) { toast(e && e.code === "permission-denied" ? "Publish the latest security rules first (SETUP.md step 5)" : "Couldn't set that up. Try again."); }
+}
+async function checkTransfer() {
+  if (state.transferChecked || state.backend !== "firebase") return;
+  state.transferChecked = true;
+  const u = usernameOf(state.account && state.account.email); if (!u) return;
+  let t; try { t = await state.db.doc("transfers/" + u).get(); } catch { return; }
+  if (!t.exists) return;
+  const from = t.data().from, old = state.players[from];
+  if (!old || from === state.uid) { try { await state.db.doc("transfers/" + u).delete(); } catch {} return; }
+  try {
+    await state.db.doc("players/" + state.uid).set({ alias: old.alias, gender: old.gender, team: old.team, look: old.look, done: old.done,
+      createdAt: old.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
+    await state.db.doc("players/" + from).delete();
+    await state.db.doc("transfers/" + u).delete();
+    state.me = { ...old, id: state.uid }; state.draft = null; state.teamChecked = true;
+    state.phase = "ready"; state.tab = "today"; state.enter = true; render(true);
+    queueReveal({ kicker: "Welcome back", title: old.alias, text: `Your character and ${plural(stats(old).n, "day")} of reading moved to the username ${u}.`, art: `<div class="frame mid">${avatarSVG(old.look, stats(old).n, { portrait: true, live: true })}</div>` });
+  } catch (e) { toast("Couldn't move your old progress. Ask your leader to try Recover again."); }
+}
+
 async function moveTeam(id, i) {
   try {
     await state.db.doc("players/" + id).update({ team: String(i) });
@@ -1697,11 +1735,15 @@ document.addEventListener("click", e => {
   const t = e.target.closest("button, a"); if (!t) return;
   const ds = t.dataset;
   if (ds.auth) { authAction(ds.auth); return; }
+  if (ds.alt) { const v = $("#u-name"); if (v) state.auth.uname = v.value; state.auth.alt = ds.alt; state.auth.error = ""; render(true); return; }
+  if (ds.umode) { const v = $("#u-name"); if (v) state.auth.uname = v.value; state.auth.umode = ds.umode; state.auth.error = ""; render(true); return; }
   if (ds.reveal) { closeReveal(ds.reveal === "act"); return; }
   if (ds.stopnav) { const cur = state.stop ?? Math.max(0, STOPS.findIndex(x => x.day > stats(state.me).n) - 1); selectStop(Math.max(0, Math.min(STOPS.length - 1, (cur < 0 ? STOPS.length - 1 : cur) + +ds.stopnav))); return; }
   if (ds.tab) { e.preventDefault(); setTab(ds.tab); return; }
   if (ds.toggle) { toggleDay(+ds.toggle, t); return; }
   if ("sel" in ds) { state.sel = ds.sel ? +ds.sel : null; render(true); if (state.sel) { const d = $("#daydetail"); if (d) d.scrollIntoView({ block: "nearest", behavior: "smooth" }); } return; }
+  if ("recover" in ds) { state.recoverFor = ds.recover || null; render(true); const i = $("#rec-name"); if (i) i.focus(); return; }
+  if (ds.recoverGo) { startRecover(ds.recoverGo); return; }
   if (ds.askremove) { state.confirmRemove = ds.askremove; render(true); return; }
   if (ds.remove) { removePlayer(ds.remove); return; }
   const d = state.draft;
@@ -1732,8 +1774,9 @@ document.addEventListener("change", e => {
   if (e.target.matches && e.target.matches("select[data-move]")) { moveTeam(e.target.dataset.move, +e.target.value); return; }
   if (e.target.id === "place" && state.draft) { state.draft.place = e.target.value; e.target.blur(); render(true); }
 });
-document.addEventListener("submit", e => { if (e.target.id === "leadform") saveConfig(e); else if (e.target.id === "emailform" || e.target.id === "emailfinish") emailSubmit(e); });
+document.addEventListener("submit", e => { if (e.target.id === "leadform") saveConfig(e); else if (e.target.id === "emailform" || e.target.id === "emailfinish") emailSubmit(e); else if (e.target.id === "userform") userSubmit(e); });
 document.addEventListener("input", e => {
+  if (e.target.id === "u-name") { state.auth.uname = e.target.value; const u = cleanUsername(e.target.value), el = $("#u-preview"); if (el) el.innerHTML = u ? `Your username: <b>${esc(u)}</b>` : "Letters, numbers and dots. Spaces become dots."; return; }
   if (e.target.id === "own-name" && state.draft) {
     const d = state.draft; d.ownName = e.target.value;
     const nm = draftName(d), alias = (nm + (nm && d.place ? " " + d.place : "")).trim(), taken = !!nm && takenAliases().has(alias.toLowerCase());
@@ -1773,7 +1816,7 @@ function authMsg(e) {
   if (c === "auth/network-request-failed") return "No connection. Check your internet and try again.";
   return "Sign-in didn't work. Please try again.";
 }
-const POPUP_HELP = "Google sign-in can't open in this browser. If you tapped the link inside another app (Messages, Instagram, Gmail, Claude…), open it in Safari or Chrome instead, or use the email link below.";
+const POPUP_HELP = "Google sign-in can't open in this browser. If you tapped the link inside another app (Messages, Instagram, Gmail, Claude…), open it in Safari or Chrome instead, or sign in with a username below.";
 // Built-in browsers inside other apps block the Google sign-in window.
 const IN_APP_BROWSER = /FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|musical_ly|GSA\/|Twitter|LinkedInApp|; wv\)/i.test(navigator.userAgent || "");
 const ON_FIREBASE_HOST = /\.(web\.app|firebaseapp\.com)$/.test(location.hostname);
@@ -1804,6 +1847,45 @@ async function startFirebase(cfg) {
   });
 }
 
+/* ---- username + password: stored as a Firebase email/password account on a placeholder address ---- */
+const USER_DOMAIN = "users.nt70-quest.web.app";
+const cleanUsername = v => String(v || "").trim().toLowerCase().replace(/\s+/g, ".").replace(/[^a-z0-9._-]/g, "").replace(/([._-])[._-]+/g, "$1").replace(/^[._-]+|[._-]+$/g, "").slice(0, 24);
+const usernameOf = email => email && email.endsWith("@" + USER_DOMAIN) ? email.slice(0, -USER_DOMAIN.length - 1) : "";
+function userForm(a) {
+  const isNew = a.umode !== "login", u = cleanUsername(a.uname);
+  return `<form id="userform" class="stack" style="gap:10px">
+    <div class="seg" role="group" aria-label="New or returning"><button type="button" data-umode="new" aria-pressed="${isNew}">New here</button><button type="button" data-umode="login" aria-pressed="${!isNew}">I have an account</button></div>
+    <input type="text" id="u-name" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="30" placeholder="Username, e.g. jordan.smith" aria-label="Username" value="${esc(a.uname || "")}">
+    <span class="small muted" id="u-preview">${u ? `Your username: <b>${esc(u)}</b>` : "Letters, numbers and dots. Spaces become dots."}</span>
+    <input type="password" id="u-pass" autocomplete="${isNew ? "new-password" : "current-password"}" placeholder="${isNew ? "Choose a password (6+ characters)" : "Password"}" aria-label="Password">
+    <button class="btn go" type="submit" ${a.busy ? "disabled" : ""}>${isNew ? "Create account" : "Sign in"}</button>
+    ${isNew ? `<p class="small muted">No email needed. <b>Write down your username and password</b>. If you ever forget the password, a leader can move your progress to a new username.</p>`
+      : `<p class="small muted">Forgot your password? Tap “New here”, make a new username, and ask a leader to tap <b>Recover</b> on your old character.</p>`}
+  </form>`;
+}
+function userAuthMsg(e, isNew) {
+  const c = (e && e.code) || "";
+  if (c === "auth/email-already-in-use") return "That username is taken. Pick another, or tap “I have an account” if it's yours.";
+  if (["auth/invalid-credential", "auth/invalid-login-credentials", "auth/wrong-password", "auth/user-not-found"].includes(c)) return isNew ? "Couldn't create that account. Try a different username." : "That username and password don't match. Check the spelling, or tap “New here” to create an account.";
+  if (c === "auth/weak-password") return "Passwords need at least 6 characters.";
+  if (c === "auth/too-many-requests") return "Too many tries. Wait a few minutes and try again.";
+  if (c === "auth/operation-not-allowed") return "Username sign-in isn't turned on yet. Your leader needs to enable Email/Password in Firebase.";
+  return authMsg(e);
+}
+async function userSubmit(e) {
+  e.preventDefault();
+  const a = state.auth, isNew = a.umode !== "login";
+  a.uname = $("#u-name").value;
+  const u = cleanUsername(a.uname), pw = $("#u-pass").value;
+  if (u.length < 3) { a.error = "Usernames need at least 3 letters or numbers."; render(true); return; }
+  if (pw.length < 6) { a.error = isNew ? "Passwords need at least 6 characters." : "Enter your password."; render(true); return; }
+  a.busy = true; a.error = ""; render(true);
+  const email = `${u}@${USER_DOMAIN}`;
+  try { if (isNew) await fb.auth.createUserWithEmailAndPassword(email, pw); else await fb.auth.signInWithEmailAndPassword(email, pw); }
+  catch (err) { a.error = userAuthMsg(err, isNew); }
+  a.busy = false; if (state.phase === "signin") render(true);
+}
+
 function viewSignIn() {
   const a = state.auth;
   let body;
@@ -1811,11 +1893,14 @@ function viewSignIn() {
       <input type="email" id="fin-email" required autocomplete="email" placeholder="you@example.com"><button class="btn go" type="submit">Finish signing in</button></form>`;
   else if (a.sent) body = `<div class="note">We sent a sign-in link to <b>${esc(a.sent)}</b>. Open it on this phone or computer to finish. Check your spam folder if it doesn't show up.</div>
       <div><button class="btn sm" data-auth="reset">Use a different email</button></div>`;
-  else body = `${IN_APP_BROWSER && !ON_FIREBASE_HOST ? `<div class="note small">You're in another app's built-in browser, where Google sign-in may not open. Use your browser's menu to <b>Open in Safari</b> or <b>Open in Chrome</b>, or sign in with an email link below.</div>` : ""}
+  else body = `${IN_APP_BROWSER && !ON_FIREBASE_HOST ? `<div class="note small">You're in another app's built-in browser, where Google sign-in may not open. Use your browser's menu to <b>Open in Safari</b> or <b>Open in Chrome</b>, or use a username below.</div>` : ""}
       <button class="btn google big" data-auth="google" ${a.busy ? "disabled" : ""}>${GOOGLE_G} Continue with Google</button>
-      <div class="or"><span>or get a link by email</span></div>
-      <form id="emailform" class="row" style="flex-wrap:nowrap"><input type="email" id="si-email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address" style="flex:1;min-width:0">
-      <button class="btn dark" type="submit" ${a.busy ? "disabled" : ""}>Send link</button></form>`;
+      <div class="or"><span>or</span></div>
+      <div class="seg" role="group" aria-label="Other ways to sign in"><button data-alt="user" aria-pressed="${a.alt !== "email"}">Username</button><button data-alt="email" aria-pressed="${a.alt === "email"}">Email link</button></div>
+      ${a.alt === "email"
+        ? `<form id="emailform" class="row" style="flex-wrap:nowrap"><input type="email" id="si-email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address" style="flex:1;min-width:0">
+           <button class="btn dark" type="submit" ${a.busy ? "disabled" : ""}>Send link</button></form>`
+        : userForm(a)}`;
   const st = parseISO(state.config.start), pd = planDay();
   const dates = st ? `${fmtDate(st)} – ${fmtDate(dayDate(st, DAYS))}` : "70 days";
   const when = pd === null ? "" : pd < 1 ? (pd === 0 ? "Starts tomorrow" : `Starts in ${plural(1 - pd, "day")}`) : pd <= DAYS ? `Day ${pd} of 70 is today. It's not too late to join` : "";
@@ -1907,7 +1992,8 @@ function startShared(db, uid, perms) {
     } else if ((state.phase === "loading" || state.phase === "join") && mine) { state.me = mine; state.phase = "ready"; }
     if (state.phase === "ready" && state.tab === "me" && !state.draft) state.draft = draftFrom(state.me);
     render();
-    if (state.phase === "ready" && state.playersLoaded) ensureTeam();
+    if (state.playersLoaded) checkTransfer();
+    if (state.phase === "ready" && state.playersLoaded && !(state.backend === "firebase" && !state.transferChecked)) ensureTeam();
   }, () => {
     if (state.phase === "loading") { startLocal(); toast("Couldn't reach the group. Playing solo for now."); }
   });
