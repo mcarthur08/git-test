@@ -232,6 +232,9 @@ main.enter > *:nth-child(4) { animation-delay: .18s; } main.enter > *:nth-child(
 /* Editor */
 .editor { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 30px; }
 .preview { display: grid; justify-items: center; gap: 10px; align-content: start; position: sticky; top: 120px; }
+.save-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 16px; padding: 16px; border-radius: 8px; border: 1px solid rgba(217,174,85,.35); background: rgba(217,174,85,.07); }
+.save-bar > div { display: grid; gap: 2px; min-width: 0; }
+.save-bar b { font-family: var(--font-display); font-size: var(--step-1); color: var(--gold-hi); overflow-wrap: anywhere; }
 .preview .alias { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); text-align: center; color: var(--gold-hi); }
 .group { display: grid; gap: 18px; }
 .ghead { font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 12px; }
@@ -289,7 +292,17 @@ select, input[type="date"], input[type="text"], input[type="email"] { font: inhe
 /* Journey map */
 .journey { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
 .journey > .card:last-child { position: sticky; top: 120px; }
-.map-card { padding: 10px; }
+.map-card { padding: 10px; display: grid; gap: 8px; }
+.map-wrap { position: relative; border-radius: 6px; overflow: hidden; }
+.map-wrap .map { touch-action: pan-y; cursor: zoom-in; user-select: none; -webkit-user-select: none; }
+.map-wrap.zoomed .map { touch-action: none; cursor: grab; }
+.map-wrap.zoomed .map:active { cursor: grabbing; }
+.map-ctl { position: absolute; right: 10px; top: 10px; display: grid; gap: 6px; z-index: 2; }
+.map-ctl button { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #8C7450; background: rgba(241,230,204,.94); color: #3A2A16; font: 700 22px/1 var(--font-display); display: grid; place-items: center; cursor: pointer; box-shadow: 0 4px 12px -4px rgba(0,0,0,.6); }
+.map-ctl button svg { width: 20px; height: 20px; }
+.map-ctl button[disabled] { opacity: .45; cursor: default; }
+.map-hint { text-align: center; }
+.m-name { font: 700 4.2px var(--font-body); fill: #2A1C0E; paint-order: stroke; stroke: rgba(241,230,204,.92); stroke-width: 1.4px; stroke-linejoin: round; pointer-events: none; }
 .map { width: 100%; height: auto; display: block; border-radius: 6px; filter: sepia(.12) saturate(.95); }
 .m-town { font: 700 9.5px var(--font-body); fill: var(--map-ink); paint-order: stroke; stroke: var(--land); stroke-width: 3px; stroke-linejoin: round; }
 .m-town.big { font: 700 12.5px var(--font-display); }
@@ -1067,11 +1080,24 @@ function mapSVG(opts = {}) {
   const people = allPlayers();
   const buckets = new Map();
   people.forEach(p => { if (state.me && p.id === state.me.id) return; const key = p.s.n; (buckets.get(key) || buckets.set(key, []).get(key)).push(p); });
+  // Zoomed in (2x or more): show everyone in rows of five with their names. Zoomed out: up to five per spot.
+  const zoom = opts.mini ? 1 : mapZoom(), named = zoom >= 2;
   let crowd = "";
   buckets.forEach((ps, n) => {
-    const pos = journeyPos(n);
-    ps.slice(0, 5).forEach((p, j) => { const ox = (j % 2 ? 1 : -1) * Math.ceil(j / 2) * 9; crowd += `<g class="m-person"><title>${esc(p.alias)} · ${p.s.n} days</title>${placeAvatar(avatarSVG(p.look, p.s.n), pos.x + ox, pos.y, 22)}</g>`; });
-    if (ps.length > 5) crowd += `<text x="${pos.x + 26}" y="${pos.y - 18}" class="m-more">+${ps.length - 5}</text>`;
+    const pos = journeyPos(n), shown = named ? ps : ps.slice(0, 5);
+    const rows = [];
+    const per = named ? 4 : 5;
+    shown.forEach((p, j) => { (rows[Math.floor(j / per)] = rows[Math.floor(j / per)] || []).push(p); });
+    rows.slice().reverse().forEach((row, ri) => {
+      const r = rows.length - 1 - ri;
+      row.forEach((p, j) => {
+        const ox = named ? (j - (row.length - 1) / 2) * 16 : (j % 2 ? 1 : -1) * Math.ceil(j / 2) * 9, oy = -r * (named ? 24 : 12), x = pos.x + ox, y = pos.y + oy;
+        const first = p.alias.split(" ")[0], label = first.length > 10 ? first.slice(0, 9) + "…" : first;
+        crowd += `<g class="m-person"><title>${esc(p.alias)} · ${p.s.n} days</title>${placeAvatar(avatarSVG(p.look, p.s.n), x, y, 22)}`
+          + (named ? `<text x="${x.toFixed(1)}" y="${(y + 5.5).toFixed(1)}" text-anchor="middle" class="m-name">${esc(label)}</text>` : "") + `</g>`;
+      });
+    });
+    if (!named && ps.length > 5) crowd += `<text x="${pos.x + 26}" y="${pos.y - 18}" class="m-more">+${ps.length - 5}</text>`;
   });
   let meSVG = "";
   if (state.me) {
@@ -1079,9 +1105,9 @@ function mapSVG(opts = {}) {
     meSVG = `<g class="m-me">${placeAvatar(avatarSVG(state.me.look, myN, { live: !opts.mini }), pos.x, pos.y, 34)}
       <g transform="translate(${pos.x.toFixed(1)} ${(pos.y - 52).toFixed(1)})"><rect x="-17" y="-9" width="34" height="14" rx="7" fill="var(--flame)"/><text x="0" y="1.5" text-anchor="middle" class="m-you">You</text></g></g>`;
   }
-  let vb = "0 0 360 560";
+  let vb = opts.mini ? "0 0 360 560" : mapVB().map(v => v.toFixed(1)).join(" ");
   if (opts.mini) { const p = journeyPos(myN), w = 170, h = 120; vb = `${Math.max(0, Math.min(360 - w, p.x - w / 2)).toFixed(0)} ${Math.max(0, Math.min(560 - h, p.y - h / 2 - 12)).toFixed(0)} ${w} ${h}`; }
-  return `<svg class="map" viewBox="${vb}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map of the land of Israel showing Jesus' journey from Bethlehem to Jerusalem for the Passover">
+  return `<svg class="map"${opts.mini ? "" : ' id="bigmap"'} viewBox="${vb}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map of the land of Israel showing Jesus' journey from Bethlehem to Jerusalem for the Passover">
     <rect width="360" height="560" fill="var(--sea)"/>${waves}
     <path d="M150 0 Q165 40 168 88 Q170 120 158 132 Q174 140 150 154 Q140 190 130 230 Q118 290 102 350 Q88 410 74 470 Q62 520 52 560 L360 560 L360 0 Z" fill="var(--land)"/>
     <path d="M150 0 Q165 40 168 88 Q170 120 158 132 Q174 140 150 154 Q140 190 130 230 Q118 290 102 350 Q88 410 74 470 Q62 520 52 560" fill="none" stroke="var(--land-2)" stroke-width="6" opacity=".9"/>
@@ -1105,6 +1131,69 @@ function mapSVG(opts = {}) {
   </svg>`;
 }
 
+/* ---- map zoom: the big map's viewBox lives in state.mapVB [x, y, w, h] ---- */
+const MAP_W = 360, MAP_H = 560;
+const mapVB = () => state.mapVB || [0, 0, MAP_W, MAP_H];
+const mapZoom = () => MAP_W / mapVB()[2];
+function setMapVB(x, y, w, opts = {}) {
+  w = Math.max(MAP_W / 6, Math.min(MAP_W, w));
+  const h = w * MAP_H / MAP_W;
+  x = Math.max(0, Math.min(MAP_W - w, x)); y = Math.max(0, Math.min(MAP_H - h, y));
+  const before = mapZoom();
+  state.mapVB = w >= MAP_W - 0.5 ? null : [x, y, w, h];
+  const svg = $("#bigmap");
+  // Crossing the 2x line (names on/off) or 1x (controls change) needs a full redraw; otherwise just move the camera.
+  if (opts.render || !svg || (before >= 2) !== (mapZoom() >= 2) || (before > 1.01) !== (mapZoom() > 1.01)) render(true);
+  else svg.setAttribute("viewBox", mapVB().map(v => v.toFixed(1)).join(" "));
+}
+function zoomMapAt(factor, cx, cy) {
+  const [x, y, w, h] = mapVB(), nw = w / factor;
+  setMapVB(cx - (cx - x) * (nw / w), cy - (cy - y) * (nw / w), nw);
+}
+function mapPoint(svg, clientX, clientY) {
+  const r = svg.getBoundingClientRect(), [x, y, w, h] = mapVB();
+  // preserveAspectRatio "slice": the same scale on both axes, centered
+  const s = Math.max(r.width / w, r.height / h);
+  return { x: x + (clientX - r.left - (r.width - w * s) / 2) / s, y: y + (clientY - r.top - (r.height - h * s) / 2) / s, s };
+}
+function mapControl(kind) {
+  const [x, y, w, h] = mapVB();
+  if (kind === "in") zoomMapAt(1.6, x + w / 2, y + h / 2);
+  if (kind === "out") zoomMapAt(1 / 1.6, x + w / 2, y + h / 2);
+  if (kind === "reset") setMapVB(0, 0, MAP_W);
+  if (kind === "me") { const p = journeyPos(state.me ? stats(state.me).n : 0), nw = MAP_W / 3; setMapVB(p.x - nw / 2, p.y - nw * MAP_H / MAP_W / 2 - 10, nw); }
+}
+let mapDragged = false;
+function setupMapGestures() {
+  const svg = $("#bigmap"); if (!svg || svg.dataset.wired) return;
+  svg.dataset.wired = "1";
+  const pts = new Map(); let last = null, pinch = null, moved = 0;
+  svg.addEventListener("pointerdown", e => {
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); moved = 0; mapDragged = false;
+    if (pts.size === 1) last = { x: e.clientX, y: e.clientY };
+    if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) }; }
+  });
+  svg.addEventListener("pointermove", e => {
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pts.size === 2 && pinch) {
+      const [a, b] = [...pts.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d > 0 && pinch.d > 0) { const m = mapPoint($("#bigmap"), (a.x + b.x) / 2, (a.y + b.y) / 2); zoomMapAt(d / pinch.d, m.x, m.y); pinch.d = d; mapDragged = true; }
+      return;
+    }
+    if (pts.size === 1 && last && mapZoom() > 1.01) {
+      const dx = e.clientX - last.x, dy = e.clientY - last.y; moved += Math.abs(dx) + Math.abs(dy);
+      const s = mapPoint($("#bigmap"), e.clientX, e.clientY).s, [x, y, w] = mapVB();
+      if (moved > 4) { setMapVB(x - dx / s, y - dy / s, w); mapDragged = true; }
+      last = { x: e.clientX, y: e.clientY };
+    }
+  });
+  const end = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) last = null; };
+  ["pointerup", "pointercancel", "pointerleave"].forEach(t => svg.addEventListener(t, end));
+  svg.addEventListener("wheel", e => { e.preventDefault(); const m = mapPoint(svg, e.clientX, e.clientY); zoomMapAt(e.deltaY < 0 ? 1.25 : 0.8, m.x, m.y); }, { passive: false });
+  svg.addEventListener("dblclick", e => { const m = mapPoint(svg, e.clientX, e.clientY); zoomMapAt(2, m.x, m.y); });
+}
+
 function viewJourney() {
   const n = stats(state.me).n, pos = journeyPos(n);
   const nextI = STOPS.findIndex(s => s.day > n), next = STOPS[nextI];
@@ -1120,7 +1209,12 @@ function viewJourney() {
       <span class="chip">${icon("target")} ${next ? `${plural(next.day - n, "day")} to ${esc(next.place)}` : "Arrived in Jerusalem"}</span></div>
     <p class="muted small" style="max-width:68ch">Every day you read moves your character along the road Jesus walked. Finish all 70 days and you arrive in Jerusalem for the Passover. Tap a town to read what happened there.</p>
     <div class="meter"><i data-w="${n / DAYS * 100}" data-k="m-journey" style="width:${n / DAYS * 100}%"></i></div></section>
-  <section class="journey"><div class="card map-card">${mapSVG()}</div><div class="card">${card}</div></section>
+  <section class="journey"><div class="card map-card"><div class="map-wrap${mapZoom() > 1.01 ? " zoomed" : ""}">${mapSVG()}
+      <div class="map-ctl" role="group" aria-label="Map zoom">
+        <button data-mapzoom="in" aria-label="Zoom in">+</button><button data-mapzoom="out" aria-label="Zoom out" ${mapZoom() <= 1.01 ? "disabled" : ""}>−</button>
+        <button data-mapzoom="me" aria-label="Zoom to my character">${icon("target")}</button>${mapZoom() > 1.01 ? `<button data-mapzoom="reset" aria-label="Show the whole map">${icon("journey")}</button>` : ""}
+      </div></div>
+      <p class="small muted map-hint">${mapZoom() > 1.01 ? "Drag to move around. Names show when you zoom in close." : "Zoom in to see who's where. Pinch or use the + button."}</p></div><div class="card">${card}</div></section>
   <section class="card stack"><h3>All stops</h3><ol class="stoplist">${STOPS.map((t, i) => `<li class="${n >= t.day ? "reached" : ""}${i === sel ? " cur" : ""}"><button data-stop="${i}"><span class="sn">${n >= t.day ? icon("check") : i + 1}</span><span><b>${esc(t.place)}</b><span class="small muted">${esc(t.title)} · day ${t.day}</span></span></button></li>`).join("")}</ol></section>`;
 }
 
@@ -1310,7 +1404,7 @@ function viewEditor(onboarding) {
       <div class="alias" id="alias-preview">${esc(alias || "Choose a name")}</div>
       <p class="small muted" style="text-align:center">${g === "f" ? "Sister" : "Brother"}${L.cover ? " · " + COVERS[g][L.cover][0] : ""} · ${MANTLES[g][L.mantle][0]} ${g === "f" ? "shawl" : "mantle"}</p>
       <p class="small" id="alias-taken" style="color:var(--rose)" ${aliasTaken ? "" : "hidden"}>Someone already has that name. Add a hometown or pick another.</p>
-      <button class="btn go" id="save-btn" data-save="1" ${!nm0 || aliasTaken || state.readOnly ? "disabled" : ""}>${onboarding ? "Begin the quest" : "Save changes"}</button>
+      <button class="btn go save-btn" data-save="1" ${!nm0 || aliasTaken || state.readOnly ? "disabled" : ""}>${onboarding ? "Begin the quest" : "Save changes"}</button>
       ${!onboarding ? `<p class="small muted" style="text-align:center">${state.readOnly ? "Saving is turned off for you." : "Saves to the group leaderboard."}</p>` : ""}
     </div>
     <div class="stack" style="gap:26px">
@@ -1367,6 +1461,10 @@ function viewEditor(onboarding) {
         <p class="small muted">Signed in${state.account.email ? ` as ${esc(state.account.email)}` : ""}. Only you see this.</p>
         <p class="small muted">Account ID (your leader may ask for it): <code>${esc(state.account.uid)}</code></p>
         <div><button class="btn sm" data-auth="signout">Sign out</button></div></div>` : ""}
+      <div class="save-bar">
+        <div><b class="alias-mirror">${esc(alias || "Choose a name")}</b><span class="small muted save-hint">${!nm0 ? "Pick a name at the top to continue." : aliasTaken ? "That name is taken. Add a hometown or pick another." : onboarding ? "Everything can be changed later." : "Changes show on the leaderboard."}</span></div>
+        <button class="btn go big save-btn" data-save="1" ${!nm0 || aliasTaken || state.readOnly ? "disabled" : ""}>${onboarding ? "Begin the quest" : "Save changes"}</button>
+      </div>
     </div>
   </section>`;
 }
@@ -1438,6 +1536,7 @@ function render(force) {
   const v = { today: viewToday, journey: viewJourney, plan: viewPlan, group: viewGroup, victories: viewVictories, me: () => viewEditor(false), leader: viewLeader }[state.tab] || viewToday;
   main.innerHTML = v();
   animateValues();
+  if (state.tab === "journey") setupMapGestures();
   if (state.tab === "group") { const t = $("#track"), m = $("#trackme"); if (t && m) t.scrollLeft = Math.max(0, m.parentElement.offsetLeft - t.clientWidth / 2); }
 }
 document.addEventListener("focusout", () => setTimeout(() => { if (state.renderPending) render(); }, 0));
@@ -1590,6 +1689,9 @@ function selectStop(i) {
 document.addEventListener("keydown", e => { const st = e.target.closest && e.target.closest("g[data-stop]"); if (st && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectStop(+st.dataset.stop); } });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#reveal").hidden) closeReveal(false); });
 document.addEventListener("click", e => {
+  if (mapDragged && e.target.closest("#bigmap")) { mapDragged = false; return; }
+  const zb = e.target.closest("[data-mapzoom]");
+  if (zb) { mapControl(zb.dataset.mapzoom); return; }
   const st = e.target.closest("[data-stop]");
   if (st && !e.target.closest(".trip-map")) { selectStop(+st.dataset.stop); return; }
   const t = e.target.closest("button, a"); if (!t) return;
@@ -1637,7 +1739,9 @@ document.addEventListener("input", e => {
     const nm = draftName(d), alias = (nm + (nm && d.place ? " " + d.place : "")).trim(), taken = !!nm && takenAliases().has(alias.toLowerCase());
     $("#alias-preview").textContent = alias || "Choose a name";
     $("#alias-taken").hidden = !taken;
-    $("#save-btn").disabled = !nm || taken || state.readOnly;
+    document.querySelectorAll(".save-btn").forEach(b => { b.disabled = !nm || taken || state.readOnly; });
+    document.querySelectorAll(".alias-mirror").forEach(el => { el.textContent = alias || "Choose a name"; });
+    document.querySelectorAll(".save-hint").forEach(el => { el.textContent = !nm ? "Pick a name at the top to continue." : taken ? "That name is taken. Add a hometown or pick another." : "Looks good!"; });
     return;
   } if (e.target.id === "cfg-start") { const h = $("#starthint"); if (h) h.textContent = startHint(e.target.value); } });
 
