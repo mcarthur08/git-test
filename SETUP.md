@@ -115,7 +115,7 @@ Firebase console › **Hosting & Serverless › Hosting** › **Get started**. C
 
 1. Open <https://console.cloud.google.com/iam-admin/serviceaccounts?project=nt70-quest>.
 2. Click **Create service account**. Name: `github-deploy`. Click **Create and continue**.
-3. Add the roles **Firebase Hosting Admin** and **API Keys Viewer**, click **Continue**, then **Done**.
+3. Add the roles **Firebase Hosting Admin**, **API Keys Viewer** and **Service Usage Consumer**, click **Continue**, then **Done**. (Without Service Usage Consumer, deploys fail with a 403 on `serviceusage.services.get`.)
 4. Click the new account › **Keys** › **Add key › Create new key** › **JSON** › **Create**. A `.json` file downloads.
 
 Treat this file like a password. Don't email it or paste it anywhere except the GitHub secret below. Delete it from your computer afterwards.
