@@ -319,6 +319,37 @@ select, input[type="date"], input[type="text"], input[type="email"] { font: inhe
 .trip-map { border: 1px solid var(--bronze); padding: 0; border-radius: 6px; overflow: hidden; height: 160px; cursor: pointer; background: var(--sea); display: block; width: 100%; }
 .trip-map .map { height: 100%; border-radius: 0; }
 
+/* Welcome / sign-in */
+.welcome { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-areas: "hero card" "cast card" "feats feats"; gap: 22px 36px; align-items: center; }
+.w-hero { grid-area: hero; display: grid; gap: 14px; }
+.w-title { font-size: clamp(2.3rem, 6.2vw, 3.8rem); line-height: 1.02; letter-spacing: .01em; }
+.w-title em { font-style: normal; background: linear-gradient(180deg, var(--gold-hi), var(--gold) 55%, #A57A2E); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 2px 14px rgba(217,174,85,.35)); }
+.w-sub { color: var(--muted); font-size: var(--step-1); max-width: 34ch; line-height: 1.4; }
+.w-when { display: inline-flex; align-items: center; gap: 8px; justify-self: start; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(217,174,85,.4); background: rgba(217,174,85,.08); color: var(--gold-hi); font-family: var(--font-display); font-weight: 600; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; }
+.w-when svg { width: 16px; height: 16px; }
+.cast { grid-area: cast; display: flex; justify-content: center; align-items: flex-end; padding: 10px 4% 18px; }
+.cast .frame { width: 21%; flex: none; margin: 0 -1.6%; --r: calc((var(--i) - 2) * 4deg); --y: calc(max(var(--i) - 2, 2 - var(--i)) * 9px); transform: rotate(var(--r)) translateY(var(--y)); animation: castin .8s var(--ease) both; animation-delay: calc(var(--i) * 90ms); }
+.cast .frame.lead { width: 29%; z-index: 2; }
+.cast .frame:nth-child(2), .cast .frame:nth-child(4) { z-index: 1; }
+@keyframes castin { from { opacity: 0; transform: rotate(var(--r)) translateY(calc(var(--y) + 30px)); } }
+.w-card { grid-area: card; display: grid; gap: 14px; align-self: center; box-shadow: var(--shadow), 0 0 80px -30px rgba(217,174,85,.45); border-color: rgba(217,174,85,.35); }
+.w-card .btn.google { width: 100%; }
+.w-trust { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: .8rem; color: var(--muted); }
+.w-trust svg { width: 14px; height: 14px; color: var(--teal); }
+.w-feats { grid-area: feats; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.w-feats li { display: grid; gap: 6px; align-content: start; padding: 16px; border-radius: var(--radius); border: 1px solid var(--line); background: linear-gradient(180deg, #1D1712, #15110D); }
+.w-feats b { font-family: var(--font-display); font-weight: 600; }
+.w-feats span:last-child { font-size: var(--step--1); color: var(--muted); line-height: 1.4; }
+.w-ic { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--gold-hi); border: 1px solid rgba(217,174,85,.45); background: rgba(217,174,85,.08); }
+.w-ic svg { width: 18px; height: 18px; }
+.crest { width: 34px; height: 34px; flex: none; border-radius: 50%; display: inline-grid; place-items: center; color: #1A120B; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--tc) 55%, #fff), var(--tc) 70%); box-shadow: 0 0 0 2px #1A1410, 0 0 0 3px var(--tc); }
+.crest svg { width: 19px; height: 19px; }
+.crest.big { width: 112px; height: 112px; box-shadow: 0 0 0 3px #1A1410, 0 0 0 5px var(--tc), 0 0 40px -6px var(--tc); }
+.crest.big svg { width: 60px; height: 60px; }
+.team h3 { gap: 10px; }
+.tribe-line { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
+.tribe-line div { display: grid; }
+.tmove { font-size: .75rem; padding: 4px 6px; max-width: 150px; }
 /* Sign-in */
 .signin { display: grid; grid-template-columns: 250px 1fr; gap: 28px; align-items: center; max-width: 780px; width: 100%; justify-self: center; }
 .btn.google { background: #F4EFE6; color: #1F1F1F; border-color: #8C7A58; font-family: var(--font-body); text-transform: none; letter-spacing: 0; font-weight: 700; font-size: var(--step-0); }
@@ -338,6 +369,8 @@ code { font-size: .8rem; background: #0F0C0A; border: 1px solid var(--line); pad
   .preview .frame { max-width: 260px; }
   .two { grid-template-columns: 1fr; }
   .journey, .trip, .signin { grid-template-columns: 1fr; }
+  .welcome { grid-template-columns: 1fr; grid-template-areas: "hero" "cast" "card" "feats"; gap: 18px; }
+  .w-feats { grid-template-columns: 1fr 1fr; }
   .journey > .card:last-child { position: static; }
   .signin .frame { max-width: 240px; justify-self: center; }
 }
@@ -501,7 +534,11 @@ const NAMES_M = ["Gideon","Caleb","Boaz","Barnabas","Silas","Timothy","Elijah","
 const NAMES_F = ["Ruth","Esther","Deborah","Hannah","Miriam","Naomi","Lydia","Priscilla","Phoebe","Dorcas","Rahab","Abigail","Martha","Elizabeth","Anna","Eunice","Lois","Rhoda","Junia","Sarah","Rebekah","Rachel","Leah","Jochebed","Zipporah","Damaris","Joanna","Susanna","Tabitha","Huldah","Jael","Keturah"];
 const PLACES = ["", "of Bethel", "of Bethlehem", "of Nazareth", "of Galilee", "of Jericho", "of Hebron", "of Zion", "of Shiloh", "of Bethany", "of Capernaum", "of Emmaus", "of Joppa", "of Tarsus", "of Antioch", "of Philippi", "of Corinth", "of Ephesus", "of Patmos", "of Berea"];
 const VERSIONS = ["KJV"];
-const TEAM_COLORS = ["var(--sky)", "var(--flame)", "var(--teal)", "var(--violet)"];
+const DEFAULT_TEAMS = ["Tribe of Judah", "Tribe of Benjamin", "Tribe of Levi", "Tribe of Ephraim"];
+const TEAM_COLORS = ["var(--gold)", "var(--sky)", "var(--rose)", "var(--teal)"];
+const TEAM_ICONS = ["lion", "wolf", "breastplate", "ox"];
+const TEAM_VERSES = [["Judah is a lion's whelp.", "Genesis 49:9"], ["Benjamin shall ravin as a wolf.", "Genesis 49:27"],
+  ["Let thy Thummim and thy Urim be with thy holy one.", "Deuteronomy 33:8"], ["His glory is like the firstling of his bullock.", "Deuteronomy 33:17"]];
 
 /* ---------- helpers ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -818,6 +855,10 @@ const ICON = {
   victories: '<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 14v4M8 21h8"/>',
   me: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.3 2.2 2 3.5 2s2.5-.7 3.5-2M9 9.5h.01M15 9.5h.01"/>',
   leader: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  lion: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="13" r="4.6"/><path d="M10.4 12.4h.01M13.6 12.4h.01M11 15.2h2M7 6l1.5 2M17 6l-1.5 2"/>',
+  wolf: '<path d="M5 3.5l4 5h6l4-5V12a7 7 0 0 1-14 0z"/><path d="M10 12.5h.01M14 12.5h.01M11 16l1 1 1-1"/>',
+  breastplate: '<rect x="6" y="3.5" width="12" height="17" rx="2"/><path d="M6 9.2h12M6 14.8h12M10 3.5v17M14 3.5v17"/>',
+  ox: '<path d="M3 5.5c1.5 3.5 4 4.5 6 4.5M21 5.5c-1.5 3.5-4 4.5-6 4.5"/><path d="M8 10h8v5.5a4 4 0 0 1-8 0z"/><path d="M10.6 16.5h.01M13.4 16.5h.01"/>',
   journey: '<path d="M9 4L3 6.5V20l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',
   book: '<path d="M4 5.5C6.5 4.3 9.3 4.4 12 6c2.7-1.6 5.5-1.7 8-.5v13c-2.5-1.2-5.3-1.1-8 .5-2.7-1.6-5.5-1.7-8-.5z"/><path d="M12 6v13"/>',
   flame: '<path d="M12 3c.8 3.2 5 5 5 10a5 5 0 0 1-10 0c0-2.2 1-3.6 2.2-4.6.2 1.6 1 2.6 2.1 2.9C11 8.6 11 5.6 12 3z"/>',
@@ -876,7 +917,7 @@ const BADGES = [
 ];
 
 /* ---------- state ---------- */
-const DEFAULT_CONFIG = { start: "2026-10-22", groupName: "Youth Group", version: "KJV", teams: ["Tribe of Judah", "Tribe of Benjamin"] };
+const DEFAULT_CONFIG = { start: "2026-10-22", groupName: "Youth Group", version: "KJV", teams: DEFAULT_TEAMS };
 const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Map"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Wins"], ["me", "My Character", "Me"], ["leader", "Leader", "Leader"]];
 const state = {
   phase: "loading", mode: "local", db: null, user: null, uid: null,
@@ -886,7 +927,9 @@ const state = {
 };
 function normConfig(c) {
   c = c && typeof c === "object" ? c : {};
-  const teams = Array.isArray(c.teams) ? c.teams.filter(t => typeof t === "string" && t.trim()).map(t => t.trim().slice(0, 30)).slice(0, 4) : DEFAULT_CONFIG.teams;
+  // Always four tribes; a blank or repeated name falls back to the default.
+  const teams = [];
+  DEFAULT_TEAMS.forEach((def, i) => { const t = Array.isArray(c.teams) && typeof c.teams[i] === "string" ? c.teams[i].trim().slice(0, 30) : ""; teams.push(t && !teams.includes(t) ? t : def); });
   return { start: parseISO(c.start) ? c.start : "", groupName: typeof c.groupName === "string" && c.groupName.trim() ? c.groupName.slice(0, 40) : DEFAULT_CONFIG.groupName,
            version: "KJV", teams };
 }
@@ -895,6 +938,17 @@ const allPlayers = () => {
   const map = { ...state.players }; if (state.me) map[state.me.id] = state.me;
   return Object.values(map).map(p => ({ ...p, s: stats(p) }));
 };
+// Players store their team as "0"–"3"; older saves stored the team's name.
+const teamIndex = p => { const t = p && p.team; if (/^[0-3]$/.test(t || "")) return +t; return state.config.teams.indexOf(t); };
+function pickTeam(excludeId) {
+  const counts = [0, 0, 0, 0];
+  allPlayers().forEach(p => { if (p.id === excludeId) return; const i = teamIndex(p); if (i >= 0) counts[i]++; });
+  const min = Math.min(...counts), open = counts.map((c, i) => c === min ? i : -1).filter(i => i >= 0);
+  return open[Math.floor(Math.random() * open.length)];
+}
+const crest = (i, cls = "") => `<span class="crest ${cls}" style="--tc:${TEAM_COLORS[i]}">${icon(TEAM_ICONS[i])}</span>`;
+const cleanName = v => String(v || "").replace(/[^\p{L}\p{M}' .-]/gu, "").replace(/\s+/g, " ").trim().slice(0, 20);
+const draftName = d => d.nameMode === "own" ? cleanName(d.ownName) : d.name;
 const takenAliases = () => new Set(allPlayers().filter(p => !state.me || p.id !== state.me.id).map(p => p.alias.toLowerCase()));
 const nextUndone = s => { for (let d = 1; d <= DAYS; d++) if (!s.doneSet.has(d)) return d; return null; };
 
@@ -1185,14 +1239,15 @@ function viewPlan() {
 function viewGroup() {
   const list = allPlayers().sort((a, b) => b.s.n - a.s.n || b.s.streak - a.s.streak || a.alias.localeCompare(b.alias));
   const teams = state.config.teams;
-  const teamHTML = teams.length ? `<section class="card stack"><h2>Team standings</h2><p class="small muted">Ranked by average progress, so small teams can still win.</p><div class="teams">${
+  const teamHTML = `<section class="card stack"><h2>The four tribes</h2><p class="small muted">Everyone is placed into a tribe when they join. Tribes are ranked by average progress, so a smaller tribe can still win.</p><div class="teams">${
     teams.map((t, i) => {
-      const mem = list.filter(p => p.team === t), ch = mem.reduce((a, p) => a + p.s.chapters, 0);
+      const mem = list.filter(p => teamIndex(p) === i), ch = mem.reduce((a, p) => a + p.s.chapters, 0);
       return { t, i, mem, ch, avg: mem.length ? ch / mem.length / TOTAL * 100 : 0 };
     }).sort((a, b) => b.avg - a.avg).map((x, rank) => `<div class="team" style="--tc:${TEAM_COLORS[x.i]}">
-      <h3><span class="dot" style="background:${TEAM_COLORS[x.i]}"></span>${esc(x.t)}${rank === 0 && x.avg > 0 ? ' <span class="rank1">Leading</span>' : ""}</h3>
+      <h3>${crest(x.i)}<span>${esc(x.t)}</span>${rank === 0 && x.avg > 0 ? ' <span class="rank1">Leading</span>' : ""}</h3>
       <div class="meter"><i data-w="${x.avg}" data-k="m-team${x.i}" style="width:${x.avg}%"></i></div>
-      <p class="small"><b>${Math.round(x.avg)}%</b> average · ${x.ch} chapters · ${plural(x.mem.length, "member")}</p></div>`).join("")}</div></section>` : "";
+      <p class="small"><b>${Math.round(x.avg)}%</b> average · ${x.ch} chapters · ${plural(x.mem.length, "member")}</p>
+      <p class="small muted"><i>"${TEAM_VERSES[x.i][0]}"</i> ${TEAM_VERSES[x.i][1]}</p></div>`).join("")}</div></section>`;
   const cols = Array.from({ length: DAYS + 1 }, () => []);
   list.forEach(p => cols[p.s.n].push(p));
   const myN = state.me ? stats(state.me).n : -1;
@@ -1201,14 +1256,16 @@ function viewGroup() {
   const pd = planDay();
   const rows = list.map((p, idx) => {
     const isMe = state.me && p.id === state.me.id;
-    const ti = teams.indexOf(p.team);
+    const ti = teamIndex(p);
+    const canMove = state.mode === "shared" && (state.backend === "firebase" ? state.canLead : state.isOwner);
+    const mv = canMove ? `<select class="tmove" data-move="${esc(p.id)}" aria-label="Move ${esc(p.alias)} to another tribe">${teams.map((t, i) => `<option value="${i}" ${i === ti ? "selected" : ""}>${esc(t)}</option>`).join("")}</select>` : "";
     const pace = pd && pd >= 1 ? (p.s.n >= Math.min(pd, DAYS) ? "on pace" : `${Math.min(pd, DAYS) - p.s.n} behind`) : "";
     const rm = state.isOwner && !isMe ? (state.confirmRemove === p.id
       ? `<button class="btn sm danger" data-remove="${esc(p.id)}">Confirm remove</button>`
       : `<button class="btn sm" data-askremove="${esc(p.id)}" aria-label="Remove ${esc(p.alias)}">Remove</button>`) : "";
     return `<div class="prow ${isMe ? "me" : ""}"><span class="rank">${idx + 1}</span><span class="bubble">${avatarSVG(p.look, p.s.n, { bust: true })}</span>
-      <div class="who"><b>${esc(p.alias)}${isMe ? " (you)" : ""}</b><span>${ti >= 0 ? `<span class="dot" style="background:${TEAM_COLORS[ti]}"></span>${esc(p.team)} · ` : ""}${p.s.streak > 0 ? `${p.s.streak}-day streak` : "no streak"}${pace ? " · " + pace : ""}</span></div>
-      <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters ${rm}</div></div>`;
+      <div class="who"><b>${esc(p.alias)}${isMe ? " (you)" : ""}</b><span>${ti >= 0 ? `<span class="dot" style="background:${TEAM_COLORS[ti]}"></span>${esc(teams[ti])} · ` : ""}${p.s.streak > 0 ? `${p.s.streak}-day streak` : "no streak"}${pace ? " · " + pace : ""}</span></div>
+      <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters ${mv}${rm}</div></div>`;
   }).join("");
   return `${state.mode === "local" ? `<div class="note">You're playing solo on this device, so only your own character shows here. Open the group's shared link and sign in to join everyone else.</div>` : ""}
   ${teamHTML}
@@ -1236,37 +1293,45 @@ function viewEditor(onboarding) {
   d.look.g = g;
   const taken = takenAliases();
   const names = g === "f" ? NAMES_F : NAMES_M;
-  const alias = (d.name + (d.place ? " " + d.place : "")).trim();
-  const aliasTaken = taken.has(alias.toLowerCase());
+  const nm0 = draftName(d), alias = (nm0 + (nm0 && d.place ? " " + d.place : "")).trim();
+  const aliasTaken = !!nm0 && taken.has(alias.toLowerCase());
   const swatches = (key, arr, label) => arr.map((c, i) => `<button class="sw-opt" style="background:${Array.isArray(c) ? c[1] : c}" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}" aria-label="${Array.isArray(c) ? esc(c[0]) : `${label} ${i + 1}`}" title="${Array.isArray(c) ? esc(c[0]) : ""}"></button>`).join("");
   const unl = key => allowedFor(key, g).map(([[label, val, need], i]) => {
     const locked = need > n;
     if (key === "tunic" || key === "sash") return `<button class="sw-opt ${locked ? "lock" : ""}" style="background:${val}" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}" ${locked ? `data-day="${need}d" aria-disabled="true"` : ""} title="${esc(label)}${locked ? ` (unlocks after ${need} days)` : ""}" aria-label="${esc(label)}${locked ? `, locked until ${need} days` : ""}"></button>`;
     return `<button class="opt ${locked ? "lock" : ""}" data-look="${key}" data-val="${i}" aria-pressed="${d.look[key] === i}" ${locked ? 'aria-disabled="true"' : ""}>${locked ? `<span class="lk">${icon("lock")}</span>` : ""}${esc(label)}${locked ? ` · ${need}d` : ""}</button>`;
   }).join("");
-  const teams = state.config.teams;
+  const teams = state.config.teams, myTeam = state.me ? teamIndex(state.me) : -1;
   const L = normLook(d.look, n);
   return `${onboarding ? `<section class="card stack"><p class="eyebrow">${esc(state.config.groupName)}</p><h2>Create your character</h2>
-      <p class="muted" style="max-width:68ch">Together we're reading the whole New Testament, Matthew to Revelation, in 70 days: about 4 chapters a day. Choose a Bible name so you stay anonymous, dress your character the way people dressed in the first century, and join a team. Reading unlocks new gear.</p></section>` : ""}
+      <p class="muted" style="max-width:68ch">Together we're reading the whole New Testament, Matthew to Revelation, in 70 days: about 4 chapters a day. Choose a Bible name or use your own first name, dress your character the way people dressed in the first century, and you'll be placed into one of four tribes. Reading unlocks new gear.</p></section>` : ""}
   <section class="card editor">
     <div class="preview"><div class="frame big">${avatarSVG(d.look, n, { portrait: true, live: true })}<div class="frame-fig">${avatarSVG(d.look, n, { live: true })}</div></div>
-      <div class="alias">${esc(alias || "Choose a name")}</div>
+      <div class="alias" id="alias-preview">${esc(alias || "Choose a name")}</div>
       <p class="small muted" style="text-align:center">${g === "f" ? "Sister" : "Brother"}${L.cover ? " · " + COVERS[g][L.cover][0] : ""} · ${MANTLES[g][L.mantle][0]} ${g === "f" ? "shawl" : "mantle"}</p>
-      ${aliasTaken ? `<p class="small" style="color:var(--rose)">Someone already has that name. Add a hometown or pick another.</p>` : ""}
-      <button class="btn go" data-save="1" ${!d.name || aliasTaken || state.readOnly ? "disabled" : ""}>${onboarding ? "Begin the quest" : "Save changes"}</button>
+      <p class="small" id="alias-taken" style="color:var(--rose)" ${aliasTaken ? "" : "hidden"}>Someone already has that name. Add a hometown or pick another.</p>
+      <button class="btn go" id="save-btn" data-save="1" ${!nm0 || aliasTaken || state.readOnly ? "disabled" : ""}>${onboarding ? "Begin the quest" : "Save changes"}</button>
       ${!onboarding ? `<p class="small muted" style="text-align:center">${state.readOnly ? "Saving is turned off for you." : "Saves to the group leaderboard."}</p>` : ""}
     </div>
     <div class="stack" style="gap:26px">
       <div class="group"><h3 class="ghead">Identity</h3>
-      <div class="field"><span class="lbl">Bible name</span>
-        <div class="seg" role="group" aria-label="Brothers or sisters"><button data-gender="m" aria-pressed="${g === "m"}">Brothers</button><button data-gender="f" aria-pressed="${g === "f"}">Sisters</button></div>
-        <div class="opts">${names.map(nm => { const t = taken.has((nm + (d.place ? " " + d.place : "")).toLowerCase());
-          return `<button class="opt" data-name="${esc(nm)}" aria-pressed="${d.name === nm}" ${t ? "disabled" : ""}>${esc(nm)}</button>`; }).join("")}</div>
+      <div class="field"><span class="lbl">I'm a</span>
+        <div class="seg" role="group" aria-label="Brother or sister"><button data-gender="m" aria-pressed="${g === "m"}">Brother</button><button data-gender="f" aria-pressed="${g === "f"}">Sister</button></div></div>
+      <div class="field"><span class="lbl">Name</span>
+        <div class="seg" role="group" aria-label="Name type"><button data-namemode="bible" aria-pressed="${d.nameMode !== "own"}">Bible name</button><button data-namemode="own" aria-pressed="${d.nameMode === "own"}">My own name</button></div>
+        ${d.nameMode === "own"
+          ? `<input type="text" id="own-name" maxlength="20" autocomplete="given-name" placeholder="First name or nickname" value="${esc(d.ownName || "")}" aria-label="Your first name or nickname">
+             <p class="small muted">First name or nickname only, up to 20 letters. It's shown to everyone in the group.</p>`
+          : `<div class="opts">${names.map(nm => { const t = taken.has((nm + (d.place ? " " + d.place : "")).toLowerCase());
+              return `<button class="opt" data-name="${esc(nm)}" aria-pressed="${d.name === nm}" ${t ? "disabled" : ""}>${esc(nm)}</button>`; }).join("")}</div>`}
         <div class="row"><label for="place" class="small">Hometown (optional)</label>
           <select id="place">${PLACES.map(p => `<option value="${esc(p)}" ${d.place === p ? "selected" : ""}>${p ? esc(p) : "None"}</option>`).join("")}</select>
-          <button class="btn sm" data-random="1">Random name</button></div>
+          ${d.nameMode === "own" ? "" : `<button class="btn sm" data-random="1">Random name</button>`}</div>
       </div>
-      ${teams.length ? `<div class="field"><span class="lbl">Team</span><div class="opts">${teams.map((t, i) => `<button class="opt" data-team="${esc(t)}" aria-pressed="${d.team === t}"><span class="dot" style="background:${TEAM_COLORS[i]}"></span>${esc(t)}</button>`).join("")}</div></div>` : ""}
+      <div class="field"><span class="lbl">Tribe</span>
+        ${myTeam >= 0 ? `<div class="tribe-line">${crest(myTeam)}<div><b>${esc(teams[myTeam])}</b><span class="small muted">Assigned when you joined. Ask a leader if you need to move.</span></div></div>`
+          : `<p class="small muted">You'll be placed into one of the four tribes (${teams.map(esc).join(", ")}) when you join, keeping the teams even.</p>`}
+      </div>
       </div>
       <div class="group"><h3 class="ghead">Face</h3>
       <div class="two">
@@ -1326,8 +1391,8 @@ function viewLeader() {
       <div class="field"><label for="cfg-name">Group name</label><input type="text" id="cfg-name" maxlength="40" value="${esc(c.groupName)}"></div>
       <div class="field"><label for="cfg-start">Day 1 date</label><input type="date" id="cfg-start" value="${esc(c.start)}">
         <span class="small muted" id="starthint">${startHint(c.start)}</span></div>
-      <div class="field"><span class="lbl">Teams (up to 4, leave blank to turn teams off)</span>
-        ${[0, 1, 2, 3].map(i => `<input type="text" id="cfg-team${i}" maxlength="30" aria-label="Team ${i + 1}" value="${esc(c.teams[i] || "")}" placeholder="Team ${i + 1}">`).join("")}</div>
+      <div class="field"><span class="lbl">Tribe names (players are assigned automatically and evenly)</span>
+        ${[0, 1, 2, 3].map(i => `<input type="text" id="cfg-team${i}" maxlength="30" aria-label="Team ${i + 1}" value="${esc(c.teams[i] || "")}" placeholder="${DEFAULT_TEAMS[i]}">`).join("")}</div>
       <div class="row"><button class="btn go" type="submit">Save settings</button><span class="small muted" id="leadmsg"></span></div>
     </form></section>
   ${state.backend === "firebase" ? `<section class="card stack"><h3>Inviting the group</h3><ol class="small" style="margin:0;padding-left:20px;max-width:68ch;display:grid;gap:6px">
@@ -1388,13 +1453,14 @@ function draftFrom(p) {
   const all = [...NAMES_M, ...NAMES_F];
   const place = PLACES.find(pl => pl && p.alias.endsWith(" " + pl)) || "";
   const name = place ? p.alias.slice(0, -(place.length + 1)) : p.alias;
-  return { gender: p.gender, name: all.includes(name) ? name : "", place, team: p.team, look: { ...L } };
+  const bible = all.includes(name);
+  return { gender: p.gender, nameMode: bible ? "bible" : "own", name: bible ? name : "", ownName: bible ? "" : name, place, look: { ...L } };
 }
 function newDraft() { return newDraftFor(Math.random() < 0.5 ? "m" : "f"); }
 function newDraftFor(g) {
   const r = arr => arr[Math.floor(Math.random() * arr.length)], f = g === "f";
   const tunics = allowedFor("tunic", g).filter(([e]) => e[2] === 0).map(([, i]) => i);
-  return { gender: g, name: "", place: "", team: "", look: { g, skin: 1 + Math.floor(Math.random() * 4), hair: f ? r([1, 4, 2]) : r([0, 3, 5]), hairColor: Math.floor(Math.random() * 4),
+  return { gender: g, nameMode: "bible", name: "", ownName: "", place: "", look: { g, skin: 1 + Math.floor(Math.random() * 4), hair: f ? r([1, 4, 2]) : r([0, 3, 5]), hairColor: Math.floor(Math.random() * 4),
     beard: f ? 0 : r([2, 3, 3, 4, 1]), tunic: r(tunics), sash: 0, hat: 0, item: 0, face: f ? r([1, 3]) : r([0, 2, 4]), eyes: f ? r([0, 4]) : r([0, 2, 3]),
     eyeColor: Math.floor(Math.random() * 3), brows: f ? r([0, 3]) : r([1, 2]), mouth: r([0, 3]), cover: f ? r([1, 2, 3]) : r([0, 1, 1]),
     mantle: f ? Math.floor(Math.random() * 3) : r([0, 1, 4]), jewel: f ? r([1, 2]) : 0 } };
@@ -1464,17 +1530,39 @@ function toggleDay(day, el) {
   saveMe(); render(true);
 }
 
+function tribeReveal(i, alias) {
+  return { kicker: alias ? `Welcome, ${alias}` : "Your tribe", title: state.config.teams[i], text: `"${TEAM_VERSES[i][0]}" (${TEAM_VERSES[i][1]}). Read with your tribe and climb the leaderboard together.`,
+    art: crest(i, "big") };
+}
+// Give an existing player without a valid tribe one, once per visit.
+function ensureTeam() {
+  if (!state.me || state.readOnly || state.teamChecked || savePending()) return;
+  state.teamChecked = true;
+  if (teamIndex(state.me) >= 0) { if (!/^[0-3]$/.test(state.me.team)) { state.me = { ...state.me, team: String(teamIndex(state.me)) }; saveMe(); } return; }
+  const ti = pickTeam(state.me.id);
+  state.me = { ...state.me, team: String(ti) }; saveMe();
+  queueReveal(tribeReveal(ti, state.me.alias));
+}
+async function moveTeam(id, i) {
+  try {
+    await state.db.doc("players/" + id).update({ team: String(i) });
+    if (state.me && id === state.me.id) state.me = { ...state.me, team: String(i) };
+    toast(`Moved to ${state.config.teams[i]}`);
+  } catch (e) { toast(e && (e.code === "permission-denied" || e.code === "invalid_argument") ? "Only leaders can move players. Publish the latest security rules (SETUP.md step 5)." : "Couldn't move that player"); }
+  render(true);
+}
+
 async function joinOrSave() {
-  const d = state.draft; if (!d || !d.name) return;
-  const alias = (d.name + (d.place ? " " + d.place : "")).trim();
+  const d = state.draft, nm = d && draftName(d); if (!nm) return;
+  const alias = (nm + (d.place ? " " + d.place : "")).trim();
   if (takenAliases().has(alias.toLowerCase())) return;
   const base = state.me || { id: state.uid || "local", done: {}, createdAt: new Date().toISOString() };
   const n = stats({ done: base.done || {} }).n;
-  state.me = { ...base, alias, gender: d.gender, team: state.config.teams.includes(d.team) ? d.team : "", look: normLook({ ...d.look, g: d.gender }, n) };
-  const joining = state.phase === "join";
+  const joining = state.phase === "join", ti = teamIndex(base) >= 0 ? teamIndex(base) : pickTeam(base.id);
+  state.me = { ...base, alias, gender: d.gender, team: String(ti), look: normLook({ ...d.look, g: d.gender }, n) };
   if (joining) { state.phase = "ready"; state.tab = "today"; state.enter = true; state.cheerUntil = Date.now() + 2000; }
   saveMe(); render(true);
-  if (joining) { toast(`Welcome, ${alias}! Day 1 is ready.`); confetti(innerWidth / 2, innerHeight / 3, 50); }
+  if (joining) { confetti(innerWidth / 2, innerHeight / 3, 50); queueReveal(tribeReveal(ti, alias)); }
   else toast("Character saved");
 }
 
@@ -1524,7 +1612,7 @@ document.addEventListener("click", e => {
     d.gender = ds.gender; d.name = ""; d.look.g = ds.gender;
   }
   else if (ds.name) d.name = ds.name;
-  else if (ds.team) d.team = d.team === ds.team ? "" : ds.team;
+  else if (ds.namemode) d.nameMode = ds.namemode;
   else if (ds.look) {
     if (t.getAttribute("aria-disabled") === "true") { const need = (UNLOCK[ds.look] || [])[+ds.val]?.[2] ?? 0; toast(`Read ${need} days to unlock this`); return; }
     d.look[ds.look] = +ds.val;
@@ -1539,10 +1627,19 @@ document.addEventListener("click", e => {
   render(true);
 });
 document.addEventListener("change", e => {
+  if (e.target.matches && e.target.matches("select[data-move]")) { moveTeam(e.target.dataset.move, +e.target.value); return; }
   if (e.target.id === "place" && state.draft) { state.draft.place = e.target.value; e.target.blur(); render(true); }
 });
 document.addEventListener("submit", e => { if (e.target.id === "leadform") saveConfig(e); else if (e.target.id === "emailform" || e.target.id === "emailfinish") emailSubmit(e); });
-document.addEventListener("input", e => { if (e.target.id === "cfg-start") { const h = $("#starthint"); if (h) h.textContent = startHint(e.target.value); } });
+document.addEventListener("input", e => {
+  if (e.target.id === "own-name" && state.draft) {
+    const d = state.draft; d.ownName = e.target.value;
+    const nm = draftName(d), alias = (nm + (nm && d.place ? " " + d.place : "")).trim(), taken = !!nm && takenAliases().has(alias.toLowerCase());
+    $("#alias-preview").textContent = alias || "Choose a name";
+    $("#alias-taken").hidden = !taken;
+    $("#save-btn").disabled = !nm || taken || state.readOnly;
+    return;
+  } if (e.target.id === "cfg-start") { const h = $("#starthint"); if (h) h.textContent = startHint(e.target.value); } });
 
 
 /* ---------- boot ---------- */
@@ -1555,6 +1652,7 @@ function startLocal() {
   if (!me) state.draft = newDraft();
   const h = (location.hash || "").slice(1); if (me && h) state.tab = TABS.some(([k]) => k === h) ? h : "today";
   render(true);
+  if (me) ensureTeam();
 }
 
 /* ---------- Firebase web app (Google + email-link sign-in) ---------- */
@@ -1584,6 +1682,7 @@ async function startFirebase(cfg) {
   // On Firebase Hosting the page and the sign-in handler share one domain, so redirect sign-in works everywhere.
   firebase.initializeApp(ON_FIREBASE_HOST ? { ...cfg, authDomain: location.hostname } : cfg);
   const auth = firebase.auth(), fs = firebase.firestore();
+  fs.doc("config/plan").get().then(d => { if (d.exists && !state.uid) { state.config = normConfig(d.data()); if (state.phase === "signin") render(true); } }).catch(() => {});
   if (ON_FIREBASE_HOST) auth.getRedirectResult().catch(e => { state.auth.error = authMsg(e); render(true); });
   fb = { auth, fs };
   state.backend = "firebase";
@@ -1613,12 +1712,37 @@ function viewSignIn() {
       <div class="or"><span>or get a link by email</span></div>
       <form id="emailform" class="row" style="flex-wrap:nowrap"><input type="email" id="si-email" required autocomplete="email" placeholder="you@example.com" aria-label="Email address" style="flex:1;min-width:0">
       <button class="btn dark" type="submit" ${a.busy ? "disabled" : ""}>Send link</button></form>`;
-  return `<section class="card signin"><div class="frame">${avatarSVG(SIGNIN_LOOK, 0, { portrait: true, live: true })}<div class="frame-fig">${avatarSVG(SIGNIN_LOOK, 0, { live: true })}</div></div>
-    <div class="stack" style="gap:14px"><p class="eyebrow">New Testament in 70 days</p><h2>Join the NT70 Quest</h2>
-      <p class="muted">Sign in so your character and progress follow you on any device. The group only ever sees the Bible name you pick.</p>
-      ${body}${a.error ? `<p class="small" style="color:var(--rose)">${esc(a.error)}</p>` : ""}</div></section>`;
+  const st = parseISO(state.config.start), pd = planDay();
+  const dates = st ? `${fmtDate(st)} – ${fmtDate(dayDate(st, DAYS))}` : "70 days";
+  const when = pd === null ? "" : pd < 1 ? (pd === 0 ? "Starts tomorrow" : `Starts in ${plural(1 - pd, "day")}`) : pd <= DAYS ? `Day ${pd} of 70 is today. It's not too late to join` : "";
+  const feats = [["me", "Create your character", "First-century robes, veils and mantles. Unlock new gear as you read."],
+    ["journey", "Walk to Jerusalem", "Every day you read moves you along Jesus' road to the Passover."],
+    ["lion", "Join a tribe", "You're placed in one of four tribes competing on one leaderboard."],
+    ["victories", "Weekly Victory Moments", "Stories of God's people overcoming, with a question to talk through."]];
+  return `<section class="welcome">
+    <div class="w-hero">
+      <p class="eyebrow">${esc(state.config.groupName)} · ${esc(dates)}</p>
+      <h1 class="w-title">Seventy days.<br>One story.<br><em>Your quest.</em></h1>
+      <p class="w-sub">Read the whole New Testament together, about four chapters a day. Build your character, join a tribe, and walk the road from Bethlehem to Jerusalem.</p>
+      ${when ? `<p class="w-when">${icon("today")}<span>${esc(when)}</span></p>` : ""}
+    </div>
+    <div class="cast" aria-hidden="true">${SIGNIN_CAST.map((lk, i) => `<div class="frame${i === 2 ? " lead" : ""}" style="--i:${i}">${avatarSVG(lk, 70, { portrait: true, live: true })}</div>`).join("")}</div>
+    <div class="card w-card">
+      <h2>Start your quest</h2>
+      <p class="muted small">Sign in so your character and progress follow you on any phone or computer.</p>
+      ${body}${a.error ? `<p class="small" style="color:var(--rose)">${esc(a.error)}</p>` : ""}
+      <p class="w-trust">${icon("check")} Free, no ads ${icon("check")} The group only sees your character's name</p>
+    </div>
+    <ul class="w-feats">${feats.map(([ic, t, d]) => `<li><span class="w-ic">${icon(ic)}</span><b>${t}</b><span>${d}</span></li>`).join("")}</ul>
+  </section>`;
 }
-const SIGNIN_LOOK = { g: "f", skin: 2, hair: 4, hairColor: 1, tunic: 3, sash: 1, face: 1, eyes: 0, eyeColor: 0, brows: 0, mouth: 0, cover: 1, mantle: 1, jewel: 1 };
+const SIGNIN_CAST = [
+  { g: "m", skin: 3, hair: 3, hairColor: 0, beard: 3, tunic: 1, mantle: 0, cover: 0, face: 2, eyes: 2, brows: 2, mouth: 1 },
+  { g: "f", skin: 1, hair: 1, hairColor: 2, tunic: 5, mantle: 0, cover: 1, face: 1, eyes: 0, brows: 0, mouth: 0, jewel: 1 },
+  { g: "m", skin: 2, hair: 0, hairColor: 1, beard: 4, tunic: 0, mantle: 4, cover: 1, face: 4, eyes: 3, brows: 1, mouth: 3, hat: 0 },
+  { g: "f", skin: 4, hair: 4, hairColor: 0, tunic: 4, mantle: 1, cover: 2, face: 3, eyes: 4, brows: 3, mouth: 1, jewel: 2 },
+  { g: "m", skin: 1, hair: 5, hairColor: 3, beard: 2, tunic: 2, mantle: 1, cover: 2, face: 0, eyes: 0, brows: 0, mouth: 0 }
+];
 
 async function authAction(kind) {
   const a = state.auth;
@@ -1679,6 +1803,7 @@ function startShared(db, uid, perms) {
     } else if ((state.phase === "loading" || state.phase === "join") && mine) { state.me = mine; state.phase = "ready"; }
     if (state.phase === "ready" && state.tab === "me" && !state.draft) state.draft = draftFrom(state.me);
     render();
+    if (state.phase === "ready" && state.playersLoaded) ensureTeam();
   }, () => {
     if (state.phase === "loading") { startLocal(); toast("Couldn't reach the group. Playing solo for now."); }
   });
