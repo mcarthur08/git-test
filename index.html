@@ -362,6 +362,7 @@ select, input[type="date"], input[type="text"], input[type="email"], input[type=
 .team h3 { gap: 10px; }
 .tribe-line { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
 .tribe-line div { display: grid; }
+.recover { grid-column: 1 / -1; display: grid; gap: 6px; padding: 10px; border-radius: 6px; border: 1px dashed rgba(217,174,85,.45); background: rgba(217,174,85,.06); }
 .tmove { font-size: .75rem; padding: 4px 6px; max-width: 150px; }
 /* Sign-in */
 .signin { display: grid; grid-template-columns: 250px 1fr; gap: 28px; align-items: center; max-width: 780px; width: 100%; justify-self: center; }
@@ -1357,9 +1358,16 @@ function viewGroup() {
     const rm = state.isOwner && !isMe ? (state.confirmRemove === p.id
       ? `<button class="btn sm danger" data-remove="${esc(p.id)}">Confirm remove</button>`
       : `<button class="btn sm" data-askremove="${esc(p.id)}" aria-label="Remove ${esc(p.alias)}">Remove</button>`) : "";
-    return `<div class="prow ${isMe ? "me" : ""}"><span class="rank">${idx + 1}</span><span class="bubble">${avatarSVG(p.look, p.s.n, { bust: true })}</span>
+    const canRecover = state.backend === "firebase" && state.canLead && !isMe;
+    const rec = !canRecover ? "" : state.recoverFor === p.id
+      ? `<div class="recover"><label class="small" for="rec-name">New username for ${esc(p.alias)}</label>
+          <div class="row" style="flex-wrap:nowrap"><input type="text" id="rec-name" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="e.g. jordan.smith2" style="flex:1;min-width:0">
+          <button class="btn sm go" data-recover-go="${esc(p.id)}">Move</button><button class="btn sm" data-recover="">Cancel</button></div>
+          <span class="small muted">Their progress moves the next time they sign in with that username.</span></div>`
+      : `<button class="btn sm" data-recover="${esc(p.id)}" aria-label="Recover ${esc(p.alias)} to a new account">Recover</button>`;
+    return `<div class="prow ${isMe ? "me" : ""}${state.recoverFor === p.id ? " recovering" : ""}"><span class="rank">${idx + 1}</span><span class="bubble">${avatarSVG(p.look, p.s.n, { bust: true })}</span>
       <div class="who"><b>${esc(p.alias)}${isMe ? " (you)" : ""}</b><span>${ti >= 0 ? `<span class="dot" style="background:${TEAM_COLORS[ti]}"></span>${esc(teams[ti])} · ` : ""}${p.s.streak > 0 ? `${p.s.streak}-day streak` : "no streak"}${pace ? " · " + pace : ""}</span></div>
-      <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters ${mv}${rm}</div></div>`;
+      <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters ${mv}${state.recoverFor === p.id ? "" : rec}${rm}</div>${state.recoverFor === p.id ? rec : ""}</div>`;
   }).join("");
   return `${state.mode === "local" ? `<div class="note">You're playing solo on this device, so only your own character shows here. Open the group's shared link and sign in to join everyone else.</div>` : ""}
   ${teamHTML}
@@ -1458,7 +1466,7 @@ function viewEditor(onboarding) {
         <p class="small muted">Locked gear shows how many days of reading it takes. You have ${plural(n, "day")}.</p></div>
       </div>
       ${!onboarding && state.backend === "firebase" && state.account ? `<div class="field acct"><span class="lbl">Account</span>
-        <p class="small muted">${usernameOf(state.account.email) ? `Signed in with the username <b>${esc(usernameOf(state.account.email))}</b>. Keep your password somewhere safe; it can't be reset by email.` : `Signed in${state.account.email ? ` as ${esc(state.account.email)}` : ""}.`} Only you see this.</p>
+        <p class="small muted">${usernameOf(state.account.email) ? `Signed in with the username <b>${esc(usernameOf(state.account.email))}</b>. Keep your password somewhere safe. If you forget it, make a new username and ask a leader to Recover your progress.` : `Signed in${state.account.email ? ` as ${esc(state.account.email)}` : ""}.`} Only you see this.</p>
         <p class="small muted">Account ID (your leader may ask for it): <code>${esc(state.account.uid)}</code></p>
         <div><button class="btn sm" data-auth="signout">Sign out</button></div></div>` : ""}
       <div class="save-bar">
@@ -1642,6 +1650,36 @@ function ensureTeam() {
   state.me = { ...state.me, team: String(ti) }; saveMe();
   queueReveal(tribeReveal(ti, state.me.alias));
 }
+/* ---- account recovery: a leader points an old character at a new username; that account claims it on sign-in ---- */
+async function startRecover(fromId) {
+  const u = cleanUsername(($("#rec-name") || {}).value);
+  if (u.length < 3) { toast("Enter the new username they signed up with"); return; }
+  const old = state.players[fromId];
+  try {
+    await state.db.doc("transfers/" + u).set({ from: fromId, alias: old ? old.alias : "", at: new Date().toISOString() });
+    state.recoverFor = null; render(true);
+    toast(`Ready: when ${u} signs in, ${old ? old.alias : "their"} progress moves over`);
+  } catch (e) { toast(e && e.code === "permission-denied" ? "Publish the latest security rules first (SETUP.md step 5)" : "Couldn't set that up. Try again."); }
+}
+async function checkTransfer() {
+  if (state.transferChecked || state.backend !== "firebase") return;
+  state.transferChecked = true;
+  const u = usernameOf(state.account && state.account.email); if (!u) return;
+  let t; try { t = await state.db.doc("transfers/" + u).get(); } catch { return; }
+  if (!t.exists) return;
+  const from = t.data().from, old = state.players[from];
+  if (!old || from === state.uid) { try { await state.db.doc("transfers/" + u).delete(); } catch {} return; }
+  try {
+    await state.db.doc("players/" + state.uid).set({ alias: old.alias, gender: old.gender, team: old.team, look: old.look, done: old.done,
+      createdAt: old.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
+    await state.db.doc("players/" + from).delete();
+    await state.db.doc("transfers/" + u).delete();
+    state.me = { ...old, id: state.uid }; state.draft = null; state.teamChecked = true;
+    state.phase = "ready"; state.tab = "today"; state.enter = true; render(true);
+    queueReveal({ kicker: "Welcome back", title: old.alias, text: `Your character and ${plural(stats(old).n, "day")} of reading moved to the username ${u}.`, art: `<div class="frame mid">${avatarSVG(old.look, stats(old).n, { portrait: true, live: true })}</div>` });
+  } catch (e) { toast("Couldn't move your old progress. Ask your leader to try Recover again."); }
+}
+
 async function moveTeam(id, i) {
   try {
     await state.db.doc("players/" + id).update({ team: String(i) });
@@ -1704,6 +1742,8 @@ document.addEventListener("click", e => {
   if (ds.tab) { e.preventDefault(); setTab(ds.tab); return; }
   if (ds.toggle) { toggleDay(+ds.toggle, t); return; }
   if ("sel" in ds) { state.sel = ds.sel ? +ds.sel : null; render(true); if (state.sel) { const d = $("#daydetail"); if (d) d.scrollIntoView({ block: "nearest", behavior: "smooth" }); } return; }
+  if ("recover" in ds) { state.recoverFor = ds.recover || null; render(true); const i = $("#rec-name"); if (i) i.focus(); return; }
+  if (ds.recoverGo) { startRecover(ds.recoverGo); return; }
   if (ds.askremove) { state.confirmRemove = ds.askremove; render(true); return; }
   if (ds.remove) { removePlayer(ds.remove); return; }
   const d = state.draft;
@@ -1819,7 +1859,8 @@ function userForm(a) {
     <span class="small muted" id="u-preview">${u ? `Your username: <b>${esc(u)}</b>` : "Letters, numbers and dots. Spaces become dots."}</span>
     <input type="password" id="u-pass" autocomplete="${isNew ? "new-password" : "current-password"}" placeholder="${isNew ? "Choose a password (6+ characters)" : "Password"}" aria-label="Password">
     <button class="btn go" type="submit" ${a.busy ? "disabled" : ""}>${isNew ? "Create account" : "Sign in"}</button>
-    ${isNew ? `<p class="small muted">No email needed. <b>Write down your username and password</b>: without an email, a forgotten password can't be reset.</p>` : ""}
+    ${isNew ? `<p class="small muted">No email needed. <b>Write down your username and password</b>. If you ever forget the password, a leader can move your progress to a new username.</p>`
+      : `<p class="small muted">Forgot your password? Tap “New here”, make a new username, and ask a leader to tap <b>Recover</b> on your old character.</p>`}
   </form>`;
 }
 function userAuthMsg(e, isNew) {
@@ -1951,7 +1992,8 @@ function startShared(db, uid, perms) {
     } else if ((state.phase === "loading" || state.phase === "join") && mine) { state.me = mine; state.phase = "ready"; }
     if (state.phase === "ready" && state.tab === "me" && !state.draft) state.draft = draftFrom(state.me);
     render();
-    if (state.phase === "ready" && state.playersLoaded) ensureTeam();
+    if (state.playersLoaded) checkTransfer();
+    if (state.phase === "ready" && state.playersLoaded && !(state.backend === "firebase" && !state.transferChecked)) ensureTeam();
   }, () => {
     if (state.phase === "loading") { startLocal(); toast("Couldn't reach the group. Playing solo for now."); }
   });
