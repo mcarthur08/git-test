@@ -300,6 +300,22 @@ details.more[open] summary > svg { transform: rotate(180deg); }
 /* Group */
 .teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
 .team { border-radius: 8px; padding: 14px; background: rgba(0,0,0,.25); border: 1px solid var(--line); display: grid; gap: 8px; }
+button.team { font: inherit; color: inherit; text-align: left; cursor: pointer; width: 100%; transition: border-color .2s, background .2s; }
+button.team:hover { border-color: var(--tc); }
+.team.open { border-color: var(--tc); background: rgba(0,0,0,.4); box-shadow: inset 0 0 0 1px var(--tc); }
+.team .tsee { display: inline-flex; align-items: center; gap: 4px; font-size: var(--step--1); font-weight: 600; color: var(--gold-hi); }
+.team .tsee i { font-style: normal; font-size: 1.1em; transition: transform .2s; }
+.team.open .tsee i { transform: rotate(90deg); }
+.roster { border-radius: 8px; padding: 14px; border: 1px solid var(--tc); border-left-width: 4px; background: rgba(0,0,0,.25); display: grid; gap: 10px; }
+.roster h3 { display: flex; align-items: center; gap: 8px; font-size: var(--step-0); }
+.roster ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.roster li { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 6px; background: rgba(255,255,255,.03); }
+.roster li.me { background: rgba(217,174,85,.08); }
+.roster .bubble { width: 40px; height: 40px; }
+.roster .who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-display); font-weight: 600; }
+.roster .who span { font-size: var(--step--1); color: var(--muted); }
+.roster .nums { text-align: right; font-variant-numeric: tabular-nums; font-size: var(--step--1); color: var(--muted); display: grid; justify-items: end; gap: 2px; }
+.roster .nums b { font-family: var(--font-display); font-size: var(--step-0); color: var(--gold-hi); line-height: 1; }
 .team h3 { display: flex; align-items: center; gap: 8px; font-size: var(--step-0); }
 .team .meter i { background: var(--tc); box-shadow: none; }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1px rgba(0,0,0,.5); }
@@ -1791,19 +1807,36 @@ function viewPlan() {
     <div>${weeks}</div></section>`;
 }
 
+// Members of the tribe tapped on the Group tab, most days read first
+function tribeRoster(list) {
+  const i = state.tribeOpen;
+  if (i === null || i === undefined) return "";
+  const mem = list.filter(p => teamIndex(p) === i);
+  const rows = mem.map(p => {
+    const isMe = state.me && p.id === state.me.id;
+    return `<li class="${isMe ? "me" : ""}"><span class="bubble">${avatarSVG(p.look, p.s.n, { bust: true })}</span>
+      <div class="who"><b>${esc(p.alias)}${isMe ? " (you)" : ""}</b><span>${p.s.streak > 0 ? `${p.s.streak}-day streak` : "no streak"}${p.s.perfect ? ` · ${p.s.perfect} perfect ${p.s.perfect === 1 ? "quiz" : "quizzes"}` : ""}</span></div>
+      <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters</div></li>`;
+  }).join("");
+  return `<div class="roster" id="roster" style="--tc:${TEAM_COLORS[i]}"><div class="row between"><h3>${crest(i)}<span>${esc(state.config.teams[i])}</span></h3>
+    <span class="row" style="gap:10px"><span class="small muted">${plural(mem.length, "member")}</span><button class="btn sm" data-tribe="">Close</button></span></div>
+    ${rows ? `<ul>${rows}</ul>` : `<p class="small muted">No one is in this tribe yet.</p>`}</div>`;
+}
+
 function viewGroup() {
   const list = allPlayers().sort((a, b) => b.s.n - a.s.n || b.s.streak - a.s.streak || a.alias.localeCompare(b.alias));
   const teams = state.config.teams;
-  const teamHTML = `<section class="card stack"><h2>The four tribes</h2><p class="small muted">Everyone is placed into a tribe when they join. Tribes are ranked by average chapters read plus a bonus point for every perfect quiz, so a smaller tribe can still win.</p><div class="teams">${
+  const teamHTML = `<section class="card stack"><h2>The four tribes</h2><p class="small muted">Everyone is placed into a tribe when they join. Tribes are ranked by average chapters read plus a bonus point for every perfect quiz, so a smaller tribe can still win. Tap a tribe to see who's in it.</p><div class="teams">${
     teams.map((t, i) => {
       const mem = list.filter(p => teamIndex(p) === i), ch = mem.reduce((a, p) => a + p.s.chapters, 0);
       const qp = mem.reduce((a, p) => a + p.s.perfect, 0);  // each perfect quiz adds one point
       return { t, i, mem, ch, qp, avg: mem.length ? ch / mem.length / TOTAL * 100 : 0, pts: mem.length ? (ch + qp) / mem.length : 0 };
-    }).sort((a, b) => b.pts - a.pts).map((x, rank) => `<div class="team" style="--tc:${TEAM_COLORS[x.i]}">
+    }).sort((a, b) => b.pts - a.pts).map((x, rank) => `<button class="team ${state.tribeOpen === x.i ? "open" : ""}" style="--tc:${TEAM_COLORS[x.i]}" data-tribe="${x.i}" aria-expanded="${state.tribeOpen === x.i}" aria-controls="roster">
       <h3>${crest(x.i)}<span>${esc(x.t)}</span>${rank === 0 && x.avg > 0 ? ' <span class="rank1">Leading</span>' : ""}</h3>
       <div class="meter"><i data-w="${x.avg}" data-k="m-team${x.i}" style="width:${x.avg}%"></i></div>
       <p class="small"><b>${Math.round(x.avg)}%</b> average · ${x.ch} chapters${x.qp ? ` · ${plural(x.qp, "quiz point")}` : ""} · ${plural(x.mem.length, "member")}</p>
-      <p class="small muted"><i>"${TEAM_VERSES[x.i][0]}"</i> ${TEAM_VERSES[x.i][1]}</p></div>`).join("")}</div></section>`;
+      <p class="small muted"><i>"${TEAM_VERSES[x.i][0]}"</i> ${TEAM_VERSES[x.i][1]}</p>
+      <span class="tsee">${state.tribeOpen === x.i ? "Hide members" : "See members"} <i aria-hidden="true">›</i></span></button>`).join("")}</div>${tribeRoster(list)}</section>`;
   const cols = Array.from({ length: DAYS + 1 }, () => []);
   list.forEach(p => cols[p.s.n].push(p));
   const myN = state.me ? stats(state.me).n : -1;
@@ -2255,6 +2288,7 @@ document.addEventListener("click", e => {
   if (ds.toggle) { toggleDay(+ds.toggle, t); return; }
   if ("sel" in ds) { state.sel = ds.sel ? +ds.sel : null; render(true); if (state.sel) { const d = $("#daydetail"); if (d) d.scrollIntoView({ block: "nearest", behavior: "smooth" }); } return; }
   if ("recover" in ds) { state.recoverFor = ds.recover || null; render(true); const i = $("#rec-name"); if (i) i.focus(); return; }
+  if ("tribe" in ds) { state.tribeOpen = ds.tribe === "" || +ds.tribe === state.tribeOpen ? null : +ds.tribe; render(true); if (state.tribeOpen !== null) { const r = $("#roster"); if (r) r.scrollIntoView({ block: "nearest", behavior: "smooth" }); } return; }
   if (ds.recoverGo) { startRecover(ds.recoverGo); return; }
   if (ds.askremove) { state.confirmRemove = ds.askremove; render(true); return; }
   if (ds.remove) { removePlayer(ds.remove); return; }
