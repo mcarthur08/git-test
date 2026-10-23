@@ -1,0 +1,24 @@
+{
+  "name": "nt70-quest",
+  "private": true,
+  "version": "1.2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "format": "prettier --write \"src/**/*.{js,jsx,css}\" vite.config.js index.html",
+    "lint": "eslint --ext .js,.jsx src vite.config.js"
+  },
+  "dependencies": {
+    "firebase": "10.12.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.57.0",
+    "prettier": "^2.8.8",
+    "vite": "^4.5.3"
+  }
+}

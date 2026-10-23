@@ -10,4 +10,4 @@ One file per book (`Matthew.json`, `1Corinthians.json`, …). Each file is an ar
 - **Source:** converted from [aruljohn/Bible-kjv](https://github.com/aruljohn/Bible-kjv).
 - **Checked:** 27 books, 260 chapters, 7,957 verses, chapter counts matching the 70-day plan.
 
-The app loads only the books needed for the day being read (see `loadBooks` in `index.html`).
+The app loads only the books needed for the day being read (see `loadBooks` in `src/actions.jsx`).
