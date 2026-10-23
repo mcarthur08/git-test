@@ -177,6 +177,7 @@ details.more[open] summary > svg { transform: rotate(180deg); }
 .rv-list { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; width: 100%; text-align: left; }
 .rv-list li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
 .rv-list li > span:last-child { display: grid; }
+.rv-list li.rv-ver { display: block; padding: 8px 2px 0; border: 0; background: none; font-weight: 800; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
 .rv-ic { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; color: var(--gold-hi); border: 1px solid rgba(217,174,85,.45); }
 .rv-ic svg { width: 16px; height: 16px; }
 .wn-art { width: 120px; height: 120px; border-radius: 50%; display: grid; place-items: center; color: var(--gold-hi); border: 2px solid var(--bronze); background: radial-gradient(circle at 50% 35%, #4A3420, #1E1712 75%); }
@@ -2193,19 +2194,27 @@ const RELEASES = [
     ["journey", "NT70 Quest launched", "70 days, 260 chapters, Bethlehem to Jerusalem."]] }
 ];
 const liveRelease = () => RELEASES.find(r => new Date(r.from) <= new Date()) || RELEASES[RELEASES.length - 1];
-function showRelease(r) {
-  queueReveal({ kicker: `What's new · Version ${r.v}`, title: r.title, art: `<div class="wn-art">${icon("star")}</div>`,
-    list: r.items.map(([ic, t, d]) => `<li><span class="rv-ic">${icon(ic)}</span><span><b>${esc(t)}</b><span class="small muted">${esc(d)}</span></span></li>`).join("") });
+const releaseItems = r => r.items.map(([ic, t, d]) => `<li><span class="rv-ic">${icon(ic)}</span><span><b>${esc(t)}</b><span class="small muted">${esc(d)}</span></span></li>`).join("");
+// One release, or every release someone missed (newest first) with a heading for each version
+function showRelease(rs) {
+  rs = [].concat(rs);
+  const r = rs[0], many = rs.length > 1;
+  queueReveal({ kicker: many ? `What's new · Versions ${rs[rs.length - 1].v} to ${r.v}` : `What's new · Version ${r.v}`,
+    title: many ? "Here's what you missed" : r.title, art: `<div class="wn-art">${icon("star")}</div>`,
+    list: many ? rs.map(x => `<li class="rv-ver">Version ${x.v} · ${esc(x.title)}</li>${releaseItems(x)}`).join("") : releaseItems(r) });
 }
 function checkWhatsNew() {
   if (state.phase !== "ready" || !state.me) return;
-  const r = liveRelease();
-  if (lsGet("nt70.seen") === r.v) return;
-  const first = !lsGet("nt70.seen");
+  const r = liveRelease(), seen = lsGet("nt70.seen");
+  if (seen === r.v) return;
   lsSet("nt70.seen", r.v);
-  // The launch needs no popup, and someone who joined after a release already has all of it
-  if (r === RELEASES[RELEASES.length - 1] || (first && state.me.createdAt && new Date(state.me.createdAt) >= new Date(r.from))) return;
-  showRelease(r);
+  // Everything live and newer than what this device last showed. The launch never pops up, and on
+  // a first visit only releases that came out after the person joined count.
+  const live = RELEASES.slice(RELEASES.indexOf(r), -1);
+  const seenAt = RELEASES.findIndex(x => x.v === seen);
+  const joined = new Date(state.me.createdAt || 0), j = isNaN(joined) ? 0 : joined;
+  const missed = seenAt >= 0 ? live.filter(x => RELEASES.indexOf(x) < seenAt) : live.filter(x => new Date(x.from) > j);
+  if (missed.length) showRelease(missed);
 }
 /* ---------- daily reminder: a repeating 15-minute calendar event through Day 70 ---------- */
 const APP_URL = "https://nt70-quest.web.app";
@@ -2296,7 +2305,8 @@ function showReveal() {
   el.hidden = false;
   const rc = el.querySelector(".reveal-card").getBoundingClientRect();
   setTimeout(() => confetti(rc.left + rc.width / 2, rc.top + 40, 44), 150);
-  el.querySelector("[data-reveal]").focus();
+  el.querySelector("[data-reveal]").focus({ preventScroll: true });
+  el.querySelector(".reveal-card").scrollTop = 0;
 }
 function closeReveal(act) {
   const r = revealQueue.shift();
