@@ -155,7 +155,7 @@ This needs the latest `firestore.rules` published (step 5).
 
 ## Announcing updates ("What's new")
 
-Each series of updates gets a version number and a "What's new" popup. Everyone sees it once, the first time they open the app after it goes live. They can see it again any time from **Me › What's new**, where the current version is shown.
+Each series of updates gets a version number and a "What's new" popup. Everyone sees it once, the first time they open the app after it goes live. Anyone who skipped a release sees every version they missed in one popup, newest first. They can see it again any time from **Me › What's new**, where the current version is shown.
 
 To announce a new release, add an entry at the **top** of `RELEASES` in `index.html`:
 
