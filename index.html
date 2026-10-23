@@ -545,6 +545,51 @@ code { font-size: .8rem; background: #0F0C0A; border: 1px solid var(--line); pad
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .confetti { display: none; }
 }
+
+/* ---------- 1.2 readability: body font for small labels, bigger text, 44px tap targets ---------- */
+:root { --step--1: 0.94rem; }
+.btn, .seg button, .tabs button, .linkish.back, .w-when { font-family: var(--font-body); font-weight: 700; letter-spacing: .02em; text-transform: none; font-size: 1rem; }
+.btn { min-height: 44px; }
+.btn.sm { min-height: 44px; padding: 8px 14px; font-size: .95rem; }
+.btn.big { font-size: 1.08rem; }
+.tabs button { font-size: .95rem; letter-spacing: .01em; }
+.seg button { min-height: 44px; padding: 8px 18px; }
+.eyebrow, .reveal .kicker, .ghead { font-family: var(--font-body); font-weight: 800; font-size: .8rem; letter-spacing: .12em; }
+.rank1 { font-family: var(--font-body); font-size: .72rem; }
+.chip { font-size: .85rem; padding: 4px 10px; }
+.opt { min-height: 44px; padding: 8px 14px; font-size: .95rem; }
+.sw-opt { width: 44px; height: 44px; }
+.sw-opt.lock::after { font-size: .68rem; }
+.feat { font-size: .85rem; min-height: 44px; }
+.cheer { width: 44px; height: 44px; font-size: 18px; }
+.cheer-count { font-size: .85rem; }
+.linkish { min-height: 44px; display: inline-flex; align-items: center; font-size: 1rem; }
+.tmove { font-size: .9rem; padding: 8px; min-height: 44px; }
+select, input[type="date"], input[type="text"], input[type="email"], input[type="password"], input[type="time"] { min-height: 44px; font-size: 1rem; }
+input[type="time"] { font: inherit; color: var(--ink); background: #0F0C0A; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; color-scheme: dark; }
+.mepill span:not(.bubble) { font-family: var(--font-body); font-weight: 700; font-size: .95rem; }
+
+.helpbtn { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface-2); color: var(--gold-hi); font: 800 1.2rem var(--font-body); cursor: pointer; margin-left: auto; }
+.helpbtn + .mepill { margin-left: 0; }
+.quick-more { display: grid; gap: 8px; justify-items: start; padding: 14px; border: 1px dashed var(--line); border-radius: 8px; }
+.wn-q { font: 800 64px/1 var(--font-display); }
+.guide { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.guide li { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; }
+.guide h3 { font-size: var(--step-0); margin-bottom: 2px; }
+.guide p { margin: 0; }
+.remind .row { gap: 10px; }
+.pgroup { display: grid; gap: 8px; }
+.pgroup + .pgroup { margin-top: 10px; }
+.pghead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.pghead h3 { font-size: var(--step-0); color: var(--gold); }
+.prow { grid-template-columns: 46px minmax(0, 1fr) auto; }
+.prow .who > span { display: block; }
+.prow .who .dot { display: inline-block; vertical-align: middle; margin: -2px 5px 0 0; }
+.improved { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(217,174,85,.4); background: rgba(217,174,85,.07); }
+.imp-list { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.imp { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.imp .bubble { width: 40px; height: 40px; }
+.imp b { display: block; font-family: var(--font-display); }
 </style>
 
 <header id="top"></header>
@@ -1070,7 +1115,7 @@ const BADGES = [
 
 /* ---------- state ---------- */
 const DEFAULT_CONFIG = { start: "2026-10-22", groupName: "Youth Group", version: "KJV", teams: DEFAULT_TEAMS };
-const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Journey"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Victories"], ["me", "Me", "Me"], ["leader", "Leader", "Leader"], ["read", "Read", "Read"], ["quiz", "Quiz", "Quiz"]];
+const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Journey"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Victories"], ["me", "Me", "Me"], ["leader", "Leader", "Leader"], ["read", "Read", "Read"], ["quiz", "Quiz", "Quiz"], ["help", "How it works", "Help"]];
 // The tab bar shows five; the Plan opens from Today and Leader tools from Me.
 const NAV_TABS = ["today", "journey", "group", "victories", "me"];
 const state = {
@@ -1380,6 +1425,7 @@ function headerHTML() {
   return `<div class="wrap bar">
       <div class="brand"><span class="brand-mark" aria-hidden="true">70</span><h1>NT70 Quest<small>${esc(state.config.groupName)} · New Testament in 70 days</small></h1></div>
       ${me && state.saveStatus ? `<span class="savestat ${state.saveStatus}" id="savestat" aria-live="polite" ${state.saveStatus === "error" ? 'data-retry="1" role="button" tabindex="0"' : ""}>${saveLabel()}</span>` : `<span class="savestat" id="savestat" aria-live="polite"></span>`}
+      ${me && state.phase === "ready" ? `<button class="helpbtn" data-tab="help" aria-label="How it works" title="How it works">?</button>` : ""}
       ${me ? `<button class="mepill" data-tab="me" aria-label="Edit my avatar"><span class="bubble">${avatarSVG(me.look, stats(me).n, { bust: true })}</span><span>${esc(me.alias)}</span></button>` : ""}
     </div>
     ${state.phase === "ready" ? `<nav class="tabs wrap" aria-label="Sections">${tabs.map(([k, l, s]) => `<button data-tab="${k}" ${state.tab === k ? 'aria-current="page"' : ""}>${icon(k)}<span>${s}</span></button>`).join("")}</nav>` : ""}`;
@@ -1810,6 +1856,20 @@ function viewPlan() {
     <div>${weeks}</div></section>`;
 }
 
+// A bright spot on the Group tab: who read more this week than last week (or, in week 1, who read the most)
+function mostImproved(list) {
+  const pd = planDay(); if (!pd || pd < 2) return "";
+  const t = new Date(), day = k => iso(new Date(t.getFullYear(), t.getMonth(), t.getDate() - k));
+  const thisFrom = day(6), prevFrom = day(13);
+  const ch = (p, a, b) => Object.entries(p.done).reduce((n, [d, dt]) => n + (dt >= a && dt <= b ? PLAN[d - 1].count : 0), 0);
+  const firstWeek = pd < 8;
+  const scored = list.map(p => { const now = ch(p, thisFrom, day(0)); return { p, now, gain: firstWeek ? now : now - ch(p, prevFrom, day(7)) }; }).filter(x => x.gain > 0 && x.now > 0);
+  if (!scored.length) return "";
+  const top = Math.max(...scored.map(x => x.gain)), best = scored.filter(x => x.gain === top).slice(0, 3);
+  return `<div class="improved"><span class="rv-ic">${icon("star")}</span><div class="stack" style="gap:6px;min-width:0"><p class="eyebrow">${firstWeek ? "Strong start this week" : "Most improved this week"}</p>
+    <div class="imp-list">${best.map(x => `<span class="imp"><span class="bubble">${avatarSVG(x.p.look, x.p.s.n, { bust: true })}</span><span><b>${esc(x.p.alias)}</b><span class="small muted">${firstWeek ? `${x.now} chapters` : `+${x.gain} chapters over last week`}</span></span></span>`).join("")}</div></div></div>`;
+}
+
 // Members of the tribe tapped on the Group tab, most days read first
 function tribeRoster(list) {
   const i = state.tribeOpen;
@@ -1845,13 +1905,12 @@ function viewGroup() {
   const myN = state.me ? stats(state.me).n : -1;
   const track = `<div class="track-wrap" id="track"><div class="track">${cols.map((ps, i) => `<div class="tcol"><div class="ppl">${ps.slice(0, 4).map(p => `<span title="${esc(p.alias)}">${avatarSVG(p.look, p.s.n, { live: state.me && p.id === state.me.id })}</span>`).join("")}${ps.length > 4 ? `<span class="more">+${ps.length - 4}</span>` : ""}</div>
       <span class="tdot ${i === 0 ? "go" : ""} ${i && i % 7 === 0 ? "mile" : ""} ${i === myN ? "me" : ""}" ${i === myN ? 'id="trackme"' : ""}></span><span class="tlabel">${i === 0 ? "Start" : (i % 7 === 0 ? i : "")}</span></div>`).join("")}</div></div>`;
-  const pd = planDay();
-  const rows = list.map((p, idx) => {
+  const pd = planDay(), goal = pd && pd >= 1 ? Math.min(pd, DAYS) : 0;
+  const row = p => {
     const isMe = state.me && p.id === state.me.id;
     const ti = teamIndex(p);
     const canMove = state.mode === "shared" && (state.backend === "firebase" ? state.canLead : state.isOwner);
     const mv = canMove ? `<select class="tmove" data-move="${esc(p.id)}" aria-label="Move ${esc(p.alias)} to another tribe">${teams.map((t, i) => `<option value="${i}" ${i === ti ? "selected" : ""}>${esc(t)}</option>`).join("")}</select>` : "";
-    const pace = pd && pd >= 1 ? (p.s.n >= Math.min(pd, DAYS) ? "on pace" : `${Math.min(pd, DAYS) - p.s.n} behind`) : "";
     const rm = state.isOwner && !isMe ? (state.confirmRemove === p.id
       ? `<button class="btn sm danger" data-remove="${esc(p.id)}">Confirm remove</button>`
       : `<button class="btn sm" data-askremove="${esc(p.id)}" aria-label="Remove ${esc(p.alias)}">Remove</button>`) : "";
@@ -1862,15 +1921,22 @@ function viewGroup() {
           <button class="btn sm go" data-recover-go="${esc(p.id)}">Move</button><button class="btn sm" data-recover="">Cancel</button></div>
           <span class="small muted">Their progress moves the next time they sign in with that username.</span></div>`
       : `<button class="btn sm" data-recover="${esc(p.id)}" aria-label="Recover ${esc(p.alias)} to a new account">Recover</button>`;
-    return `<div class="prow ${isMe ? "me" : ""}${state.recoverFor === p.id ? " recovering" : ""}"><span class="rank">${idx + 1}</span><span class="bubble">${avatarSVG(p.look, p.s.n, { bust: true })}</span>
-      <div class="who"><b>${esc(p.alias)}${isMe ? " (you)" : ""}</b><span>${ti >= 0 ? `<span class="dot" style="background:${TEAM_COLORS[ti]}"></span>${esc(teams[ti])} · ` : ""}${p.s.streak > 0 ? `${p.s.streak}-day streak` : "no streak"}${pace ? " · " + pace : ""}</span></div>
+    return `<div class="prow ${isMe ? "me" : ""}${state.recoverFor === p.id ? " recovering" : ""}"><span class="bubble">${avatarSVG(p.look, p.s.n, { bust: true })}</span>
+      <div class="who"><b>${esc(p.alias)}${isMe ? " (you)" : ""}</b><span>${ti >= 0 ? `<span class="dot" style="background:${TEAM_COLORS[ti]}"></span>${esc(teams[ti])} · ` : ""}${p.s.streak > 0 ? `${p.s.streak}-day streak` : "no streak"}</span></div>
       <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters</div>
       ${(() => { const acts = cheerButtons(p) + mv + (state.recoverFor === p.id ? "" : rec) + rm; return acts ? `<div class="prow-acts">${acts}</div>` : ""; })()}${state.recoverFor === p.id ? rec : ""}</div>`;
-  }).join("");
+  };
+  // No rank numbers: readers are grouped by where they are, most days first within each group
+  const groups = [
+    ["Finished", "Read the whole New Testament", list.filter(p => p.s.n >= DAYS)],
+    [goal ? "On pace" : "Reading", goal ? `Read through Day ${goal}` : "", list.filter(p => p.s.n < DAYS && p.s.n >= goal)],
+    ["Catching up", "Every day you read counts. Keep going!", list.filter(p => p.s.n < goal)]
+  ].filter(g => g[2].length);
+  const rows = groups.map(([t, sub, ps]) => `<div class="pgroup"><div class="pghead"><h3>${t}</h3><span class="small muted">${ps.length}${sub ? " · " + sub : ""}</span></div>${ps.map(row).join("")}</div>`).join("");
   return `${state.mode === "local" ? `<div class="note">You're playing solo on this device, so only your own character shows here. Open the group's shared link and sign in to join everyone else.</div>` : ""}
   ${teamHTML}
   <section class="card stack"><h2>The road to Revelation</h2><p class="small muted">Each dot is one day of reading; gold dots are Victory Moments. Scroll sideways to see everyone.</p>${track}</section>
-  <section class="card stack"><div class="row between"><h2>Leaderboard</h2><span class="small muted">${plural(list.length, "reader")}</span></div><div class="board">${rows || '<p class="muted">Nobody has joined yet.</p>'}</div></section>`;
+  <section class="card stack"><div class="row between"><h2>Readers</h2><span class="small muted">${plural(list.length, "reader")}</span></div>${mostImproved(list)}<div class="board">${rows || '<p class="muted">Nobody has joined yet.</p>'}</div></section>`;
 }
 
 function viewVictories() {
@@ -1904,13 +1970,16 @@ function viewEditor(onboarding) {
   }).join("");
   const teams = state.config.teams, myTeam = state.me ? teamIndex(state.me) : -1;
   const L = normLook(d.look, n);
+  // New players get a quick start: name and a ready-made look. Every detail stays one tap away.
+  const quick = onboarding && !state.fullEditor;
   return `${onboarding ? `<section class="card stack"><p class="eyebrow">${esc(state.config.groupName)}</p><h2>Create your character</h2>
-      <p class="muted" style="max-width:68ch">Together we're reading the whole New Testament, Matthew to Revelation, in 70 days: about 4 chapters a day. Choose a Bible name or use your own first name, dress your character the way people dressed in the first century, and you'll be placed into one of four tribes. Reading unlocks new gear.</p></section>` : ""}
+      <p class="muted" style="max-width:68ch">${quick ? "Pick a name and tap <b>Surprise me</b> until you like your look. That's it. You can change every detail later under <b>Me</b>." : "Together we're reading the whole New Testament, Matthew to Revelation, in 70 days: about 4 chapters a day. Choose a Bible name or use your own first name, dress your character the way people dressed in the first century, and you'll be placed into one of four tribes. Reading unlocks new gear."}</p></section>` : ""}
   <section class="card editor">
     <div class="preview"><div class="frame big">${avatarSVG(d.look, n, { portrait: true, live: true })}<div class="frame-fig">${avatarSVG(d.look, n, { live: true })}</div></div>
       <div class="alias" id="alias-preview">${esc(alias || "Choose a name")}</div>
       <p class="small muted" style="text-align:center">${g === "f" ? "Sister" : "Brother"}${L.cover ? " · " + COVERS[g][L.cover][0] : ""} · ${MANTLES[g][L.mantle][0]} ${g === "f" ? "shawl" : "mantle"}</p>
       <p class="small" id="alias-taken" style="color:var(--rose)" ${aliasTaken ? "" : "hidden"}>Someone already has that name. Add a hometown or pick another.</p>
+      ${onboarding ? `<button class="btn" data-surprise="1">${icon("star")} Surprise me</button>` : ""}
       <button class="btn go save-btn" data-save="1" ${!nm0 || aliasTaken || state.readOnly ? "disabled" : ""}>${onboarding ? "Begin the quest" : "Save changes"}</button>
       ${!onboarding ? `<p class="small muted" style="text-align:center">${state.readOnly ? "Saving is turned off for you." : "Saves to the group leaderboard."}</p>` : ""}
     </div>
@@ -1934,7 +2003,7 @@ function viewEditor(onboarding) {
           : `<p class="small muted">You'll be placed into one of the four tribes (${teams.map(esc).join(", ")}) when you join, keeping the teams even.</p>`}
       </div>
       </div>
-      <div class="group"><h3 class="ghead">Face</h3>
+      ${quick ? `<div class="quick-more"><p class="small muted">Want to choose the face, hair, clothing and more yourself?</p><button class="btn sm" data-fulleditor="1">Customize every detail</button></div>` : `<div class="group"><h3 class="ghead">Face</h3>
       <div class="two">
         <div class="field"><span class="lbl">Skin</span><div class="opts">${swatches("skin", SKINS, "Skin tone")}</div></div>
         <div class="field"><span class="lbl">Eye color</span><div class="opts">${swatches("eyeColor", EYEC, "Eye color")}</div></div>
@@ -1963,7 +2032,7 @@ function viewEditor(onboarding) {
       <div class="field"><span class="lbl">Headgear</span><div class="opts">${unl("hat")}</div></div>
       <div class="field"><span class="lbl">Item</span><div class="opts">${unl("item")}</div>
         <p class="small muted">Locked gear shows how many days of reading it takes. You have ${plural(n, "day")}.</p></div>
-      </div>
+      </div>`}
       ${!onboarding && state.backend === "firebase" && state.account ? `<div class="field acct"><span class="lbl">Account</span>
         <p class="small muted">${usernameOf(state.account.email) ? `Signed in with the username <b>${esc(usernameOf(state.account.email))}</b>. Keep your password somewhere safe. If you forget it, make a new username and ask a leader to Recover your progress.` : `Signed in${state.account.email ? ` as ${esc(state.account.email)}` : ""}.`} Only you see this.</p>
         <p class="small muted">Account ID (your leader may ask for it): <code>${esc(state.account.uid)}</code></p>
@@ -2042,13 +2111,14 @@ function render(force) {
   if (state.tab === "me" && !state.draft && state.me) state.draft = draftFrom(state.me);
   const back = (tab, label) => `<button class="linkish back" data-tab="${tab}">← ${label}</button>`;
   const v = { today: viewToday, journey: viewJourney, plan: () => back("today", "Back to Today") + viewPlan(), group: viewGroup, victories: viewVictories,
-    me: () => (state.canLead ? `<section class="card row between"><div><p class="eyebrow">Leader</p><b>Group settings, tribes and tools</b></div><button class="btn sm" data-tab="leader">Open leader tools</button></section>` : "") + viewEditor(false)
+    me: () => (state.canLead ? `<section class="card row between"><div><p class="eyebrow">Leader</p><b>Group settings, tribes and tools</b></div><button class="btn sm" data-tab="leader">Open leader tools</button></section>` : "") + reminderCard() + viewEditor(false)
       + `<p class="small muted app-ver">NT70 Quest version ${liveRelease().v} · <button class="linkish" data-whatsnew="1">What's new</button></p>`,
-    leader: () => back("me", "Back to Me") + viewLeader(), read: viewRead, quiz: viewQuiz }[state.tab] || viewToday;
+    leader: () => back("me", "Back to Me") + viewLeader(), read: viewRead, quiz: viewQuiz, help: viewHelp }[state.tab] || viewToday;
   main.innerHTML = v();
   animateValues();
   if (state.tab === "journey") setupMapGestures();
   checkWhatsNew();
+  checkGuide();
   if (state.tab === "group") { const t = $("#track"), m = $("#trackme"); if (t && m) t.scrollLeft = Math.max(0, m.parentElement.offsetLeft - t.clientWidth / 2); }
 }
 document.addEventListener("toggle", e => {
@@ -2106,6 +2176,12 @@ function confetti(x, y, count = 36) {
 // features (1.2, 1.3…) and the last for bug fixes (1.2.1). The popup waits until `from`
 // (local time), then shows once per device to anyone who hasn't seen that version.
 const RELEASES = [
+  { v: "1.2", from: "2026-10-24T06:00", title: "Easier every day", items: [
+    ["today", "Daily reminder", "Add a reminder to Google Calendar, iPhone or Outlook at the time you choose. Find it under Me."],
+    ["me", "Help is one tap away", "Tap the ? at the top for how everything works."],
+    ["group", "A kinder leaderboard", "Readers are grouped as Finished, On pace and Catching up, with a weekly highlight."],
+    ["book", "Easier to read", "Bigger text and buttons that are easier to tap."],
+    ["star", "Quick start", "New friends can join in seconds with Surprise me."]] },
   { v: "1.1", from: "2026-10-23T06:00", title: "Fresh on the road", items: [
     ["group", "Tribe rosters", "Tap a tribe on the Group tab to see who's in it."],
     ["target", "Daily quiz", "5 quick KJV questions after each reading. Perfect scores earn your tribe a point."],
@@ -2131,6 +2207,82 @@ function checkWhatsNew() {
   if (r === RELEASES[RELEASES.length - 1] || (first && state.me.createdAt && new Date(state.me.createdAt) >= new Date(r.from))) return;
   showRelease(r);
 }
+/* ---------- daily reminder: a repeating 15-minute calendar event through Day 70 ---------- */
+const APP_URL = "https://nt70-quest.web.app";
+function reminderPlan() {
+  const tm = (($("#rem-time") || {}).value || "07:00").split(":").map(Number), h = tm[0] || 0, m = tm[1] || 0;
+  const start = parseISO(state.config.start), now = new Date();
+  const from = start && start > now ? start : now;
+  const at = new Date(from.getFullYear(), from.getMonth(), from.getDate(), h, m);
+  if (at < now) at.setDate(at.getDate() + 1);   // today's time already passed: start tomorrow
+  // one event a day through Day 70 (or 70 days when there's no start date yet)
+  const count = start ? Math.max(1, daysBetween(at, dayDate(start, DAYS)) + 1) : DAYS;
+  const stamp = d => `${iso(d).replace(/-/g, "")}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+  return { start: stamp(at), end: stamp(new Date(at.getTime() + 15 * 60000)), count, time: `${pad(h)}:${pad(m)}`,
+    label: at.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }) };
+}
+const REM_TITLE = "NT70 Quest: today's reading";
+const REM_TEXT = `About 4 chapters (15–20 minutes). Read, then check it off: ${APP_URL}`;
+function addReminder(kind) {
+  const r = reminderPlan();
+  if (kind === "google") {
+    const q = new URLSearchParams({ action: "TEMPLATE", text: REM_TITLE, details: REM_TEXT, dates: `${r.start}/${r.end}`, recur: `RRULE:FREQ=DAILY;COUNT=${r.count}` });
+    try { q.set("ctz", Intl.DateTimeFormat().resolvedOptions().timeZone); } catch {}
+    window.open("https://calendar.google.com/calendar/render?" + q, "_blank", "noopener");
+  } else {
+    const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//NT70 Quest//Reminder//EN", "BEGIN:VEVENT",
+      `UID:nt70-${Date.now()}@nt70-quest.web.app`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").slice(0, 15)}Z`,
+      `DTSTART:${r.start}`, `DTEND:${r.end}`, `RRULE:FREQ=DAILY;COUNT=${r.count}`, `SUMMARY:${REM_TITLE}`,
+      `DESCRIPTION:${REM_TEXT.replace(/,/g, "\\,")}`, `URL:${APP_URL}`,
+      "BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${REM_TITLE}`, "TRIGGER:PT0M", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" })); a.download = "nt70-daily-reminder.ics";
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  lsSet("nt70.remind", r.time); render(true);
+  toast(`Daily reminder set for ${r.label} through Day 70`);
+}
+function reminderCard() {
+  const set = lsGet("nt70.remind");
+  return `<section class="card stack remind"><div class="row between"><h3>Daily reminder</h3>${set ? `<span class="chip ok">${icon("check")} Added</span>` : ""}</div>
+    <p class="small muted">Adds a 15-minute event to your calendar every day through Day 70, with a link back here.</p>
+    <div class="row"><label for="rem-time" class="small">Remind me at</label><input type="time" id="rem-time" value="${esc(set || "07:00")}">
+      <button class="btn sm" data-remind="google">Google Calendar</button><button class="btn sm" data-remind="ics">iPhone / Outlook</button></div>
+  </section>`;
+}
+
+/* ---------- How it works: shown once to new players, reopened from the ? in the header ---------- */
+const GUIDE = [
+  ["today", "Each day", "Open <b>Today</b>, tap <b>Read Day X</b> (or use your own Bible), then check it off. About 4 chapters, 15–20 minutes."],
+  ["group", "Your tribe", "You're in one of four tribes. Tribes are ranked by average chapters plus perfect-quiz points, so every reader helps."],
+  ["flame", "Fell behind?", "No guilt. Today shows one clear next step. Read on paper? Use <b>Mark everything read through</b>. Finishing late still counts."],
+  ["victories", "Along the way", "Your character walks from Bethlehem to Jerusalem, and every 7 days unlocks a Victory Moment to talk about."],
+  ["me", "Something not working?", "Message a youth leader in the group chat. Closing and reopening the app fixes most things."]
+];
+function guideReveal() {
+  return { kicker: "How it works", title: "Five things to know", art: `<div class="wn-art"><span class="wn-q">?</span></div>`,
+    list: GUIDE.map(([ic, t, d]) => `<li><span class="rv-ic">${icon(ic)}</span><span><b>${esc(t)}</b><span class="small muted">${d}</span></span></li>`).join(""),
+    action: "Set a daily reminder", onAct: () => setTab("help") };
+}
+function checkGuide() {
+  if (state.phase !== "ready" || !state.me || lsGet("nt70.guide")) return;
+  lsSet("nt70.guide", 1);
+  // Players who were here before the guide existed already know their way around
+  const added = RELEASES.find(r => r.v === "1.2");
+  if (stats(state.me).n >= 3 || (added && state.me.createdAt && new Date(state.me.createdAt) < new Date(added.from))) return;
+  queueReveal(guideReveal());
+}
+function viewHelp() {
+  return `<button class="linkish back" data-tab="today">← Back to Today</button>
+  <section class="card stack"><p class="eyebrow">NT70 Quest</p><h2>How it works</h2>
+    <ul class="guide">${GUIDE.map(([ic, t, d]) => `<li><span class="rv-ic">${icon(ic)}</span><div><h3>${esc(t)}</h3><p class="muted">${d}</p></div></li>`).join("")}
+      <li><span class="rv-ic">${icon("target")}</span><div><h3>Daily quiz</h3><p class="muted">After you check off a day, try 5 quick questions from that reading. A perfect score adds a point for your tribe.</p></div></li>
+      <li><span class="rv-ic">${icon("lock")}</span><div><h3>Forgot your password?</h3><p class="muted">Make a new username, then ask a leader to tap <b>Recover</b> on your old character. Your progress moves over.</p></div></li>
+    </ul></section>
+  ${reminderCard()}
+  <p class="small muted app-ver">NT70 Quest version ${liveRelease().v} · <button class="linkish" data-whatsnew="1">What's new</button></p>`;
+}
+
 // Catch a release that goes live while the app sits open overnight
 document.addEventListener("visibilitychange", () => { if (!document.hidden) checkWhatsNew(); });
 
@@ -2266,9 +2418,9 @@ async function joinOrSave() {
   const n = stats({ done: base.done || {} }).n;
   const joining = state.phase === "join", ti = teamIndex(base) >= 0 ? teamIndex(base) : pickTeam(base.id);
   state.me = { ...base, alias, gender: d.gender, team: String(ti), look: normLook({ ...d.look, g: d.gender }, n) };
-  if (joining) { state.phase = "ready"; state.tab = "today"; state.enter = true; state.cheerUntil = Date.now() + 2000; }
+  if (joining) { state.phase = "ready"; state.tab = "today"; state.enter = true; state.cheerUntil = Date.now() + 2000; lsSet("nt70.guide", 1); }
   saveMe(); render(true);
-  if (joining) { confetti(innerWidth / 2, innerHeight / 3, 50); queueReveal(tribeReveal(ti, alias)); }
+  if (joining) { confetti(innerWidth / 2, innerHeight / 3, 50); queueReveal(tribeReveal(ti, alias)); queueReveal(guideReveal()); }
   else toast("Character saved");
 }
 
@@ -2321,6 +2473,7 @@ document.addEventListener("click", e => {
   if (ds.alt) { const v = $("#u-name"); if (v) state.auth.uname = v.value; state.auth.alt = ds.alt; state.auth.error = ""; render(true); return; }
   if (ds.umode) { const v = $("#u-name"); if (v) state.auth.uname = v.value; state.auth.umode = ds.umode; state.auth.error = ""; render(true); return; }
   if (ds.whatsnew) { showRelease(liveRelease()); return; }
+  if (ds.remind) { addReminder(ds.remind); return; }
   if (ds.reveal) { closeReveal(ds.reveal === "act"); return; }
   if (ds.stopnav) { const cur = state.stop ?? Math.max(0, STOPS.findIndex(x => x.day > stats(state.me).n) - 1); selectStop(Math.max(0, Math.min(STOPS.length - 1, (cur < 0 ? STOPS.length - 1 : cur) + +ds.stopnav))); return; }
   if (ds.tab) { e.preventDefault(); setTab(ds.tab); return; }
@@ -2351,7 +2504,11 @@ document.addEventListener("click", e => {
       const nm = names[Math.floor(Math.random() * names.length)], pl = Math.random() < 0.6 ? PLACES[1 + Math.floor(Math.random() * (PLACES.length - 1))] : "";
       if (!taken.has((nm + (pl ? " " + pl : "")).toLowerCase())) { d.name = nm; d.place = pl; break; }
     }
-  } else if (ds.save) { joinOrSave(); return; }
+  } else if (ds.surprise) {
+    const fresh = newDraftFor(d.gender).look;
+    d.look = { ...fresh, hat: d.look.hat || 0, item: d.look.item || 0 };
+  } else if (ds.fulleditor) state.fullEditor = true;
+  else if (ds.save) { joinOrSave(); return; }
   else return;
   render(true);
 });

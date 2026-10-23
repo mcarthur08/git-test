@@ -168,6 +168,7 @@ To announce a new release, add an entry at the **top** of `RELEASES` in `index.h
 - **Version:** bump the middle number for new features (1.2, 1.3…) and the last number for bug-fix-only releases (1.2.1).
 - **`from`:** the local date and time the popup starts showing. Leave it in the past to show it right away.
 - **Icons:** today, plan, group, victories, me, journey, book, flame, check, star, crown, target, lock.
+- **The "How it works" guide** (the **?** in the header) is the `GUIDE` list in `index.html`. Edit it there.
 - People who join after a release went out don't get its popup.
 
 ## Good to know
