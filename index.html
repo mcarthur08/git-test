@@ -244,6 +244,32 @@ details.more[open] summary > svg { transform: rotate(180deg); }
 .prow-acts { grid-column: 2 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .prow-acts .cheers { margin-right: auto; }
 
+/* Quiz */
+.quiz { display: grid; gap: 14px; max-width: 640px; width: 100%; justify-self: center; }
+.qz-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.qz-dots { display: inline-flex; gap: 6px; }
+.qz-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.qz-dots i.cur { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.qz-dots i.ok { background: var(--teal); } .qz-dots i.no { background: var(--rose); }
+.qz-verse { margin: 0; padding: 14px 16px; border-radius: 8px; background: rgba(0,0,0,.28); border-left: 3px solid var(--gold); font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif; font-size: 1.12rem; line-height: 1.6; }
+.qz-blank { display: inline-block; min-width: 4.5em; border-bottom: 2px solid var(--gold); color: transparent; }
+.qz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.qz-opt { min-height: 52px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: linear-gradient(#2B231C, #211A15); color: var(--ink); font: 700 1rem var(--font-body); cursor: pointer; transition: transform .15s var(--spring), border-color .2s, background .2s; }
+.qz-opt:hover:not([disabled]) { border-color: var(--gold); }
+.qz-opt:active:not([disabled]) { transform: scale(.97); }
+.qz-opt.right { border-color: var(--teal); background: rgba(141,163,94,.22); color: #D7E8B8; }
+.qz-opt.wrong { border-color: var(--rose); background: rgba(194,83,63,.2); color: #F2B9AC; }
+.qz-opt.dim { opacity: .45; }
+.qz-fb { padding: 12px 14px; border-radius: 8px; border: 1px solid var(--line); display: grid; gap: 6px; }
+.qz-fb.ok { border-color: rgba(141,163,94,.5); } .qz-fb.ok b { color: var(--teal); }
+.qz-fb.no { border-color: rgba(194,83,63,.5); } .qz-fb.no b { color: #E07E69; }
+.qz-end { text-align: center; justify-items: center; }
+.qz-score { font-family: var(--font-display); color: var(--gold-hi); display: flex; align-items: baseline; gap: 6px; }
+.qz-score b { font-size: 4rem; line-height: 1; }
+.qz-score span { font-size: 1.4rem; color: var(--muted); }
+.quiz-nudge { border-color: rgba(143,168,220,.35); }
+@media (max-width: 420px) { .qz-opts { grid-template-columns: 1fr; } }
+
 /* Reader */
 .reader { --rd-ink: #EFE6D2; --rd-bg: linear-gradient(180deg, #1F1915, #17120F); --rd-num: var(--gold); --rd-head: var(--gold-hi); background: var(--rd-bg); padding: 26px clamp(18px, 5vw, 48px) 30px; }
 .reader.light { --rd-ink: #2A1E12; --rd-bg: linear-gradient(180deg, #F3EAD6, #E9DCC0); --rd-num: #9A6B1E; --rd-head: #5A3B12; border-color: #B79C6C; }
@@ -992,6 +1018,7 @@ function normPlayer(d, id) {
   return { id, alias: typeof d.alias === "string" && d.alias.trim() ? d.alias.slice(0, 40) : "Traveler",
     gender: d.gender === "f" ? "f" : "m", team: typeof d.team === "string" ? d.team.slice(0, 30) : "",
     look: d.look && typeof d.look === "object" ? { g: d.gender === "f" ? "f" : "m", ...d.look } : { g: d.gender === "f" ? "f" : "m" }, done,
+    quiz: (() => { const q = {}; if (d.quiz && typeof d.quiz === "object") for (const [k, v] of Object.entries(d.quiz)) { const n = +k; if (Number.isInteger(n) && n >= 1 && n <= DAYS && Number.isInteger(v) && v >= 0 && v <= 5) q[n] = v; } return q; })(),
     createdAt: typeof d.createdAt === "string" ? d.createdAt : "", updatedAt: typeof d.updatedAt === "string" ? d.updatedAt : "" };
 }
 function stats(p) {
@@ -1002,7 +1029,8 @@ function stats(p) {
   while (dates.has(iso(d))) { cur++; d.setDate(d.getDate() - 1); }
   let best = 0, run = 0, prev = null;
   [...dates].map(parseISO).sort((a, b) => a - b).forEach(x => { run = prev && daysBetween(prev, x) === 1 ? run + 1 : 1; best = Math.max(best, run); prev = x; });
-  return { n: days.length, doneSet, chapters, streak: cur, best };
+  const qs = Object.values(p.quiz || {});
+  return { n: days.length, doneSet, chapters, streak: cur, best, quizzes: qs.length, perfect: qs.filter(v => v === 5).length };
 }
 const through = (s, chap) => PLAN.filter(d => d.from < chap).every(d => s.doneSet.has(d.day));
 const BADGES = [
@@ -1016,12 +1044,14 @@ const BADGES = [
   { name: "Letter Carrier", desc: "Read through Philemon", color: "#D98A00", icon: "book", test: s => through(s, 204) },
   { name: "Unshakable", desc: "30-day streak", color: "#7C4DFF", icon: "flame", test: s => s.best >= 30 },
   { name: "Hall of Faith", desc: "Read through Jude", color: "#7C4DFF", icon: "book", test: s => through(s, 238) },
-  { name: "Finisher", desc: "The whole New Testament", color: "#F5B301", icon: "crown", test: s => s.n >= DAYS }
+  { name: "Finisher", desc: "The whole New Testament", color: "#F5B301", icon: "crown", test: s => s.n >= DAYS },
+  { name: "Sharp Mind", desc: "5 perfect quizzes", color: "#2F7BF0", icon: "target", test: s => s.perfect >= 5 },
+  { name: "Scholar", desc: "25 quizzes completed", color: "#0E9C8D", icon: "book", test: s => s.quizzes >= 25 }
 ];
 
 /* ---------- state ---------- */
 const DEFAULT_CONFIG = { start: "2026-10-22", groupName: "Youth Group", version: "KJV", teams: DEFAULT_TEAMS };
-const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Journey"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Victories"], ["me", "Me", "Me"], ["leader", "Leader", "Leader"], ["read", "Read", "Read"]];
+const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Journey"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Victories"], ["me", "Me", "Me"], ["leader", "Leader", "Leader"], ["read", "Read", "Read"], ["quiz", "Quiz", "Quiz"]];
 // The tab bar shows five; the Plan opens from Today and Leader tools from Me.
 const NAV_TABS = ["today", "journey", "group", "victories", "me"];
 const state = {
@@ -1079,7 +1109,7 @@ async function flush() {
   writing = true; dirty = false;
   const me = state.me;
   try {
-    await state.db.doc("players/" + state.uid).set({ alias: me.alias, gender: me.gender, team: me.team, look: me.look, done: me.done,
+    await state.db.doc("players/" + state.uid).set({ alias: me.alias, gender: me.gender, team: me.team, look: me.look, done: me.done, quiz: me.quiz || {},
       createdAt: me.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
     state.writeError = null;
     if (!dirty) setSave("saved");
@@ -1344,7 +1374,7 @@ function loadBooks(list) {
     if (b in KJV || KJV_LOADING[b]) return;
     KJV_LOADING[b] = fetch(bookFile(b)).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(j => { KJV[b] = j; }).catch(() => { KJV[b] = null; })
-      .finally(() => { delete KJV_LOADING[b]; if (state.tab === "read") render(true); });
+      .finally(() => { delete KJV_LOADING[b]; if (state.tab === "read" || state.tab === "quiz") render(true); });
   });
 }
 const RD_SIZES = [0.95, 1.05, 1.15, 1.28, 1.42, 1.6];
@@ -1372,6 +1402,7 @@ function viewRead() {
   const finish = isDone
     ? `<div class="rd-done"><p class="eyebrow">${icon("check")} Day ${d} read</p>
         ${next ? `<button class="btn go big" data-readday="${next.day}">Read Day ${next.day}: ${esc(next.short)} →</button>` : `<p>That's the whole New Testament. Well done!</p>`}
+        ${(state.me.quiz || {})[d] !== undefined ? `<button class="btn" data-quiz="${d}">${icon("target")} Quiz: ${state.me.quiz[d]}/5 · try again</button>` : `<button class="btn" data-quiz="${d}">${icon("target")} Take the 1-minute quiz</button>`}
         <button class="linkish" data-toggle="${d}">Mark Day ${d} as not read</button></div>`
     : `<div class="rd-done"><p class="muted">Finished all ${plural(p.count, "chapter")}?</p>
         <button class="btn go big" data-toggle="${d}" ${state.readOnly ? "disabled" : ""}>${icon("check")} I read Day ${d}</button></div>`;
@@ -1491,6 +1522,142 @@ function recapCard() {
   </section>`;
 }
 
+/* ---------- Daily quiz: 5 questions built from the day's KJV text ---------- */
+const QUIZ_STOP = new Set(("the and that unto them with they which shall have said this from were there their him his for not but all was are thou thee thy hath when then into upon what also her these those things came come went saith being even because should would could every before after again against among about through other more than many much whom whose where here now yet behold verily therefore wherefore according hast shalt doth didst wilt neither nor only some such same your ours been made make took take given give gave spake spoken until while shalt cometh goeth hearken answered answering certain great things thing whosoever whatsoever whilst thereof without within therein whereby wherein thereby thence hither thither likewise forthwith straightway began daily wrought though although howbeit insomuch nevertheless notwithstanding").split(" "));
+const QUIZ_FALLBACK = ["mercy", "glory", "wisdom", "peace", "power", "light", "faith", "bread", "house", "heart", "spirit", "kingdom", "truth", "grace"];
+const QUIZ_NAMES = ["Peter", "John", "James", "Paul", "Moses", "Abraham", "David", "Elias", "Pilate", "Herod", "Mary", "Martha", "Barnabas", "Timothy", "Israel", "Jerusalem", "Galilee", "Judaea", "Andrew", "Philip"];
+const qCore = w => w.replace(/^[^A-Za-z']+|[^A-Za-z']+$/g, "");
+const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function quizVerses(day) {
+  const p = PLAN[day - 1], out = [];
+  CHAPTERS.slice(p.from, p.to).forEach(c => (KJV[c.b][c.c - 1] || []).forEach((t, i) => out.push({ c, v: i + 1, t, ref: `${c.one ? c.b : `${c.b} ${c.c}`}:${i + 1}`, chap: c.one ? c.b : `${c.b} ${c.c}` })));
+  return out;
+}
+// Words worth asking about. Plain words: lowercase, 5+ letters, not filler, and not repeated elsewhere in the verse.
+// Names: capitalized, never lowercase anywhere in the day's reading, and not just starting a sentence.
+let QUIZ_LOWER = new Set();
+// People, places and peoples of the New Testament (capitalized everywhere they appear in the KJV NT).
+const NT_NAMES = new Set(["Aaron","Abaddon","Abel","Abia","Abiathar","Abilene","Abiud","Abraham","Aceldama","Achaia","Achaicus","Achaz","Achim","Adam","Addi","Adramyttium","Adria","Aeneas","Aenon","Agabus","Agar","Agrippa","Alexander","Alexandria","Alexandrians","Alphaeus","Aminadab","Amon","Amos","Amphipolis","Amplias","Ananias","Andrew","Andronicus","Anna","Annas","Antioch","Antipas","Antipatris","Apelles","Apollonia","Apollos","Apollyon","Apphia","Appii","Aquila","Arabia","Arabians","Aram","Archelaus","Archippus","Areopagite","Areopagus","Aretas","Arimathaea","Aristarchus","Aristobulus","Armageddon","Arphaxad","Artemas","Asa","Aser","Asia","Assos","Asyncritus","Athenians","Athens","Attalia","Augustus","Azor","Azotus","Baal","Babylon","Balaam","Balac","Barabbas","Barachias","Barak","Barjesus","Barjona","Barnabas","Barsabas","Bartholomew","Bartimaeus","Beelzebub","Belial","Benjamin","Berea","Bernice","Bethabara","Bethany","Bethesda","Bethlehem","Bethphage","Bethsaida","Bithynia","Blastus","Boanerges","Booz","Bosor","Caesar","Caesarea","Caiaphas","Cain","Cainan","Calvary","Cana","Canaan","Canaanite","Candace","Capernaum","Cappadocia","Carpus","Castor","Cedron","Cenchrea","Cephas","Chaldaeans","Chanaan","Charran","Chios","Chloe","Chorazin","Christian","Christians","Chuza","Cilicia","Cis","Clauda","Claudia","Claudius","Clement","Cleopas","Cleophas","Cnidus","Colosse","Coos","Core","Corinth","Corinthians","Cornelius","Cosam","Crete","Cretians","Crispus","Cyprus","Cyrene","Cyrenian","Cyrenians","Cyrenius","Dalmanutha","Dalmatia","Damaris","Damascenes","Damascus","Daniel","David","Decapolis","Demas","Demetrius","Derbe","Diana","Didymus","Dionysius","Diotrephes","Dorcas","Drusilla","Egypt","Egyptian","Egyptians","Elamites","Eleazar","Eli","Eliakim","Elias","Eliezer","Elisabeth","Eliseus","Eliud","Elmodam","Elymas","Emmanuel","Emmaus","Emmor","Enoch","Enos","Epaenetus","Epaphras","Epaphroditus","Ephesian","Ephesians","Ephesus","Ephraim","Epicureans","Erastus","Esaias","Esau","Esli","Esrom","Ethiopia","Ethiopians","Eunice","Euodias","Euphrates","Euroclydon","Eutychus","Eve","Ezekias","Felix","Festus","Fortunatus","Gabbatha","Gabriel","Gad","Gadarenes","Gaius","Galatia","Galatians","Galilaean","Galilaeans","Galilee","Gallio","Gamaliel","Gaza","Gedeon","Gennesaret","Gentile","Gentiles","Gergesenes","Gethsemane","Gog","Golgotha","Gomorrha","Grecians","Greece","Greek","Greeks","Heber","Hebrew","Hebrews","Heli","Hermas","Hermes","Hermogenes","Herod","Herodians","Herodias","Herodion","Hierapolis","Hymenaeus","Iconium","Idumaea","Illyricum","Isaac","Iscariot","Israel","Israelite","Israelites","Issachar","Italian","Italy","Ituraea","Jacob","Jairus","Jambres","James","Janna","Jannes","Jared","Jason","Jechonias","Jephthae","Jeremias","Jeremy","Jericho","Jerusalem","Jesse","Jesus","Jew","Jewess","Jewish","Jewry","Jews","Jezebel","Joanna","Joatham","Job","Joel","John","Jona","Jonan","Jonas","Joppa","Joram","Jordan","Jorim","Josaphat","Jose","Joseph","Joses","Josias","Juda","Judaea","Judah","Judas","Julia","Julius","Junia","Jupiter","Justus","Lamech","Laodicea","Laodiceans","Lasea","Latin","Lazarus","Lebbaeus","Levi","Levite","Levites","Levitical","Libertines","Libya","Linus","Lois","Lucas","Lucius","Luke","Lycaonia","Lycia","Lydda","Lydia","Lysanias","Lysias","Lystra","Maath","Macedonia","Macedonian","Madian","Magdala","Magdalene","Magog","Malchus","Maleleel","Manaen","Manasses","Marcus","Mars","Martha","Mary","Mathusala","Mattatha","Mattathias","Matthan","Matthat","Matthew","Matthias","Medes","Melchi","Melchisedec","Melea","Melita","Menan","Mercurius","Mesopotamia","Messias","Michael","Miletum","Miletus","Mitylene","Mnason","Moloch","Moses","Myra","Mysia","Naaman","Naasson","Nachor","Nagge","Nain","Narcissus","Nathan","Nathanael","Naum","Nazarene","Nazarenes","Nazareth","Neapolis","Nephthalim","Nereus","Neri","Nicanor","Nicodemus","Nicolaitanes","Nicolas","Nicopolis","Niger","Nineve","Nineveh","Ninevites","Noah","Noe","Nymphas","Obed","Olives","Olivet","Olympas","Onesimus","Onesiphorus","Osee","Ozias","Pamphylia","Paphos","Parmenas","Patara","Patmos","Patrobas","Paul","Paulus","Perga","Pergamos","Persis","Peter","Phalec","Phanuel","Pharaoh","Phares","Pharisee","Pharisees","Phebe","Phenice","Phenicia","Philadelphia","Philemon","Philetus","Philip","Philippi","Philippians","Philologus","Phlegon","Phrygia","Phygellus","Pilate","Pisidia","Pollux","Pontius","Pontus","Porcius","Praetorium","Prisca","Priscilla","Prochorus","Ptolemais","Publius","Pudens","Puteoli","Quartus","Rachab","Rachel","Ragau","Rahab","Rama","Rebecca","Remphan","Reuben","Rhegium","Rhesa","Rhoda","Rhodes","Roboam","Roman","Romans","Rome","Rufus","Ruth","Sadducees","Sadoc","Sala","Salamis","Salathiel","Salem","Salim","Salmon","Salmone","Salome","Samaria","Samaritan","Samaritans","Samos","Samothracia","Samson","Samuel","Sapphira","Sara","Sarah","Sardis","Sarepta","Saron","Saruch","Satan","Saul","Sceva","Scythian","Secundus","Seleucia","Sem","Semei","Sergius","Seth","Sidon","Silas","Siloam","Silvanus","Simeon","Simon","Sina","Sinai","Sion","Smyrna","Sodom","Sodoma","Solomon","Sopater","Sosipater","Sosthenes","Spain","Stachys","Stephanas","Stephen","Stoicks","Susanna","Sychar","Sychem","Syntyche","Syracuse","Syria","Syrian","Syrophenician","Tabitha","Tarsus","Tertius","Tertullus","Thaddaeus","Thamar","Thara","Theophilus","Thessalonians","Thessalonica","Theudas","Thomas","Thyatira","Tiberias","Tiberius","Timaeus","Timon","Timotheus","Timothy","Titus","Trachonitis","Troas","Trogyllium","Trophimus","Tryphena","Tryphosa","Tychicus","Tyrannus","Tyre","Urbane","Urias","Zabulon","Zacchaeus","Zacharias","Zara","Zebedee","Zelotes","Zenas","Zorobabel"]);
+function quizWords(v, names) {
+  const toks = v.t.split(" ").map((w, i) => ({ w, i, core: qCore(w) }));
+  const count = c => toks.filter(t => t.core.toLowerCase() === c.toLowerCase()).length;
+  return toks.filter(x => x.core.length >= 4 && !/'/.test(x.core) && !QUIZ_STOP.has(x.core.toLowerCase()) && count(x.core) === 1
+    && (names ? (x.i > 0 && !/[.:;?!]$/.test(toks[x.i - 1].w) && !(/,$/.test(toks[x.i - 1].w) && /^(saying|said|saith|cried|crying|voice|answered|written)$/i.test(toks[x.i - 1].core))
+          && NT_NAMES.has(x.core) && !QUIZ_LOWER.has(x.core.toLowerCase())
+          && !/^(Praise|Write|Come|Behold|Blessed|Woe|Verily|Fear|Rejoice|Alleluia|Hosanna|Glory|Hail|Arise|Go|Lo|Yea|Nay|Wherefore|Therefore)$/.test(x.core)
+          && !/^(God|Lord|LORD|Christ|Holy|Ghost|Spirit|Father|Son|Amen|Lamb|Saviour|Almighty)$/.test(x.core))
+      : /^[a-z]+$/.test(x.core) && x.core.length >= 5));
+}
+// Wrong answers that look like the right one: same ending first, then similar length.
+function lookalikes(pool, ans) {
+  const end = ans.slice(-2);
+  return shuffle(pool.filter(w => w.toLowerCase() !== ans.toLowerCase()))
+    .sort((a, b) => ((a.slice(-2) === end ? 0 : 2) + Math.min(2, Math.abs(a.length - ans.length) / 3)) - ((b.slice(-2) === end ? 0 : 2) + Math.min(2, Math.abs(b.length - ans.length) / 3)));
+}
+function blankVerse(v, tok) {
+  const words = v.t.split(" ");
+  const pre = tok.w.slice(0, tok.w.indexOf(tok.core)), post = tok.w.slice(tok.w.indexOf(tok.core) + tok.core.length);
+  return words.map((w, i) => i === tok.i ? `${esc(pre)}<span class="qz-blank">_____</span>${esc(post)}` : esc(w)).join(" ");
+}
+function makeQuiz(day) {
+  const verses = quizVerses(day), used = new Set(), chaps = [...new Set(verses.map(v => v.chap))];
+  QUIZ_LOWER = new Set(verses.flatMap(v => v.t.split(" ").map(qCore).filter(c => /^[a-z]+$/.test(c))));
+  const allWords = [...new Set(verses.flatMap(v => quizWords(v, false).map(x => x.core.toLowerCase())))];
+  const allNames = [...new Set(verses.flatMap(v => quizWords(v, true).map(x => x.core)))];
+  const freshVerse = test => shuffle(verses.filter(v => !used.has(v.ref) && test(v)))[0];
+  const make = {
+    finish() {
+      const v = freshVerse(v => v.t.split(" ").length >= 8 && quizWords(v, false).length); if (!v) return null;
+      const tok = pick(quizWords(v, false)), ans = tok.core.toLowerCase();
+      const opts = [...new Set([...lookalikes(allWords, ans), ...shuffle(QUIZ_FALLBACK)])].filter(w => w !== ans).slice(0, 3);
+      used.add(v.ref);
+      return { kind: "Finish the verse", prompt: "Which word completes this verse?", body: blankVerse(v, tok), options: shuffle([ans, ...opts]), answer: ans, v };
+    },
+    name() {
+      const v = freshVerse(v => quizWords(v, true).length); if (!v) return null;
+      const tok = pick(quizWords(v, true)), ans = tok.core;
+      const opts = [...new Set([...shuffle(allNames), ...shuffle(QUIZ_NAMES)])].filter(w => w !== ans).slice(0, 3);  // day's own names first
+      used.add(v.ref);
+      return { kind: "Who or where?", prompt: "Which name completes this verse?", body: blankVerse(v, tok), options: shuffle([ans, ...opts]), answer: ans, v };
+    },
+    chapter() {
+      if (chaps.length < 2) return null;
+      const v = freshVerse(v => v.t.split(" ").length >= 10); if (!v) return null;
+      used.add(v.ref);
+      // 3-chapter days borrow a neighboring chapter so there are always 4 choices
+      const p = PLAN[day - 1], near = [CHAPTERS[p.from - 1], CHAPTERS[p.to]].filter(Boolean).map(c => c.one ? c.b : `${c.b} ${c.c}`);
+      const opts = [...shuffle(chaps.filter(c => c !== v.chap)), ...near].slice(0, 3);
+      return { kind: "Where was it?", prompt: "Which chapter is this verse from?", body: esc(v.t), options: shuffle([v.chap, ...opts]), answer: v.chap, v };
+    }
+  };
+  const order = chaps.length >= 2 ? ["chapter", "finish", "name", "finish", "chapter"] : ["finish", "name", "finish", "name", "finish"];
+  return order.map(k => make[k]() || make.finish() || make.name()).filter(Boolean).slice(0, 5);
+}
+function startQuiz(day, from) {
+  state.quiz = { day, qs: null, i: 0, picks: [], from: from || state.tab };
+  if (state.tab === "quiz") render(true); else setTab("quiz");
+}
+function viewQuiz() {
+  const q = state.quiz; if (!q) return viewToday();
+  const p = PLAN[q.day - 1], books = [...new Set(CHAPTERS.slice(p.from, p.to).map(c => c.b))];
+  loadBooks(books.filter(b => !(b in KJV)));
+  const back = `<button class="linkish back" data-tab="${q.from === "read" ? "today" : (q.from || "today")}">← Done</button>`;
+  if (books.some(b => KJV[b] === null)) return back + `<div class="note warn">Couldn't load the Bible text for this quiz. Check your connection and try again.</div>`;
+  if (!books.every(b => KJV[b])) return back + `<section class="card"><div class="rd-loading"><span></span><span></span><span></span><p class="small muted">Preparing your quiz…</p></div></section>`;
+  if (!q.qs) q.qs = makeQuiz(q.day);
+  const total = q.qs.length;
+  if (q.i >= total) {
+    const score = q.picks.filter((x, i) => x === q.qs[i].answer).length, best = (state.me.quiz || {})[q.day];
+    const msg = score === total ? "Perfect! You earned a quiz point for your tribe." : score >= 3 ? "Nicely done. You were paying attention!" : "Good effort. A quick reread will lock it in.";
+    return back + `<section class="card quiz qz-end">
+      <p class="eyebrow">Day ${q.day} quiz · ${esc(p.label)}</p>
+      <div class="qz-score"><b>${score}</b><span>/ ${total}</span></div>
+      <h2>${score === total ? "Perfect score" : "Quiz complete"}</h2><p class="muted">${msg}</p>
+      ${best !== undefined ? `<p class="small muted">Best for this day: ${best}/5</p>` : ""}
+      <div class="row" style="justify-content:center"><button class="btn" data-quiz="${q.day}">Try new questions</button><button class="btn" data-readday="${q.day}">${icon("book")} Reread</button><button class="btn go" data-tab="today">Back to Today</button></div>
+    </section>`;
+  }
+  const cur = q.qs[q.i], picked = q.picks[q.i], answered = picked !== undefined;
+  return back + `<section class="card quiz">
+    <div class="qz-top"><p class="eyebrow">Day ${q.day} quiz · ${cur.kind}</p><span class="qz-dots">${q.qs.map((x, i) => `<i class="${i < q.i ? (q.picks[i] === x.answer ? "ok" : "no") : i === q.i ? "cur" : ""}"></i>`).join("")}</span></div>
+    <h3>${cur.prompt}</h3>
+    <blockquote class="qz-verse">${cur.body}</blockquote>
+    <div class="qz-opts">${cur.options.map(o => `<button class="qz-opt${answered ? (o === cur.answer ? " right" : o === picked ? " wrong" : " dim") : ""}" data-qpick="${esc(o)}" ${answered ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>
+    ${answered ? `<div class="qz-fb ${picked === cur.answer ? "ok" : "no"}"><b>${picked === cur.answer ? "Correct!" : `The answer is “${esc(cur.answer)}”.`}</b>
+      <p class="small">${esc(cur.v.t)} <span class="muted">(${esc(cur.v.ref)})</span></p></div>
+      <button class="btn go big" data-qnext="1">${q.i + 1 < total ? "Next question" : "See my score"} →</button>` : ""}
+  </section>`;
+}
+function quizPick(val) {
+  const q = state.quiz; if (!q || !q.qs || q.picks[q.i] !== undefined) return;
+  q.picks[q.i] = val; render(true);
+}
+function quizNext() {
+  const q = state.quiz; if (!q) return;
+  q.i++;
+  if (q.i >= q.qs.length && state.me && !state.readOnly) {
+    const score = q.picks.filter((x, i) => x === q.qs[i].answer).length, prev = (state.me.quiz || {})[q.day];
+    if (prev === undefined || score > prev) {
+      const before = stats(state.me);
+      state.me = { ...state.me, quiz: { ...(state.me.quiz || {}), [q.day]: score } };
+      const after = stats(state.me);
+      BADGES.filter(b => b.test(after) && !b.test(before)).forEach(b => queueReveal({ kicker: "Badge earned", title: b.name, text: b.desc + ".", art: medalIcon(b) }));
+      saveMe();
+    }
+    if (score === q.qs.length) confetti(innerWidth / 2, innerHeight / 3, 40);
+  }
+  render(true); window.scrollTo({ top: 0 });
+}
+// Today: offer the quiz for the most recent day read that hasn't been quizzed yet.
+function quizNudge() {
+  if (!state.me) return "";
+  const days = Object.keys(state.me.done).map(Number); if (!days.length) return "";
+  const last = Math.max(...days); if ((state.me.quiz || {})[last] !== undefined) return "";
+  return `<section class="card row between quiz-nudge"><div><p class="eyebrow">1-minute refresher</p><b>Quiz yourself on Day ${last}</b><p class="small muted">5 quick questions from ${esc(PLAN[last - 1].label)}.</p></div>
+    <button class="btn go" data-quiz="${last}">Take the quiz</button></section>`;
+}
+
 function viewToday() {
   const me = state.me, s = stats(me), pd = planDay(), start = parseISO(state.config.start);
   const target = pd !== null && pd >= 1 && pd <= DAYS ? pd : null;
@@ -1550,6 +1717,7 @@ function viewToday() {
     <div class="prog-line"><span><b>${s.n}</b> of 70 days</span><span>${icon("flame")} <b>${s.streak}-day</b> streak</span><span><b>${pct}%</b> of the New Testament</span></div>
     <div class="meter" role="img" aria-label="${s.chapters} of 260 chapters"><i data-w="${s.chapters / TOTAL * 100}" data-k="m-main" style="width:${s.chapters / TOTAL * 100}%"></i></div>
   </section>
+  ${quizNudge()}
   ${cheersReceivedCard()}
   ${catchup}
   ${tripCard(s.n)}
@@ -1602,6 +1770,7 @@ function viewPlan() {
       <div class="row">
       <button class="btn ${isDone ? "done-state" : "go"}" data-toggle="${sel.day}" ${state.readOnly ? "disabled" : ""}>${isDone ? `${icon("check")} Read · tap to undo` : `${icon("check")} I read this`}</button>
       <button class="btn" data-readday="${sel.day}">${icon("book")} Read here</button>
+      ${isDone ? `<button class="btn" data-quiz="${sel.day}">${icon("target")} ${(state.me.quiz || {})[sel.day] !== undefined ? `Quiz ${state.me.quiz[sel.day]}/5` : "Quiz"}</button>` : ""}
       <button class="btn sm" data-sel="">Close</button></div></section>`;
   }
   let weeks = "";
@@ -1625,14 +1794,15 @@ function viewPlan() {
 function viewGroup() {
   const list = allPlayers().sort((a, b) => b.s.n - a.s.n || b.s.streak - a.s.streak || a.alias.localeCompare(b.alias));
   const teams = state.config.teams;
-  const teamHTML = `<section class="card stack"><h2>The four tribes</h2><p class="small muted">Everyone is placed into a tribe when they join. Tribes are ranked by average progress, so a smaller tribe can still win.</p><div class="teams">${
+  const teamHTML = `<section class="card stack"><h2>The four tribes</h2><p class="small muted">Everyone is placed into a tribe when they join. Tribes are ranked by average chapters read plus a bonus point for every perfect quiz, so a smaller tribe can still win.</p><div class="teams">${
     teams.map((t, i) => {
       const mem = list.filter(p => teamIndex(p) === i), ch = mem.reduce((a, p) => a + p.s.chapters, 0);
-      return { t, i, mem, ch, avg: mem.length ? ch / mem.length / TOTAL * 100 : 0 };
-    }).sort((a, b) => b.avg - a.avg).map((x, rank) => `<div class="team" style="--tc:${TEAM_COLORS[x.i]}">
+      const qp = mem.reduce((a, p) => a + p.s.perfect, 0);  // each perfect quiz adds one point
+      return { t, i, mem, ch, qp, avg: mem.length ? ch / mem.length / TOTAL * 100 : 0, pts: mem.length ? (ch + qp) / mem.length : 0 };
+    }).sort((a, b) => b.pts - a.pts).map((x, rank) => `<div class="team" style="--tc:${TEAM_COLORS[x.i]}">
       <h3>${crest(x.i)}<span>${esc(x.t)}</span>${rank === 0 && x.avg > 0 ? ' <span class="rank1">Leading</span>' : ""}</h3>
       <div class="meter"><i data-w="${x.avg}" data-k="m-team${x.i}" style="width:${x.avg}%"></i></div>
-      <p class="small"><b>${Math.round(x.avg)}%</b> average · ${x.ch} chapters · ${plural(x.mem.length, "member")}</p>
+      <p class="small"><b>${Math.round(x.avg)}%</b> average · ${x.ch} chapters${x.qp ? ` · ${plural(x.qp, "quiz point")}` : ""} · ${plural(x.mem.length, "member")}</p>
       <p class="small muted"><i>"${TEAM_VERSES[x.i][0]}"</i> ${TEAM_VERSES[x.i][1]}</p></div>`).join("")}</div></section>`;
   const cols = Array.from({ length: DAYS + 1 }, () => []);
   list.forEach(p => cols[p.s.n].push(p));
@@ -1837,7 +2007,7 @@ function render(force) {
   const back = (tab, label) => `<button class="linkish back" data-tab="${tab}">← ${label}</button>`;
   const v = { today: viewToday, journey: viewJourney, plan: () => back("today", "Back to Today") + viewPlan(), group: viewGroup, victories: viewVictories,
     me: () => (state.canLead ? `<section class="card row between"><div><p class="eyebrow">Leader</p><b>Group settings, tribes and tools</b></div><button class="btn sm" data-tab="leader">Open leader tools</button></section>` : "") + viewEditor(false),
-    leader: () => back("me", "Back to Me") + viewLeader(), read: viewRead }[state.tab] || viewToday;
+    leader: () => back("me", "Back to Me") + viewLeader(), read: viewRead, quiz: viewQuiz }[state.tab] || viewToday;
   main.innerHTML = v();
   animateValues();
   if (state.tab === "journey") setupMapGestures();
@@ -1998,7 +2168,7 @@ async function checkTransfer() {
   const from = t.data().from, old = state.players[from];
   if (!old || from === state.uid) { try { await state.db.doc("transfers/" + u).delete(); } catch {} return; }
   try {
-    await state.db.doc("players/" + state.uid).set({ alias: old.alias, gender: old.gender, team: old.team, look: old.look, done: old.done,
+    await state.db.doc("players/" + state.uid).set({ alias: old.alias, gender: old.gender, team: old.team, look: old.look, done: old.done, quiz: old.quiz || {},
       createdAt: old.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
     await state.db.doc("players/" + from).delete();
     await state.db.doc("transfers/" + u).delete();
@@ -2064,6 +2234,9 @@ document.addEventListener("click", e => {
   const t = e.target.closest("button, a"); if (!t) return;
   const ds = t.dataset;
   if (ds.toastAct) { const f = toastAction; $("#toast").hidden = true; toastAction = null; if (f) f.fn(); return; }
+  if (ds.quiz) { startQuiz(+ds.quiz); return; }
+  if (ds.qpick !== undefined && "qpick" in ds) { quizPick(ds.qpick); return; }
+  if (ds.qnext) { quizNext(); return; }
   if (ds.cheer) { toggleCheer(ds.cheer, ds.kind); return; }
   if (ds.post) { postReply(+ds.post); return; }
   if (ds.delreply) { deleteReply(ds.delreply); return; }
