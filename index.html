@@ -215,6 +215,35 @@ details.more[open] summary > svg { transform: rotate(180deg); }
 .tile.done.vic::before { background: #170F08; box-shadow: none; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* Cheers, discussion, recap */
+.cheers { display: inline-flex; align-items: center; gap: 4px; }
+.cheer { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: rgba(0,0,0,.25); font-size: 16px; line-height: 1; cursor: pointer; transition: transform .15s var(--spring), border-color .2s, background .2s; }
+.cheer:active { transform: scale(.88); }
+.cheer.on { border-color: var(--gold); background: rgba(217,174,85,.18); box-shadow: 0 0 10px -2px rgba(242,213,140,.6); }
+.cheer-count { font-size: .75rem; font-weight: 700; color: var(--gold-hi); }
+.cheer-card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; border-color: rgba(217,174,85,.35); }
+.cheer-card p { flex: 1 1 220px; }
+.disc { border-top: 1px solid var(--line); padding-top: 10px; }
+.disc summary { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--gold); min-height: 40px; }
+.disc summary::-webkit-details-marker { display: none; }
+.disc summary svg { width: 18px; height: 18px; }
+.replies { list-style: none; margin: 8px 0 12px; padding: 0; display: grid; gap: 10px; }
+.replies li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; }
+.replies li > div { background: rgba(0,0,0,.25); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; min-width: 0; }
+.replies b { font-family: var(--font-display); font-size: .85rem; }
+.replies p { overflow-wrap: anywhere; margin-top: 2px; }
+.bubble.sm-b { width: 34px; height: 34px; }
+.reply-form { display: flex; gap: 8px; align-items: flex-end; }
+.reply-form textarea { flex: 1; min-width: 0; font: inherit; color: var(--ink); background: #0F0C0A; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; resize: vertical; }
+.recap { border-color: rgba(217,174,85,.45); box-shadow: var(--shadow), 0 0 50px -24px rgba(217,174,85,.6); display: grid; gap: 10px; }
+.recap-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.recap-list li { position: relative; padding-left: 28px; }
+.recap-list svg { position: absolute; left: 0; top: 3px; width: 18px; height: 18px; color: var(--gold); }
+.recap .btn { justify-self: start; }
+.prow { content-visibility: auto; contain-intrinsic-size: auto 66px; }
+.prow-acts { grid-column: 2 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.prow-acts .cheers { margin-right: auto; }
+
 /* Reader */
 .reader { --rd-ink: #EFE6D2; --rd-bg: linear-gradient(180deg, #1F1915, #17120F); --rd-num: var(--gold); --rd-head: var(--gold-hi); background: var(--rd-bg); padding: 26px clamp(18px, 5vw, 48px) 30px; }
 .reader.light { --rd-ink: #2A1E12; --rd-bg: linear-gradient(180deg, #F3EAD6, #E9DCC0); --rd-num: #9A6B1E; --rd-head: #5A3B12; border-color: #B79C6C; }
@@ -646,8 +675,15 @@ const mixHex = (a, b, t) => {
 let AVN = 0;
 
 // opts.portrait / opts.bust / opts.vb draw the painted portrait; otherwise the small full-body figure (map, road).
+// Still (non-animated) avatars are cached by look, so re-renders don't rebuild every portrait.
+const AV_CACHE = new Map();
 function avatarSVG(look, n, opts = {}) {
-  return opts.portrait || opts.bust || opts.vb ? portraitSVG(look, n, opts) : figureSVG(look, n, opts);
+  const draw = () => opts.portrait || opts.bust || opts.vb ? portraitSVG(look, n, opts) : figureSVG(look, n, opts);
+  if (opts.live || opts.cheer) return draw();
+  const key = JSON.stringify([normLook(look, n), opts.portrait ? 1 : 0, opts.bust ? 1 : 0, opts.vb || ""]);
+  let svg = AV_CACHE.get(key);
+  if (!svg) { svg = draw(); if (AV_CACHE.size > 500) AV_CACHE.clear(); AV_CACHE.set(key, svg); }
+  return svg;
 }
 
 function portraitSVG(look, n, opts = {}) {
@@ -992,6 +1028,7 @@ const state = {
   phase: "loading", mode: "local", db: null, user: null, uid: null,
   me: null, players: {}, playersLoaded: false, config: { ...DEFAULT_CONFIG },
   canLead: false, isOwner: false, readOnly: false, writeError: null,
+  cheers: [], replies: [], openDisc: {},
   backend: "local", auth: {}, account: null, tab: "today", enter: true, cheerUntil: 0, sel: null, stop: null, draft: null, confirmRemove: null, renderPending: false
 };
 function normConfig(c) {
@@ -1355,6 +1392,105 @@ function viewRead() {
   </article>`;
 }
 
+/* ---------- Cheers, discussion and weekly recap (shared group only) ---------- */
+const WEEK_MS = 7 * 864e5;
+const recentCheer = c => Date.now() - Date.parse(c.at || 0) < WEEK_MS;
+const CHEER_KINDS = { pray: "🙏", fire: "🔥" };
+function cheerButtons(p) {
+  if (state.mode !== "shared") return "";
+  const recv = state.cheers.filter(c => c.to === p.id && recentCheer(c));
+  if (state.me && p.id === state.me.id) return recv.length ? `<span class="cheer-count" title="Cheers this week">${recv.length} ${recv.length === 1 ? "cheer" : "cheers"}</span>` : "";
+  const mine = state.cheers.find(c => c.to === p.id && c.from === state.uid);
+  return `<span class="cheers">${Object.entries(CHEER_KINDS).map(([k, e]) => `<button class="cheer${mine && mine.kind === k ? " on" : ""}" data-cheer="${esc(p.id)}" data-kind="${k}" aria-pressed="${!!(mine && mine.kind === k)}" aria-label="${k === "pray" ? "Pray for" : "Cheer on"} ${esc(p.alias)}">${e}</button>`).join("")}${recv.length ? `<span class="cheer-count">${recv.length}</span>` : ""}</span>`;
+}
+async function toggleCheer(to, kind) {
+  if (state.mode !== "shared" || !state.uid) return;
+  const id = `${to}_${state.uid}`, mine = state.cheers.find(c => c.to === to && c.from === state.uid), who = (state.players[to] || {}).alias || "them";
+  try {
+    if (mine && mine.kind === kind) { await state.db.doc("cheers/" + id).delete(); toast(`Cheer removed`); }
+    else { await state.db.doc("cheers/" + id).set({ to, from: state.uid, kind, at: new Date().toISOString() }); toast(`${CHEER_KINDS[kind]} Sent to ${who}`); }
+  } catch (e) { toast(e && e.code === "permission-denied" ? "Cheers need the latest security rules (ask your leader)" : "Couldn't send that. Try again."); }
+}
+function cheersReceivedCard() {
+  if (state.mode !== "shared" || !state.me) return "";
+  const recv = state.cheers.filter(c => c.to === state.me.id && c.from !== state.me.id && recentCheer(c) && state.players[c.from])
+    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
+  if (!recv.length) return "";
+  const names = recv.slice(0, 4).map(c => `${CHEER_KINDS[c.kind] || "🙏"} ${esc(state.players[c.from].alias.split(" ")[0])}`).join(", ");
+  return `<section class="card cheer-card"><p><b>${names}</b>${recv.length > 4 ? ` and ${recv.length - 4} more` : ""} ${recv.length === 1 ? "is" : "are"} cheering you on this week. Keep going!</p>
+    <button class="btn sm" data-tab="group">Cheer someone back</button></section>`;
+}
+
+// Discussion under each unlocked Victory Moment. week = 1..10
+function discussionHTML(week) {
+  if (state.mode !== "shared") return "";
+  const list = state.replies.filter(r => r.week === week).sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+  const open = !!(state.openDisc && state.openDisc[week]);
+  const items = list.map(r => {
+    const p = state.players[r.uid], mine = r.uid === state.uid, canDel = mine || state.canLead;
+    return `<li><span class="bubble sm-b">${p ? avatarSVG(p.look, stats(p).n, { bust: true }) : ""}</span><div><b>${esc(p ? p.alias : "Former member")}</b><p>${esc(r.text)}</p>
+      ${canDel ? `<button class="linkish" data-delreply="${esc(r.id)}">${mine ? "Delete" : "Remove"}</button>` : ""}</div></li>`;
+  }).join("");
+  return `<details class="disc" data-disc="${week}" ${open ? "open" : ""}><summary>${icon("group")} Discussion${list.length ? ` · ${list.length}` : ""}</summary>
+    ${items ? `<ul class="replies">${items}</ul>` : `<p class="small muted">No replies yet. Be the first to share.</p>`}
+    ${state.readOnly ? "" : `<div class="reply-form"><textarea id="reply-${week}" maxlength="280" rows="2" placeholder="Share your answer (280 characters)" aria-label="Your reply"></textarea>
+      <button class="btn sm go" data-post="${week}">Post</button></div>`}
+  </details>`;
+}
+async function postReply(week) {
+  const el = $("#reply-" + week), text = (el ? el.value : "").trim().slice(0, 280);
+  if (!text) { toast("Write something first"); return; }
+  try {
+    await state.db.collection("replies").add({ week, uid: state.uid, text, at: new Date().toISOString() });
+    if (el) { el.value = ""; el.blur(); }
+    state.openDisc = { ...(state.openDisc || {}), [week]: true }; render(true); toast("Posted");
+  } catch (e) { toast(e && e.code === "permission-denied" ? "Replies need the latest security rules (ask your leader)" : "Couldn't post. Try again."); }
+}
+async function deleteReply(id) {
+  try { await state.db.doc("replies/" + id).delete(); toast("Reply removed"); } catch { toast("Couldn't remove that reply"); }
+}
+
+const chRef = c => c.one ? c.b : `${c.b} ${c.c}`;
+// Thursday recap: shown once per week from week 2 on, until dismissed.
+function recapCard() {
+  const pd = planDay(), start = parseISO(state.config.start);
+  if (!start || !pd || pd < 8 || pd > DAYS + 7) return "";
+  const w = Math.min(10, Math.floor((pd - 1) / 7));           // weeks finished so far; last week = w
+  if (lsGet("nt70.recap") === w) return "";
+  const from = iso(dayDate(start, 7 * (w - 1) + 1)), to = iso(dayDate(start, 7 * w));
+  const inWeek = dt => dt >= from && dt <= to;
+  const chaptersIn = (p, test) => Object.entries(p.done).reduce((a, [d, dt]) => a + (test(dt) ? PLAN[d - 1].count : 0), 0);
+  const people = allPlayers();
+  const myCh = chaptersIn(state.me, inWeek), myDays = Object.values(state.me.done).filter(inWeek).length;
+  const groupCh = people.reduce((a, p) => a + chaptersIn(p, inWeek), 0);
+  // tribe standing by average chapters read up to a date
+  const standing = until => state.config.teams.map((t, i) => {
+    const mem = people.filter(p => teamIndex(p) === i);
+    return { i, avg: mem.length ? mem.reduce((a, p) => a + chaptersIn(p, dt => dt <= until), 0) / mem.length : 0 };
+  }).sort((a, b) => b.avg - a.avg).map(x => x.i);
+  const ti = teamIndex(state.me);
+  let tribeLine = "";
+  if (ti >= 0 && people.length > 1) {
+    const prevEnd = iso(dayDate(start, 7 * (w - 1))), now = standing(to).indexOf(ti) + 1, before = w > 1 ? standing(prevEnd).indexOf(ti) + 1 : now;
+    const ord = n => ["1st", "2nd", "3rd", "4th"][n - 1];
+    const tn = esc(state.config.teams[ti]);
+    tribeLine = now < before ? `${tn} moved up to <b>${ord(now)}</b>.` : now > before ? `${tn} slipped to <b>${ord(now)}</b>. This week can change that.` : `${tn} is holding <b>${ord(now)}</b> place.`;
+  }
+  const nextFirst = PLAN[Math.min(7 * w, DAYS - 1)], nextLast = PLAN[Math.min(7 * w + 6, DAYS - 1)];
+  const vic = VICTORIES[w - 1];
+  return `<section class="card recap">
+    <p class="eyebrow">Week ${w} recap · ${fmtDate(parseISO(from))} – ${fmtDate(parseISO(to))}</p>
+    <h3>${myDays ? `You read ${plural(myDays, "day")} (${myCh} chapters) last week` : "A new week, a fresh start"}</h3>
+    <ul class="recap-list">
+      <li>${icon("group")} The group read <b>${groupCh} chapters</b> together.</li>
+      ${tribeLine ? `<li>${icon(TEAM_ICONS[ti])} ${tribeLine}</li>` : ""}
+      ${vic && stats(state.me).n >= vic.day ? `<li>${icon("victories")} You unlocked <b>${esc(vic.title)}</b>. Talk about it in Victories.</li>` : ""}
+      ${w < 10 ? `<li>${icon("book")} This week: <b>${esc(chRef(CHAPTERS[nextFirst.from]))}</b> to <b>${esc(chRef(CHAPTERS[nextLast.to - 1]))}</b>.</li>` : ""}
+    </ul>
+    <button class="btn sm" data-recapdone="${w}">Got it</button>
+  </section>`;
+}
+
 function viewToday() {
   const me = state.me, s = stats(me), pd = planDay(), start = parseISO(state.config.start);
   const target = pd !== null && pd >= 1 && pd <= DAYS ? pd : null;
@@ -1407,13 +1543,14 @@ function viewToday() {
   const nv = VICTORIES.find(v => v.day > s.n);
   const pct = Math.round(s.chapters / TOTAL * 100);
   const stat = (k, val, unit, label, color, ic) => `<div class="stat"><span class="ic" style="color:${color}">${icon(ic)}</span><b><span data-count="${val}" data-k="${k}">${val}</span>${unit ? `<small>${unit}</small>` : ""}</b><span class="sl">${label}</span></div>`;
-  return `${banner}
+  return `${banner}${recapCard()}
   ${state.readOnly ? `<div class="note warn">You can look around, but your progress can't be saved yet. Ask your leader for access.</div>` : ""}
   <section class="card">${hero}</section>
   <section class="prog" aria-label="Your progress">
     <div class="prog-line"><span><b>${s.n}</b> of 70 days</span><span>${icon("flame")} <b>${s.streak}-day</b> streak</span><span><b>${pct}%</b> of the New Testament</span></div>
     <div class="meter" role="img" aria-label="${s.chapters} of 260 chapters"><i data-w="${s.chapters / TOTAL * 100}" data-k="m-main" style="width:${s.chapters / TOTAL * 100}%"></i></div>
   </section>
+  ${cheersReceivedCard()}
   ${catchup}
   ${tripCard(s.n)}
   <details class="card more" id="more" ${state.openProgress ? "open" : ""}>
@@ -1521,7 +1658,8 @@ function viewGroup() {
       : `<button class="btn sm" data-recover="${esc(p.id)}" aria-label="Recover ${esc(p.alias)} to a new account">Recover</button>`;
     return `<div class="prow ${isMe ? "me" : ""}${state.recoverFor === p.id ? " recovering" : ""}"><span class="rank">${idx + 1}</span><span class="bubble">${avatarSVG(p.look, p.s.n, { bust: true })}</span>
       <div class="who"><b>${esc(p.alias)}${isMe ? " (you)" : ""}</b><span>${ti >= 0 ? `<span class="dot" style="background:${TEAM_COLORS[ti]}"></span>${esc(teams[ti])} · ` : ""}${p.s.streak > 0 ? `${p.s.streak}-day streak` : "no streak"}${pace ? " · " + pace : ""}</span></div>
-      <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters ${mv}${state.recoverFor === p.id ? "" : rec}${rm}</div>${state.recoverFor === p.id ? rec : ""}</div>`;
+      <div class="nums"><b>${p.s.n}/70</b>${p.s.chapters} chapters</div>
+      ${(() => { const acts = cheerButtons(p) + mv + (state.recoverFor === p.id ? "" : rec) + rm; return acts ? `<div class="prow-acts">${acts}</div>` : ""; })()}${state.recoverFor === p.id ? rec : ""}</div>`;
   }).join("");
   return `${state.mode === "local" ? `<div class="note">You're playing solo on this device, so only your own character shows here. Open the group's shared link and sign in to join everyone else.</div>` : ""}
   ${teamHTML}
@@ -1540,7 +1678,8 @@ function viewVictories() {
       <p>${esc(v.story)}</p><blockquote>"${esc(v.verse)}"<span>${esc(v.verseRef)} · KJV</span></blockquote>
       <p class="small"><b>New Testament connection (KJV):</b> ${esc(v.nt)}</p>
       <div class="q"><b>Talk about it:</b> ${esc(v.q)}</div>
-      <div class="row"><a class="btn sm" href="${readingURL(v.ref, state.config.version)}" target="_blank" rel="noopener">Read ${esc(v.ref)} ${icon("ext")}</a></div></div></article>`;
+      <div class="row"><a class="btn sm" href="${readingURL(v.ref, state.config.version)}" target="_blank" rel="noopener">Read ${esc(v.ref)} ${icon("ext")}</a></div>
+      ${discussionHTML(i + 1)}</div></article>`;
   }).join("")}</div>`;
 }
 
@@ -1704,7 +1843,10 @@ function render(force) {
   if (state.tab === "journey") setupMapGestures();
   if (state.tab === "group") { const t = $("#track"), m = $("#trackme"); if (t && m) t.scrollLeft = Math.max(0, m.parentElement.offsetLeft - t.clientWidth / 2); }
 }
-document.addEventListener("toggle", e => { if (e.target.id === "more") state.openProgress = e.target.open; }, true);
+document.addEventListener("toggle", e => {
+  if (e.target.id === "more") state.openProgress = e.target.open;
+  if (e.target.dataset && e.target.dataset.disc) state.openDisc = { ...(state.openDisc || {}), [e.target.dataset.disc]: e.target.open };
+}, true);
 document.addEventListener("focusout", () => setTimeout(() => { if (state.renderPending) render(); }, 0));
 
 function setTab(t) {
@@ -1922,6 +2064,10 @@ document.addEventListener("click", e => {
   const t = e.target.closest("button, a"); if (!t) return;
   const ds = t.dataset;
   if (ds.toastAct) { const f = toastAction; $("#toast").hidden = true; toastAction = null; if (f) f.fn(); return; }
+  if (ds.cheer) { toggleCheer(ds.cheer, ds.kind); return; }
+  if (ds.post) { postReply(+ds.post); return; }
+  if (ds.delreply) { deleteReply(ds.delreply); return; }
+  if (ds.recapdone) { lsSet("nt70.recap", +ds.recapdone); render(true); return; }
   if (ds.readday) { openReader(+ds.readday); return; }
   if (ds.jump) { const el = $("#rd-ch-" + ds.jump); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
   if (ds.rdsize) { state.rdSize = Math.max(0, Math.min(RD_SIZES.length - 1, (state.rdSize ?? 2) + +ds.rdsize)); lsSet("nt70.rd", { size: state.rdSize, light: !!state.rdLight }); render(true); return; }
@@ -2168,6 +2314,14 @@ function startShared(db, uid, perms) {
   state.phase = "loading"; render(true);
   const h = (location.hash || "").slice(1); if (h) state.tab = TABS.some(([k]) => k === h) ? h : "today";
 
+  db.collection("cheers").onSnapshot(snap => {
+    state.cheers = snap.docs.map(d => d.data()).filter(c => c && typeof c.to === "string" && typeof c.from === "string" && c.kind in CHEER_KINDS);
+    if (state.phase === "ready" && (state.tab === "group" || state.tab === "today")) render();
+  }, () => {});
+  db.collection("replies").onSnapshot(snap => {
+    state.replies = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(r => r && typeof r.text === "string" && Number.isInteger(r.week) && typeof r.uid === "string");
+    if (state.phase === "ready" && state.tab === "victories") render();
+  }, () => {});
   db.doc("config/plan").onSnapshot(snap => {
     state.config = normConfig(snap.exists ? snap.data() : DEFAULT_CONFIG);
     if (state.phase !== "loading") render();
