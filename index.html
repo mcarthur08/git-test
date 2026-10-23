@@ -215,6 +215,33 @@ details.more[open] summary > svg { transform: rotate(180deg); }
 .tile.done.vic::before { background: #170F08; box-shadow: none; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* Reader */
+.reader { --rd-ink: #EFE6D2; --rd-bg: linear-gradient(180deg, #1F1915, #17120F); --rd-num: var(--gold); --rd-head: var(--gold-hi); background: var(--rd-bg); padding: 26px clamp(18px, 5vw, 48px) 30px; }
+.reader.light { --rd-ink: #2A1E12; --rd-bg: linear-gradient(180deg, #F3EAD6, #E9DCC0); --rd-num: #9A6B1E; --rd-head: #5A3B12; border-color: #B79C6C; }
+.reader.light .eyebrow, .reader.light .muted { color: #7A6040; }
+.reader.light h2 { color: #3A2810; }
+.reader.light .linkish, .reader.light .rd-alt a { color: #7A4E12; }
+.rd-head { display: grid; gap: 10px; max-width: 40em; margin: 0 auto 8px; }
+.rd-tools { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+.rd-jump, .rd-opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.rd-jump button, .rd-opts button { min-height: 40px; min-width: 44px; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: rgba(0,0,0,.2); color: inherit; font: 700 .85rem var(--font-body); cursor: pointer; }
+.reader.light .rd-jump button, .reader.light .rd-opts button { border-color: #B79C6C; background: rgba(255,255,255,.4); color: #3A2810; }
+.rd-text { max-width: 40em; margin: 0 auto; color: var(--rd-ink); font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; font-size: var(--rd-size); line-height: 1.75; }
+.rd-chapter { padding-top: 18px; scroll-margin-top: 130px; }
+.rd-chapter h3 { font-family: var(--font-display); color: var(--rd-head); font-size: 1.05em; letter-spacing: .08em; margin-bottom: 8px; }
+.rd-chapter p { margin: 0; }
+.rd-chapter sup { color: var(--rd-num); font-family: var(--font-body); font-weight: 700; font-size: .62em; margin: 0 .2em 0 .35em; vertical-align: .55em; }
+.rd-done { max-width: 40em; margin: 28px auto 0; padding-top: 22px; border-top: 1px solid var(--line); display: grid; gap: 12px; justify-items: center; text-align: center; }
+.rd-done .eyebrow { display: inline-flex; align-items: center; gap: 6px; color: var(--teal); }
+.rd-done .eyebrow svg { width: 16px; height: 16px; }
+.rd-alt { max-width: 40em; margin: 18px auto 0; text-align: center; }
+.rd-alt a { display: inline-flex; align-items: center; gap: 6px; }
+.rd-alt svg { width: 14px; height: 14px; }
+.rd-loading { display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; padding: 40px 0; }
+.rd-loading span { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); animation: pulse 1.2s ease-in-out infinite; }
+.rd-loading span:nth-child(2) { animation-delay: .2s; } .rd-loading span:nth-child(3) { animation-delay: .4s; }
+.rd-loading p { width: 100%; text-align: center; }
+
 /* Group */
 .teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
 .team { border-radius: 8px; padding: 14px; background: rgba(0,0,0,.25); border: 1px solid var(--line); display: grid; gap: 8px; }
@@ -958,7 +985,7 @@ const BADGES = [
 
 /* ---------- state ---------- */
 const DEFAULT_CONFIG = { start: "2026-10-22", groupName: "Youth Group", version: "KJV", teams: DEFAULT_TEAMS };
-const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Journey"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Victories"], ["me", "Me", "Me"], ["leader", "Leader", "Leader"]];
+const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Journey"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Victories"], ["me", "Me", "Me"], ["leader", "Leader", "Leader"], ["read", "Read", "Read"]];
 // The tab bar shows five; the Plan opens from Today and Leader tools from Me.
 const NAV_TABS = ["today", "journey", "group", "victories", "me"];
 const state = {
@@ -1272,6 +1299,62 @@ function headerHTML() {
     ${state.phase === "ready" ? `<nav class="tabs wrap" aria-label="Sections">${tabs.map(([k, l, s]) => `<button data-tab="${k}" ${state.tab === k ? 'aria-current="page"' : ""}>${icon(k)}<span>${s}</span></button>`).join("")}</nav>` : ""}`;
 }
 
+/* ---------- In-app KJV reader: one small JSON file per book in kjv/, loaded when needed ---------- */
+const KJV = {}, KJV_LOADING = {};
+const bookFile = b => "kjv/" + b.replace(/ /g, "") + ".json";
+function loadBooks(list) {
+  list.forEach(b => {
+    if (b in KJV || KJV_LOADING[b]) return;
+    KJV_LOADING[b] = fetch(bookFile(b)).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(j => { KJV[b] = j; }).catch(() => { KJV[b] = null; })
+      .finally(() => { delete KJV_LOADING[b]; if (state.tab === "read") render(true); });
+  });
+}
+const RD_SIZES = [0.95, 1.05, 1.15, 1.28, 1.42, 1.6];
+function openReader(day, from) {
+  state.readDay = day; state.readFrom = from || state.tab;
+  if (state.tab === "read") { render(true); window.scrollTo({ top: 0 }); } else setTab("read");
+}
+function viewRead() {
+  const d = Math.max(1, Math.min(DAYS, state.readDay || 1)), p = PLAN[d - 1], s = stats(state.me), isDone = s.doneSet.has(d);
+  const start = parseISO(state.config.start), chs = CHAPTERS.slice(p.from, p.to);
+  const books = [...new Set(chs.map(c => c.b))];
+  loadBooks(books.filter(b => !(b in KJV)));
+  const failed = books.some(b => KJV[b] === null), ready = books.every(b => KJV[b]);
+  const size = RD_SIZES[state.rdSize ?? 2] || 1.15, light = !!state.rdLight;
+  const backTo = state.readFrom === "plan" ? ["plan", "Back to the plan"] : ["today", "Back to Today"];
+  let text;
+  if (failed) text = `<div class="note warn">Couldn't load the Bible text. Check your connection, or <a href="${readingURL(p.label, "KJV")}" target="_blank" rel="noopener">open it on Bible Gateway</a>.</div>`;
+  else if (!ready) text = `<div class="rd-loading"><span></span><span></span><span></span><p class="small muted">Opening the scroll…</p></div>`;
+  else text = chs.map((c, i) => {
+    const verses = KJV[c.b][c.c - 1] || [];
+    return `<section class="rd-chapter" id="rd-ch-${i}"><h3>${esc(c.one ? c.b : `${c.b} ${c.c}`)}</h3>
+      <p>${verses.map((t, v) => `<sup>${v + 1}</sup>${esc(t)}`).join(" ")}</p></section>`;
+  }).join("");
+  const next = d < DAYS ? PLAN[d] : null;
+  const finish = isDone
+    ? `<div class="rd-done"><p class="eyebrow">${icon("check")} Day ${d} read</p>
+        ${next ? `<button class="btn go big" data-readday="${next.day}">Read Day ${next.day}: ${esc(next.short)} →</button>` : `<p>That's the whole New Testament. Well done!</p>`}
+        <button class="linkish" data-toggle="${d}">Mark Day ${d} as not read</button></div>`
+    : `<div class="rd-done"><p class="muted">Finished all ${plural(p.count, "chapter")}?</p>
+        <button class="btn go big" data-toggle="${d}" ${state.readOnly ? "disabled" : ""}>${icon("check")} I read Day ${d}</button></div>`;
+  return `<button class="linkish back" data-tab="${backTo[0]}">← ${backTo[1]}</button>
+  <article class="card reader${light ? " light" : ""}" style="--rd-size:${size}rem">
+    <header class="rd-head">
+      <p class="eyebrow">Day ${d}${start ? " · " + fmtDate(dayDate(start, d)) : ""} · King James Version</p>
+      <h2>${esc(p.label)}</h2>
+      <div class="rd-tools">
+        ${chs.length > 1 ? `<div class="rd-jump" aria-label="Jump to chapter">${chs.map((c, i) => `<button data-jump="${i}">${esc(c.one ? c.b : (i === 0 || chs[i - 1].b !== c.b ? `${c.ab} ${c.c}` : String(c.c)))}</button>`).join("")}</div>` : "<span></span>"}
+        <div class="rd-opts"><button data-rdsize="-1" aria-label="Smaller text">A−</button><button data-rdsize="1" aria-label="Larger text">A+</button>
+          <button data-rdlight="1" aria-label="${light ? "Dark page" : "Light page"}">${light ? "Dark" : "Light"}</button></div>
+      </div>
+    </header>
+    <div class="rd-text">${text}</div>
+    ${ready ? finish : ""}
+    <p class="small muted rd-alt"><a href="${readingURL(p.label, "KJV")}" target="_blank" rel="noopener">Open on Bible Gateway ${icon("ext")}</a></p>
+  </article>`;
+}
+
 function viewToday() {
   const me = state.me, s = stats(me), pd = planDay(), start = parseISO(state.config.start);
   const target = pd !== null && pd >= 1 && pd <= DAYS ? pd : null;
@@ -1300,8 +1383,8 @@ function viewToday() {
       <div class="stack" style="gap:6px"><p class="eyebrow">${lead}${dateLine}</p><h2 class="hero-day">Day ${focus}</h2><p class="hero-read">${esc(p.label)}</p></div>
       <div class="row"><span class="chip">${icon("book")} ${plural(p.count, "chapter")}</span>${pace}</div>
       <div class="row">
-        <button class="btn go big" data-toggle="${focus}" ${state.readOnly ? "disabled" : ""}>${icon("check")} I read Day ${focus}</button>
-        <a class="btn" href="${readingURL(p.label, state.config.version)}" target="_blank" rel="noopener">Open Bible (${esc(state.config.version)}) ${icon("ext")}</a>
+        <button class="btn go big" data-readday="${focus}">${icon("book")} Read Day ${focus}</button>
+        <button class="btn" data-toggle="${focus}" ${state.readOnly ? "disabled" : ""}>${icon("check")} I already read it</button>
       </div>
       <button class="linkish" data-tab="plan">See the full 70-day plan</button></div></div>`;
   }
@@ -1315,7 +1398,7 @@ function viewToday() {
     catchup = `<section class="card stack catchup">
       <h3>Catching up</h3>
       <p class="muted">You're ${plural(behind.length, "day")} behind. No worries, it happens. ${plan}</p>
-      <div class="row"><button class="btn go" data-toggle="${first.day}" ${state.readOnly ? "disabled" : ""}>${icon("check")} I read Day ${first.day}</button><span class="small muted">${esc(first.label)}</span></div>
+      <div class="row"><button class="btn go" data-readday="${first.day}">${icon("book")} Read Day ${first.day}</button><button class="btn sm" data-toggle="${first.day}" ${state.readOnly ? "disabled" : ""}>${icon("check")} Mark read</button><span class="small muted">${esc(first.label)}</span></div>
       ${thruControl(s, target)}
       ${behind.length > 1 ? `<details class="pick"><summary class="small">Pick a specific day</summary><div class="catch">${behind.map(d => `<button class="btn sm" data-toggle="${d.day}" ${state.readOnly ? "disabled" : ""}>Day ${d.day} · ${esc(d.short)}</button>`).join("")}</div></details>` : ""}
     </section>`;
@@ -1381,7 +1464,7 @@ function viewPlan() {
         <h2>${esc(sel.label)}</h2></div><span class="chip sec sec-${sel.sec}">${SECTIONS[sel.sec]}</span></div>
       <div class="row">
       <button class="btn ${isDone ? "done-state" : "go"}" data-toggle="${sel.day}" ${state.readOnly ? "disabled" : ""}>${isDone ? `${icon("check")} Read · tap to undo` : `${icon("check")} I read this`}</button>
-      <a class="btn" href="${readingURL(sel.label, state.config.version)}" target="_blank" rel="noopener">Open Bible ${icon("ext")}</a>
+      <button class="btn" data-readday="${sel.day}">${icon("book")} Read here</button>
       <button class="btn sm" data-sel="">Close</button></div></section>`;
   }
   let weeks = "";
@@ -1615,7 +1698,7 @@ function render(force) {
   const back = (tab, label) => `<button class="linkish back" data-tab="${tab}">← ${label}</button>`;
   const v = { today: viewToday, journey: viewJourney, plan: () => back("today", "Back to Today") + viewPlan(), group: viewGroup, victories: viewVictories,
     me: () => (state.canLead ? `<section class="card row between"><div><p class="eyebrow">Leader</p><b>Group settings, tribes and tools</b></div><button class="btn sm" data-tab="leader">Open leader tools</button></section>` : "") + viewEditor(false),
-    leader: () => back("me", "Back to Me") + viewLeader() }[state.tab] || viewToday;
+    leader: () => back("me", "Back to Me") + viewLeader(), read: viewRead }[state.tab] || viewToday;
   main.innerHTML = v();
   animateValues();
   if (state.tab === "journey") setupMapGestures();
@@ -1839,6 +1922,10 @@ document.addEventListener("click", e => {
   const t = e.target.closest("button, a"); if (!t) return;
   const ds = t.dataset;
   if (ds.toastAct) { const f = toastAction; $("#toast").hidden = true; toastAction = null; if (f) f.fn(); return; }
+  if (ds.readday) { openReader(+ds.readday); return; }
+  if (ds.jump) { const el = $("#rd-ch-" + ds.jump); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+  if (ds.rdsize) { state.rdSize = Math.max(0, Math.min(RD_SIZES.length - 1, (state.rdSize ?? 2) + +ds.rdsize)); lsSet("nt70.rd", { size: state.rdSize, light: !!state.rdLight }); render(true); return; }
+  if (ds.rdlight) { state.rdLight = !state.rdLight; lsSet("nt70.rd", { size: state.rdSize ?? 2, light: state.rdLight }); render(true); return; }
   if (ds.thru) { const sel = $("#thru-day"); if (sel) markThrough(+sel.value); return; }
   if (ds.auth) { authAction(ds.auth); return; }
   if (ds.alt) { const v = $("#u-name"); if (v) state.auth.uname = v.value; state.auth.alt = ds.alt; state.auth.error = ""; render(true); return; }
@@ -1896,6 +1983,7 @@ document.addEventListener("input", e => {
 
 
 /* ---------- boot ---------- */
+{ const rd = lsGet("nt70.rd"); if (rd) { state.rdSize = Number.isInteger(rd.size) ? rd.size : 2; state.rdLight = !!rd.light; } }
 function startLocal() {
   state.mode = "local"; state.canLead = true;
   state.config = normConfig(lsGet("nt70.config") || DEFAULT_CONFIG);
