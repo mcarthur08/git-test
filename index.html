@@ -179,6 +179,9 @@ details.more[open] summary > svg { transform: rotate(180deg); }
 .rv-list li > span:last-child { display: grid; }
 .rv-ic { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; color: var(--gold-hi); border: 1px solid rgba(217,174,85,.45); }
 .rv-ic svg { width: 16px; height: 16px; }
+.wn-art { width: 120px; height: 120px; border-radius: 50%; display: grid; place-items: center; color: var(--gold-hi); border: 2px solid var(--bronze); background: radial-gradient(circle at 50% 35%, #4A3420, #1E1712 75%); }
+.wn-art svg { width: 64px; height: 64px; }
+.app-ver { text-align: center; margin-top: 18px; }
 .savestat { font-size: .78rem; font-weight: 700; color: var(--teal); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; min-height: 1em; }
 .savestat svg { width: 14px; height: 14px; }
 .savestat.saving { color: var(--muted); }
@@ -399,7 +402,7 @@ select, input[type="date"], input[type="text"], input[type="email"], input[type=
 @keyframes confetti { 0% { transform: translate(0,0); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
 .reveal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); background: radial-gradient(circle at 50% 40%, rgba(40,26,14,.75), rgba(5,4,3,.92)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: fadein .35s ease; }
 @keyframes fadein { from { opacity: 0; } }
-.reveal-card { position: relative; width: min(390px, 100%); background: linear-gradient(180deg, #241C16, #15110D); border: 1px solid var(--bronze); border-radius: 12px; padding: 30px 22px 22px; text-align: center; display: grid; gap: 10px; justify-items: center; box-shadow: var(--shadow-lg), 0 0 60px -20px rgba(217,174,85,.5); animation: pop .6s var(--spring); overflow: hidden; }
+.reveal-card { position: relative; width: min(390px, 100%); background: linear-gradient(180deg, #241C16, #15110D); border: 1px solid var(--bronze); border-radius: 12px; padding: 30px 22px 22px; text-align: center; display: grid; gap: 10px; justify-items: center; box-shadow: var(--shadow-lg), 0 0 60px -20px rgba(217,174,85,.5); animation: pop .6s var(--spring); overflow: hidden auto; max-height: calc(100dvh - 48px); overscroll-behavior: contain; }
 .reveal-card::before { content: ""; position: absolute; inset: 5px; border: 1px solid rgba(217,174,85,.18); border-radius: 8px; pointer-events: none; }
 @keyframes pop { from { transform: scale(.85) translateY(24px); opacity: 0; } }
 .reveal-art { position: relative; width: 180px; height: 180px; display: grid; place-items: center; }
@@ -2039,11 +2042,13 @@ function render(force) {
   if (state.tab === "me" && !state.draft && state.me) state.draft = draftFrom(state.me);
   const back = (tab, label) => `<button class="linkish back" data-tab="${tab}">← ${label}</button>`;
   const v = { today: viewToday, journey: viewJourney, plan: () => back("today", "Back to Today") + viewPlan(), group: viewGroup, victories: viewVictories,
-    me: () => (state.canLead ? `<section class="card row between"><div><p class="eyebrow">Leader</p><b>Group settings, tribes and tools</b></div><button class="btn sm" data-tab="leader">Open leader tools</button></section>` : "") + viewEditor(false),
+    me: () => (state.canLead ? `<section class="card row between"><div><p class="eyebrow">Leader</p><b>Group settings, tribes and tools</b></div><button class="btn sm" data-tab="leader">Open leader tools</button></section>` : "") + viewEditor(false)
+      + `<p class="small muted app-ver">NT70 Quest version ${liveRelease().v} · <button class="linkish" data-whatsnew="1">What's new</button></p>`,
     leader: () => back("me", "Back to Me") + viewLeader(), read: viewRead, quiz: viewQuiz }[state.tab] || viewToday;
   main.innerHTML = v();
   animateValues();
   if (state.tab === "journey") setupMapGestures();
+  checkWhatsNew();
   if (state.tab === "group") { const t = $("#track"), m = $("#trackme"); if (t && m) t.scrollLeft = Math.max(0, m.parentElement.offsetLeft - t.clientWidth / 2); }
 }
 document.addEventListener("toggle", e => {
@@ -2096,6 +2101,39 @@ function confetti(x, y, count = 36) {
     document.body.appendChild(b); setTimeout(() => b.remove(), 1700);
   }
 }
+/* ---------- what's new ---------- */
+// Newest first. Add an entry for every series of updates: bump the middle number for new
+// features (1.2, 1.3…) and the last for bug fixes (1.2.1). The popup waits until `from`
+// (local time), then shows once per device to anyone who hasn't seen that version.
+const RELEASES = [
+  { v: "1.1", from: "2026-10-24T06:00", title: "Fresh on the road", items: [
+    ["group", "Tribe rosters", "Tap a tribe on the Group tab to see who's in it."],
+    ["target", "Daily quiz", "5 quick KJV questions after each reading. Perfect scores earn your tribe a point."],
+    ["flame", "Cheers", "Send a 🙏 or 🔥 to friends on the leaderboard."],
+    ["victories", "Talk about it", "Share your thoughts under each Victory Moment."],
+    ["book", "Read in the app", "Open each day's KJV chapters right here, with bigger text and a light mode."],
+    ["today", "Weekly recap", "Each week starts with a look back at how you and your tribe did."]] },
+  { v: "1.0", from: "2026-10-22T00:00", title: "The quest begins", items: [
+    ["journey", "NT70 Quest launched", "70 days, 260 chapters, Bethlehem to Jerusalem."]] }
+];
+const liveRelease = () => RELEASES.find(r => new Date(r.from) <= new Date()) || RELEASES[RELEASES.length - 1];
+function showRelease(r) {
+  queueReveal({ kicker: `What's new · Version ${r.v}`, title: r.title, art: `<div class="wn-art">${icon("star")}</div>`,
+    list: r.items.map(([ic, t, d]) => `<li><span class="rv-ic">${icon(ic)}</span><span><b>${esc(t)}</b><span class="small muted">${esc(d)}</span></span></li>`).join("") });
+}
+function checkWhatsNew() {
+  if (state.phase !== "ready" || !state.me) return;
+  const r = liveRelease();
+  if (lsGet("nt70.seen") === r.v) return;
+  const first = !lsGet("nt70.seen");
+  lsSet("nt70.seen", r.v);
+  // The launch needs no popup, and someone who joined after a release already has all of it
+  if (r === RELEASES[RELEASES.length - 1] || (first && state.me.createdAt && new Date(state.me.createdAt) >= new Date(r.from))) return;
+  showRelease(r);
+}
+// Catch a release that goes live while the app sits open overnight
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkWhatsNew(); });
+
 const revealQueue = [];
 function queueReveal(r) { revealQueue.push(r); if (revealQueue.length === 1) showReveal(); }
 function showReveal() {
@@ -2282,6 +2320,7 @@ document.addEventListener("click", e => {
   if (ds.auth) { authAction(ds.auth); return; }
   if (ds.alt) { const v = $("#u-name"); if (v) state.auth.uname = v.value; state.auth.alt = ds.alt; state.auth.error = ""; render(true); return; }
   if (ds.umode) { const v = $("#u-name"); if (v) state.auth.uname = v.value; state.auth.umode = ds.umode; state.auth.error = ""; render(true); return; }
+  if (ds.whatsnew) { showRelease(liveRelease()); return; }
   if (ds.reveal) { closeReveal(ds.reveal === "act"); return; }
   if (ds.stopnav) { const cur = state.stop ?? Math.max(0, STOPS.findIndex(x => x.day > stats(state.me).n) - 1); selectStop(Math.max(0, Math.min(STOPS.length - 1, (cur < 0 ? STOPS.length - 1 : cur) + +ds.stopnav))); return; }
   if (ds.tab) { e.preventDefault(); setTab(ds.tab); return; }

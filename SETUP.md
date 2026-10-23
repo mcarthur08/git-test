@@ -153,6 +153,23 @@ Username accounts have no real email, so a forgotten password can't be reset. Mo
 
 This needs the latest `firestore.rules` published (step 5).
 
+## Announcing updates ("What's new")
+
+Each series of updates gets a version number and a "What's new" popup. Everyone sees it once, the first time they open the app after it goes live. They can see it again any time from **Me › What's new**, where the current version is shown.
+
+To announce a new release, add an entry at the **top** of `RELEASES` in `index.html`:
+
+```js
+{ v: "1.2", from: "2026-10-31T06:00", title: "A short headline", items: [
+  ["group", "Feature name", "One sentence about what changed."],
+  ["check", "Bug fixes", "What was fixed."]] },
+```
+
+- **Version:** bump the middle number for new features (1.2, 1.3…) and the last number for bug-fix-only releases (1.2.1).
+- **`from`:** the local date and time the popup starts showing. Leave it in the past to show it right away.
+- **Icons:** today, plan, group, victories, me, journey, book, flame, check, star, crown, target, lock.
+- People who join after a release went out don't get its popup.
+
 ## Good to know
 
 - **Ages.** Google accounts need the user to be 13 or older, unless a parent manages the account through Family Link. Email-link sign-in works with any email address. Check your church's policy on collecting youth emails and parental consent.
