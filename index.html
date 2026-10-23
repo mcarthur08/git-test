@@ -156,6 +156,34 @@ main.enter > *:nth-child(4) { animation-delay: .18s; } main.enter > *:nth-child(
 .meter i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent); transform: translateX(-100%); animation: shine 3s ease-in-out infinite 1s; }
 @keyframes shine { 60%, 100% { transform: translateX(100%); } }
 .catch { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip.soft { background: rgba(217,174,85,.12); color: var(--gold-hi); border-color: rgba(217,174,85,.4); }
+.linkish { justify-self: start; background: none; border: 0; padding: 4px 0; color: var(--gold); font: 600 var(--step--1) var(--font-body); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.linkish.back { text-decoration: none; font-family: var(--font-display); letter-spacing: .06em; }
+.prog { display: grid; gap: 10px; padding: 4px 2px; }
+.prog-line { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: space-between; color: var(--muted); font-size: var(--step--1); }
+.prog-line b { color: var(--gold-hi); font-family: var(--font-display); font-size: var(--step-0); }
+.prog-line span { display: inline-flex; align-items: center; gap: 6px; }
+.prog-line svg { width: 15px; height: 15px; color: var(--flame-2); }
+.catchup { border-color: rgba(217,174,85,.35); }
+.thru { display: grid; gap: 6px; padding-top: 4px; }
+details.pick summary, details.more summary { cursor: pointer; list-style: none; }
+details.pick summary::-webkit-details-marker, details.more summary::-webkit-details-marker { display: none; }
+details.pick summary { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; margin-bottom: 8px; }
+details.more summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+details.more summary > span { display: grid; gap: 2px; }
+details.more summary > svg { width: 22px; height: 22px; color: var(--gold); transition: transform .2s; flex: none; }
+details.more[open] summary > svg { transform: rotate(180deg); }
+.stat .ic { border: 1px solid currentColor; background: rgba(0,0,0,.2); }
+.rv-list { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; width: 100%; text-align: left; }
+.rv-list li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
+.rv-list li > span:last-child { display: grid; }
+.rv-ic { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; color: var(--gold-hi); border: 1px solid rgba(217,174,85,.45); }
+.rv-ic svg { width: 16px; height: 16px; }
+.savestat { font-size: .78rem; font-weight: 700; color: var(--teal); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; min-height: 1em; }
+.savestat svg { width: 14px; height: 14px; }
+.savestat.saving { color: var(--muted); }
+.savestat.error { color: #E07E69; cursor: pointer; text-decoration: underline; }
+.toast-btn { margin-left: 10px; background: none; border: 1px solid var(--gold); color: var(--gold-hi); border-radius: 4px; padding: 3px 10px; font: 700 .8rem var(--font-body); cursor: pointer; }
 
 /* Badges */
 .badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
@@ -391,10 +419,9 @@ code { font-size: .8rem; background: #0F0C0A; border: 1px solid var(--line); pad
 @media (max-width: 640px) {
   #top { box-shadow: none; }
   .tabs { position: fixed; z-index: 6; left: 0; right: 0; bottom: 0; justify-content: space-around; gap: 0; background: linear-gradient(#1A1410, #0E0B09); border-top: 1px solid var(--bronze); box-shadow: 0 -10px 30px -10px #000; padding: 4px max(6px, env(safe-area-inset-right, 0px)) calc(4px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px)); }
-  .tabs button { flex-direction: column; gap: 3px; padding: 7px 2px 6px; font-size: .58rem; letter-spacing: .06em; flex: 1; }
+  .tabs button { flex-direction: column; gap: 3px; padding: 8px 2px 7px; font-size: .7rem; letter-spacing: .04em; flex: 1; min-height: 52px; }
   .tabs button svg { width: 21px; height: 21px; }
   .tabs button[aria-current="page"]::after { left: 30%; right: 30%; top: 0; bottom: auto; }
-  .tabs .lg { display: none; }
   main { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   .toast { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
   .stats { grid-template-columns: repeat(2, 1fr); }
@@ -413,7 +440,6 @@ code { font-size: .8rem; background: #0F0C0A; border: 1px solid var(--line); pad
   .mepill { padding: 3px; }
   .card { padding: 18px 16px; }
 }
-@media (min-width: 641px) { .tabs .sm-l { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .confetti { display: none; }
@@ -932,7 +958,9 @@ const BADGES = [
 
 /* ---------- state ---------- */
 const DEFAULT_CONFIG = { start: "2026-10-22", groupName: "Youth Group", version: "KJV", teams: DEFAULT_TEAMS };
-const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Map"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Wins"], ["me", "My Character", "Me"], ["leader", "Leader", "Leader"]];
+const TABS = [["today", "Today", "Today"], ["journey", "Journey", "Journey"], ["plan", "Plan", "Plan"], ["group", "Group", "Group"], ["victories", "Victories", "Victories"], ["me", "Me", "Me"], ["leader", "Leader", "Leader"]];
+// The tab bar shows five; the Plan opens from Today and Leader tools from Me.
+const NAV_TABS = ["today", "journey", "group", "victories", "me"];
 const state = {
   phase: "loading", mode: "local", db: null, user: null, uid: null,
   me: null, players: {}, playersLoaded: false, config: { ...DEFAULT_CONFIG },
@@ -968,8 +996,17 @@ const nextUndone = s => { for (let d = 1; d <= DAYS; d++) if (!s.doneSet.has(d))
 
 /* ---------- saving ---------- */
 let saveTimer = null, writing = false, dirty = false;
+const saveLabel = () => ({ saving: "Saving…", saved: `${icon("check")} Saved`, error: "Not saved · tap to retry" })[state.saveStatus] || "";
+let saveStatusTimer = null;
+function setSave(st) {
+  state.saveStatus = st; clearTimeout(saveStatusTimer);
+  const el = $("#savestat");
+  if (el) { el.className = "savestat " + st; el.innerHTML = saveLabel(); if (st === "error") { el.setAttribute("data-retry", "1"); el.setAttribute("role", "button"); el.tabIndex = 0; } else { el.removeAttribute("data-retry"); el.removeAttribute("role"); el.removeAttribute("tabindex"); } }
+  if (st === "saved") saveStatusTimer = setTimeout(() => { state.saveStatus = ""; const e2 = $("#savestat"); if (e2) { e2.className = "savestat"; e2.innerHTML = ""; } }, 2500);
+}
 function saveMe() {
-  if (state.mode === "local") { lsSet("nt70.me", state.me); return; }
+  if (state.mode === "local") { lsSet("nt70.me", state.me); setSave("saved"); return; }
+  setSave("saving");
   clearTimeout(saveTimer); saveTimer = setTimeout(flush, 350);
 }
 async function flush() {
@@ -981,7 +1018,9 @@ async function flush() {
     await state.db.doc("players/" + state.uid).set({ alias: me.alias, gender: me.gender, team: me.team, look: me.look, done: me.done,
       createdAt: me.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
     state.writeError = null;
+    if (!dirty) setSave("saved");
   } catch (e) {
+    setSave("error");
     if (e && (e.code === "invalid_argument" || e.code === "permission-denied")) state.readOnly = true;
     state.writeError = (e && e.code) || "unavailable";
     render(true);
@@ -1223,13 +1262,14 @@ function viewJourney() {
 const dayDate = (start, day) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + day - 1);
 
 function headerHTML() {
-  const tabs = TABS.filter(([k]) => k !== "leader" || state.canLead);
+  const tabs = TABS.filter(([k]) => NAV_TABS.includes(k));
   const me = state.me;
   return `<div class="wrap bar">
       <div class="brand"><span class="brand-mark" aria-hidden="true">70</span><h1>NT70 Quest<small>${esc(state.config.groupName)} · New Testament in 70 days</small></h1></div>
+      ${me && state.saveStatus ? `<span class="savestat ${state.saveStatus}" id="savestat" aria-live="polite" ${state.saveStatus === "error" ? 'data-retry="1" role="button" tabindex="0"' : ""}>${saveLabel()}</span>` : `<span class="savestat" id="savestat" aria-live="polite"></span>`}
       ${me ? `<button class="mepill" data-tab="me" aria-label="Edit my avatar"><span class="bubble">${avatarSVG(me.look, stats(me).n, { bust: true })}</span><span>${esc(me.alias)}</span></button>` : ""}
     </div>
-    ${state.phase === "ready" ? `<nav class="tabs wrap" aria-label="Sections">${tabs.map(([k, l, s]) => `<button data-tab="${k}" ${state.tab === k ? 'aria-current="page"' : ""}>${icon(k)}<span class="lg">${l}</span><span class="sm-l">${s}</span></button>`).join("")}</nav>` : ""}`;
+    ${state.phase === "ready" ? `<nav class="tabs wrap" aria-label="Sections">${tabs.map(([k, l, s]) => `<button data-tab="${k}" ${state.tab === k ? 'aria-current="page"' : ""}>${icon(k)}<span>${s}</span></button>`).join("")}</nav>` : ""}`;
 }
 
 function viewToday() {
@@ -1243,8 +1283,8 @@ function viewToday() {
     ? `<div class="note">Set the group's start date under <a href="#leader" data-tab="leader">Leader</a> so everyone shares one calendar. Until then, start with Day 1.</div>`
     : `<div class="note">Your leader hasn't set the start date yet. You can begin with Day 1 now.</div>`;
   else if (pd < 1) banner = `<div class="note">The quest starts ${fmtDate(start)}, in ${plural(1 - pd, "day")}. Reading ahead is allowed.</div>`;
-  else if (pd > DAYS) banner = `<div class="note">The 70 days ended ${fmtDate(dayDate(start, DAYS))}. Finish any days you missed.</div>`;
-  const pace = target ? (s.n >= target ? `<span class="chip ok">${icon("check")} On pace</span>` : `<span class="chip behind">${plural(target - s.n, "day")} behind</span>`) : "";
+  else if (pd > DAYS) banner = `<div class="note">The 70 days ended ${fmtDate(dayDate(start, DAYS))}. Finish any days you missed. It still counts!</div>`;
+  const pace = target ? (behind.length ? `<span class="chip soft">${plural(behind.length, "day")} to catch up</span>` : `<span class="chip ok">${icon("check")} On pace</span>`) : "";
 
   let hero;
   const stage = `<div class="frame${cheer ? " glow" : ""}">${avatarSVG(me.look, s.n, { portrait: true, live: true, cheer })}<div class="frame-fig">${avatarSVG(me.look, s.n, { live: true })}</div></div>`;
@@ -1258,35 +1298,66 @@ function viewToday() {
     const dateLine = start ? ` · ${fmtDate(dayDate(start, focus))}` : "";
     hero = `<div class="hero">${stage}<div class="stack" style="gap:14px">
       <div class="stack" style="gap:6px"><p class="eyebrow">${lead}${dateLine}</p><h2 class="hero-day">Day ${focus}</h2><p class="hero-read">${esc(p.label)}</p></div>
-      <div class="row"><span class="chip sec sec-${p.sec}">${SECTIONS[p.sec]}</span><span class="chip">${icon("book")} ${plural(p.count, "chapter")}</span>${pace}</div>
+      <div class="row"><span class="chip">${icon("book")} ${plural(p.count, "chapter")}</span>${pace}</div>
       <div class="row">
         <button class="btn go big" data-toggle="${focus}" ${state.readOnly ? "disabled" : ""}>${icon("check")} I read Day ${focus}</button>
         <a class="btn" href="${readingURL(p.label, state.config.version)}" target="_blank" rel="noopener">Open Bible (${esc(state.config.version)}) ${icon("ext")}</a>
-      </div></div></div>`;
+      </div>
+      <button class="linkish" data-tab="plan">See the full 70-day plan</button></div></div>`;
   }
+
+  // Catch-up: one clear next step, a realistic date, and a shortcut for people reading on paper.
+  let catchup = "";
+  if (behind.length) {
+    const first = behind[0], today = new Date(), lateBy = target + behind.length > DAYS;
+    const plan = lateBy ? "Read a little extra each day and you can still finish by the last day."
+      : `Read one extra day each day and you'll be caught up by ${fmtDate(new Date(today.getFullYear(), today.getMonth(), today.getDate() + behind.length))}.`;
+    catchup = `<section class="card stack catchup">
+      <h3>Catching up</h3>
+      <p class="muted">You're ${plural(behind.length, "day")} behind. No worries, it happens. ${plan}</p>
+      <div class="row"><button class="btn go" data-toggle="${first.day}" ${state.readOnly ? "disabled" : ""}>${icon("check")} I read Day ${first.day}</button><span class="small muted">${esc(first.label)}</span></div>
+      ${thruControl(s, target)}
+      ${behind.length > 1 ? `<details class="pick"><summary class="small">Pick a specific day</summary><div class="catch">${behind.map(d => `<button class="btn sm" data-toggle="${d.day}" ${state.readOnly ? "disabled" : ""}>Day ${d.day} · ${esc(d.short)}</button>`).join("")}</div></details>` : ""}
+    </section>`;
+  }
+
   const nv = VICTORIES.find(v => v.day > s.n);
   const pct = Math.round(s.chapters / TOTAL * 100);
-  const stat = (k, val, unit, label, color, ic) => `<div class="stat"><span class="ic" style="background:color-mix(in srgb, ${color} 16%, var(--surface));color:${color}">${icon(ic)}</span><b><span data-count="${val}" data-k="${k}">${val}</span>${unit ? `<small>${unit}</small>` : ""}</b><span class="sl">${label}</span></div>`;
+  const stat = (k, val, unit, label, color, ic) => `<div class="stat"><span class="ic" style="color:${color}">${icon(ic)}</span><b><span data-count="${val}" data-k="${k}">${val}</span>${unit ? `<small>${unit}</small>` : ""}</b><span class="sl">${label}</span></div>`;
   return `${banner}
-  ${state.readOnly ? `<div class="note warn">You can look around, but your progress can't be saved yet. Ask your leader to give you <b>Contributor</b> access to this page.</div>` : ""}
-  ${state.writeError && !state.readOnly ? `<div class="note warn">Your last check-off didn't save (${esc(state.writeError)}). Check your connection and tap it again.</div>` : ""}
+  ${state.readOnly ? `<div class="note warn">You can look around, but your progress can't be saved yet. Ask your leader for access.</div>` : ""}
   <section class="card">${hero}</section>
-  <section class="stats" aria-label="Your progress">
-    ${stat("days", s.n, "/70", "days done", "var(--teal)", "plan")}
-    ${stat("ch", s.chapters, "", "of 260 chapters", "var(--sky)", "book")}
-    ${stat("streak", s.streak, "", `day streak · best ${s.best}`, "var(--flame)", "flame")}
-    ${stat("pct", pct, "%", "of the New Testament", "var(--violet)", "target")}
+  <section class="prog" aria-label="Your progress">
+    <div class="prog-line"><span><b>${s.n}</b> of 70 days</span><span>${icon("flame")} <b>${s.streak}-day</b> streak</span><span><b>${pct}%</b> of the New Testament</span></div>
+    <div class="meter" role="img" aria-label="${s.chapters} of 260 chapters"><i data-w="${s.chapters / TOTAL * 100}" data-k="m-main" style="width:${s.chapters / TOTAL * 100}%"></i></div>
   </section>
-  <div class="meter" role="img" aria-label="${s.chapters} of 260 chapters"><i data-w="${s.chapters / TOTAL * 100}" data-k="m-main" style="width:${s.chapters / TOTAL * 100}%"></i></div>
-  ${behind.length ? `<section class="card stack"><h3>Catch up</h3><p class="small muted">Tap a day to mark it read. Each one gets you closer to the group.</p>
-    <div class="catch">${behind.map(d => `<button class="btn sm" data-toggle="${d.day}" ${state.readOnly ? "disabled" : ""}>Day ${d.day} · ${esc(d.short)}</button>`).join("")}</div></section>` : ""}
+  ${catchup}
   ${tripCard(s.n)}
-  ${nv ? `<section class="card row between">
-      <div class="row" style="gap:14px;flex-wrap:nowrap;min-width:0">${victoryMedal(VICTORIES.indexOf(nv)).replace('class="medal"', 'class="medal" style="width:52px;height:52px;flex:none;filter:grayscale(.6);opacity:.8"')}
-      <div style="min-width:0"><p class="eyebrow">Next Victory Moment · Day ${nv.day}</p><h3>${esc(nv.title)}</h3><p class="small muted">${plural(nv.day - s.n, "more day")} to unlock this story from ${esc(nv.ref)}.</p></div></div>
-      <button class="btn sm" data-tab="victories">See victories</button></section>` : ""}
-  <section class="card stack"><div class="row between"><h3>Badges</h3><span class="small muted">${BADGES.filter(b => b.test(s)).length} of ${BADGES.length}</span></div>
-    <div class="badges">${BADGES.map(b => { const on = b.test(s); return `<div class="badge ${on ? "" : "locked"}">${medalIcon(b)}<div><b>${b.name}</b><span>${b.desc}</span></div></div>`; }).join("")}</div></section>`;
+  <details class="card more" id="more" ${state.openProgress ? "open" : ""}>
+    <summary><span><h3>My progress</h3><span class="small muted">Stats, badges${nv ? " and your next Victory Moment" : ""}</span></span>${icon("plan")}</summary>
+    <div class="stack" style="gap:16px;margin-top:14px">
+      <div class="stats">
+        ${stat("days", s.n, "/70", "days done", "var(--teal)", "plan")}
+        ${stat("ch", s.chapters, "", "of 260 chapters", "var(--sky)", "book")}
+        ${stat("streak", s.streak, "", `day streak · best ${s.best}`, "var(--flame)", "flame")}
+        ${stat("pct", pct, "%", "of the New Testament", "var(--violet)", "target")}
+      </div>
+      ${nv ? `<div class="row" style="gap:14px;flex-wrap:nowrap;min-width:0">${victoryMedal(VICTORIES.indexOf(nv)).replace('class="medal"', 'class="medal" style="width:46px;height:46px;flex:none;filter:grayscale(.6);opacity:.8"')}
+        <div style="min-width:0"><p class="eyebrow">Next Victory Moment · Day ${nv.day}</p><b>${esc(nv.title)}</b><p class="small muted">${plural(nv.day - s.n, "more day")} to unlock this story from ${esc(nv.ref)}.</p></div></div>` : ""}
+      <div><div class="row between" style="margin-bottom:8px"><b>Badges</b><span class="small muted">${BADGES.filter(b => b.test(s)).length} of ${BADGES.length}</span></div>
+        <div class="badges">${BADGES.map(b => { const on = b.test(s); return `<div class="badge ${on ? "" : "locked"}">${medalIcon(b)}<div><b>${b.name}</b><span>${b.desc}</span></div></div>`; }).join("")}</div></div>
+      ${behind.length ? "" : thruControl(s, target)}
+    </div>
+  </details>`;
+}
+
+// "I've read through Day X" for people who read ahead or in a paper Bible.
+function thruControl(s, target) {
+  const first = nextUndone(s); if (!first || state.readOnly) return "";
+  const def = Math.max(first, target || first);
+  const opts = PLAN.filter(d => d.day >= first).map(d => `<option value="${d.day}" ${d.day === def ? "selected" : ""}>Day ${d.day} · ${esc(d.short)}</option>`).join("");
+  return `<div class="thru"><label for="thru-day" class="small">Reading in a paper Bible? Mark everything read through</label>
+    <div class="row" style="flex-wrap:nowrap"><select id="thru-day" style="flex:1;min-width:0">${opts}</select><button class="btn sm" data-thru="1">Mark read</button></div></div>`;
 }
 
 function tripCard(n) {
@@ -1541,12 +1612,16 @@ function render(force) {
   if (state.phase === "signin") { main.innerHTML = viewSignIn(); return; }
   if (state.phase === "join") { main.innerHTML = viewEditor(true); return; }
   if (state.tab === "me" && !state.draft && state.me) state.draft = draftFrom(state.me);
-  const v = { today: viewToday, journey: viewJourney, plan: viewPlan, group: viewGroup, victories: viewVictories, me: () => viewEditor(false), leader: viewLeader }[state.tab] || viewToday;
+  const back = (tab, label) => `<button class="linkish back" data-tab="${tab}">← ${label}</button>`;
+  const v = { today: viewToday, journey: viewJourney, plan: () => back("today", "Back to Today") + viewPlan(), group: viewGroup, victories: viewVictories,
+    me: () => (state.canLead ? `<section class="card row between"><div><p class="eyebrow">Leader</p><b>Group settings, tribes and tools</b></div><button class="btn sm" data-tab="leader">Open leader tools</button></section>` : "") + viewEditor(false),
+    leader: () => back("me", "Back to Me") + viewLeader() }[state.tab] || viewToday;
   main.innerHTML = v();
   animateValues();
   if (state.tab === "journey") setupMapGestures();
   if (state.tab === "group") { const t = $("#track"), m = $("#trackme"); if (t && m) t.scrollLeft = Math.max(0, m.parentElement.offsetLeft - t.clientWidth / 2); }
 }
+document.addEventListener("toggle", e => { if (e.target.id === "more") state.openProgress = e.target.open; }, true);
 document.addEventListener("focusout", () => setTimeout(() => { if (state.renderPending) render(); }, 0));
 
 function setTab(t) {
@@ -1575,9 +1650,13 @@ function newDraftFor(g) {
 
 /* ---------- celebrations ---------- */
 let toastTimer = null;
-function toast(msg) {
-  const t = $("#toast"); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false;
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3200);
+let toastAction = null;
+function toast(msg, action) {
+  const t = $("#toast"); t.hidden = true; void t.offsetWidth;
+  toastAction = action || null;
+  t.innerHTML = esc(msg) + (action ? ` <button class="toast-btn" data-toast-act="1">${esc(action.label)}</button>` : "");
+  t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; toastAction = null; }, action ? 6000 : 3200);
 }
 function confetti(x, y, count = 36) {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1595,7 +1674,7 @@ function showReveal() {
   const r = revealQueue[0], el = $("#reveal");
   if (!r) { el.hidden = true; el.innerHTML = ""; return; }
   el.innerHTML = `<div class="reveal-card"><div class="reveal-art">${r.art}</div><p class="kicker">${esc(r.kicker)}</p><h2 id="reveal-title">${esc(r.title)}</h2>
-    <p class="muted">${esc(r.text)}</p><div class="row" style="justify-content:center;margin-top:6px">${r.action ? `<button class="btn go" data-reveal="act">${esc(r.action)}</button>` : ""}<button class="btn ${r.action ? "" : "go"}" data-reveal="close">${revealQueue.length > 1 ? "Next" : "Awesome"}</button></div></div>`;
+    ${r.text ? `<p class="muted">${esc(r.text)}</p>` : ""}${r.list ? `<ul class="rv-list">${r.list}</ul>` : ""}<div class="row" style="justify-content:center;margin-top:6px">${r.action ? `<button class="btn go" data-reveal="act">${esc(r.action)}</button>` : ""}<button class="btn ${r.action ? "" : "go"}" data-reveal="close">${revealQueue.length > 1 ? "Next" : "Awesome"}</button></div></div>`;
   el.hidden = false;
   const rc = el.querySelector(".reveal-card").getBoundingClientRect();
   setTimeout(() => confetti(rc.left + rc.width / 2, rc.top + 40, 44), 150);
@@ -1610,29 +1689,53 @@ function closeReveal(act) {
 /* ---------- actions ---------- */
 function toggleDay(day, el) {
   if (state.readOnly || !state.me) return;
-  const before = stats(state.me);
   const done = { ...state.me.done };
-  if (done[day]) delete done[day]; else done[day] = todayISO();
+  if (done[day]) {
+    const prev = done[day]; delete done[day];
+    applyDone(done, el);
+    toast(`Day ${day} marked as not read`, { label: "Undo", fn: () => { const d2 = { ...state.me.done, [day]: prev }; applyDone(d2, null, "", { quiet: true }); toast(`Day ${day} restored`); } });
+    return;
+  }
+  done[day] = todayISO();
+  applyDone(done, el, `Day ${day} done · +${PLAN[day - 1].count} chapters`);
+}
+function markThrough(last) {
+  if (state.readOnly || !state.me) return;
+  const done = { ...state.me.done }, t = todayISO(); let added = 0;
+  for (let d = 1; d <= last; d++) if (!done[d]) { done[d] = t; added++; }
+  if (!added) { toast(`Already read through Day ${last}`); return; }
+  applyDone(done, null, `Marked ${plural(added, "day")} as read`);
+}
+// Save new reading and celebrate everything it unlocked in a single card.
+function applyDone(done, el, msg, opts = {}) {
+  const before = stats(state.me);
   state.me = { ...state.me, done };
   const after = stats(state.me);
-  if (after.n > before.n) {
+  if (after.n > before.n && !opts.quiet) {
     state.cheerUntil = Date.now() + 2000;
     setTimeout(() => document.querySelectorAll(".av.cheer").forEach(a => a.classList.remove("cheer")), 2000);
-    toast(`Day ${day} done · +${PLAN[day - 1].count} chapters`);
+    if (msg) toast(msg);
     if (el) { const r = el.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top + r.height / 2); }
-    STOPS.forEach((t, i) => { if (t.day > 0 && t.day === after.n) queueReveal({ kicker: i === STOPS.length - 1 ? "You made it to the Passover" : "New stop on your journey", title: t.place, text: t.title + ". " + t.verseRef + ".",
+    const crossed = d => d > before.n && d <= after.n, rewards = [];
+    VICTORIES.forEach((v, i) => { if (crossed(v.day)) rewards.push({ kicker: "Victory Moment unlocked", title: v.title, text: `${v.ref} is ready for you. A story of God bringing his people through.`, art: victoryMedal(i), action: "Read the story", onAct: () => setTab("victories"), ic: "victories" }); });
+    STOPS.forEach((t, i) => { if (t.day > 0 && crossed(t.day)) rewards.push({ kicker: i === STOPS.length - 1 ? "You made it to the Passover" : "New stop on your journey", title: t.place, text: t.title + ". " + t.verseRef + ".",
       art: `<svg class="medal" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4C20 4 11 13 11 25c0 16 21 35 21 35s21-19 21-35C53 13 44 4 32 4z" fill="var(--flame)"/><circle cx="32" cy="25" r="9" fill="#fff"/></svg>`,
-      action: "Open the map", onAct: () => { state.stop = i; setTab("journey"); } }); });
-    const vic = VICTORIES.find(v => v.day === after.n);
-    if (vic) queueReveal({ kicker: "Victory Moment unlocked", title: vic.title, text: `${vic.ref} is ready for you. A story of God bringing his people through.`, art: victoryMedal(VICTORIES.indexOf(vic)), action: "Read the story", onAct: () => setTab("victories") });
-    BADGES.filter(b => b.test(after) && !b.test(before)).forEach(b => queueReveal({ kicker: "Badge earned", title: b.name, text: b.desc + ".", art: medalIcon(b) }));
+      action: "Open the map", onAct: () => { state.stop = i; setTab("journey"); }, ic: "journey" }); });
+    BADGES.filter(b => b.test(after) && !b.test(before)).forEach(b => rewards.push({ kicker: "Badge earned", title: b.name, text: b.desc + ".", art: medalIcon(b), ic: "star" }));
+    const g = normLook(state.me.look, 0).g;
     for (const [k, arr] of Object.entries(UNLOCK)) arr.forEach(([label, , need, who], i) => {
-      if (need === after.n && need > before.n && (!who || who === normLook(state.me.look, 0).g)) {
+      if (crossed(need) && (!who || who === g)) {
         const look = { ...normLook(state.me.look, after.n), [k]: i };
-        queueReveal({ kicker: `New ${UNLOCK_NAMES[k]} unlocked`, title: label, text: `You read ${plural(after.n, "day")}. Try it on!`, art: `<div class="frame mid">${avatarSVG(look, after.n, { portrait: true, live: true })}<div class="frame-fig">${avatarSVG(look, after.n, { live: true })}</div></div>`, action: "Wear it",
-          onAct: () => { state.me = { ...state.me, look }; saveMe(); toast(`Wearing ${label}`); render(true); } });
+        rewards.push({ kicker: `New ${UNLOCK_NAMES[k]} unlocked`, title: label, text: `You read ${plural(after.n, "day")}. Try it on!`, art: `<div class="frame mid">${avatarSVG(look, after.n, { portrait: true, live: true })}<div class="frame-fig">${avatarSVG(look, after.n, { live: true })}</div></div>`, action: "Wear it",
+          onAct: () => { state.me = { ...state.me, look }; saveMe(); toast(`Wearing ${label}`); render(true); }, ic: "me" });
       }
     });
+    if (rewards.length === 1) queueReveal(rewards[0]);
+    else if (rewards.length > 1) {
+      const top = rewards[0];
+      queueReveal({ kicker: `Day ${after.n} of 70`, title: `You unlocked ${rewards.length} things`, text: "", art: top.art, action: top.action, onAct: top.onAct,
+        list: rewards.map(r => `<li><span class="rv-ic">${icon(r.ic)}</span><span><b>${esc(r.title)}</b><span class="small muted">${esc(r.kicker)}</span></span></li>`).join("") });
+    }
   }
   saveMe(); render(true);
 }
@@ -1732,8 +1835,11 @@ document.addEventListener("click", e => {
   if (zb) { mapControl(zb.dataset.mapzoom); return; }
   const st = e.target.closest("[data-stop]");
   if (st && !e.target.closest(".trip-map")) { selectStop(+st.dataset.stop); return; }
+  if (e.target.closest("[data-retry]")) { if (state.mode === "shared") { setSave("saving"); flush(); } return; }
   const t = e.target.closest("button, a"); if (!t) return;
   const ds = t.dataset;
+  if (ds.toastAct) { const f = toastAction; $("#toast").hidden = true; toastAction = null; if (f) f.fn(); return; }
+  if (ds.thru) { const sel = $("#thru-day"); if (sel) markThrough(+sel.value); return; }
   if (ds.auth) { authAction(ds.auth); return; }
   if (ds.alt) { const v = $("#u-name"); if (v) state.auth.uname = v.value; state.auth.alt = ds.alt; state.auth.error = ""; render(true); return; }
   if (ds.umode) { const v = $("#u-name"); if (v) state.auth.uname = v.value; state.auth.umode = ds.umode; state.auth.error = ""; render(true); return; }
