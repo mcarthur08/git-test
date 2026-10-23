@@ -298,7 +298,9 @@ details.more[open] summary > svg { transform: rotate(180deg); }
 .rd-loading p { width: 100%; text-align: center; }
 
 /* Group */
-.teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.teams { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 980px) { .teams { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 540px) { .teams { grid-template-columns: 1fr; } }
 .team { border-radius: 8px; padding: 14px; background: rgba(0,0,0,.25); border: 1px solid var(--line); display: grid; gap: 8px; }
 .team h3 { display: flex; align-items: center; gap: 8px; font-size: var(--step-0); }
 .team .meter i { background: var(--tc); box-shadow: none; }
@@ -470,6 +472,15 @@ select, input[type="date"], input[type="text"], input[type="email"], input[type=
 .crest.big { width: 112px; height: 112px; box-shadow: 0 0 0 3px #1A1410, 0 0 0 5px var(--tc), 0 0 40px -6px var(--tc); }
 .crest.big svg { width: 60px; height: 60px; }
 .team h3 { gap: 10px; }
+.team { position: relative; }
+.team.lead { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(217,174,85,.5), 0 0 30px -12px rgba(242,213,140,.7); }
+.trank { display: flex; align-items: baseline; gap: 8px; }
+.trank b { font-family: var(--font-display); font-size: 1.6rem; line-height: 1; color: var(--tc); }
+.team.lead .trank b { color: var(--gold-hi); }
+.trank span { font-size: .75rem; font-weight: 700; color: var(--muted); }
+.trank .tmv { margin-left: auto; padding: 2px 8px; border-radius: 999px; font-size: .78rem; }
+.tmv.up { color: #CFE3A6; background: rgba(141,163,94,.18); }
+.tmv.down { color: #F2B9AC; background: rgba(194,83,63,.16); }
 .tribe-line { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
 .tribe-line div { display: grid; }
 .recover { grid-column: 1 / -1; display: grid; gap: 6px; padding: 10px; border-radius: 6px; border: 1px dashed rgba(217,174,85,.45); background: rgba(217,174,85,.06); }
@@ -1791,6 +1802,52 @@ function viewPlan() {
     <div>${weeks}</div></section>`;
 }
 
+/* ---- tribe places: remember yesterday's order on this device to show movement, and slide cards when the order changes ---- */
+const ORD = ["", "1st", "2nd", "3rd", "4th"];
+function tribePlaces() {
+  const people = allPlayers();
+  const rows = state.config.teams.map((t, i) => {
+    const mem = people.filter(p => teamIndex(p) === i);
+    return { i, pts: mem.length ? mem.reduce((a, p) => a + p.s.chapters + p.s.perfect, 0) / mem.length : 0 };
+  });
+  const places = {}; rows.forEach(r => { places[r.i] = 1 + rows.filter(o => o.pts > r.pts + 1e-9).length; });
+  return places;
+}
+// The baseline is the last order recorded on an earlier day, so arrows mean "since yesterday" (or your last visit).
+function tribeBase() {
+  if (state._tribeBase) return state._tribeBase;
+  const rec = lsGet("nt70.tribes") || {}, today = todayISO();
+  state._tribeBase = rec.date === today ? (rec.base || {}) : (rec.places || {});
+  state._tribeBaseDate = rec.date === today ? rec.baseDate : rec.date;
+  return state._tribeBase;
+}
+const tribeBaseLabel = () => { const d = parseISO(state._tribeBaseDate || ""); return d ? (daysBetween(d, new Date()) === 1 ? "yesterday" : fmtDate(d)) : "your last visit"; };
+function recordTribes() {
+  if (state.mode !== "shared" || !state.playersLoaded) return;
+  const rec = lsGet("nt70.tribes") || {}, today = todayISO(), places = tribePlaces();
+  if (rec.date === today) lsSet("nt70.tribes", { ...rec, places });
+  else lsSet("nt70.tribes", { date: today, places, base: rec.places || {}, baseDate: rec.date || "" });
+}
+function tribeRects() { const m = {}; document.querySelectorAll(".team[data-tribe]").forEach(el => { m[el.dataset.tribe] = el.getBoundingClientRect(); }); return m; }
+function slideTribes(before) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelectorAll(".team[data-tribe]").forEach(el => {
+    const a = before[el.dataset.tribe]; if (!a) return;
+    const b = el.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top;
+    if (Math.abs(dx) + Math.abs(dy) < 2) return;
+    el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 700, easing: "cubic-bezier(.2,.8,.2,1)" });
+  });
+}
+// On opening the Group tab, start each card where yesterday's order had it and slide to today's place (once per visit).
+function introSlide() {
+  if (state.tribeIntroDone) return; state.tribeIntroDone = true;
+  const base = tribeBase(), cards = [...document.querySelectorAll(".team[data-tribe]")]; if (!cards.length || !Object.keys(base).length) return;
+  const slots = cards.map(c => c.getBoundingClientRect()), before = {};
+  const baseOrder = cards.map(c => +c.dataset.tribe).sort((a, b) => (base[a] || 9) - (base[b] || 9) || a - b);
+  baseOrder.forEach((t, k) => { before[t] = slots[k]; });
+  slideTribes(before);
+}
+
 function viewGroup() {
   const list = allPlayers().sort((a, b) => b.s.n - a.s.n || b.s.streak - a.s.streak || a.alias.localeCompare(b.alias));
   const teams = state.config.teams;
@@ -1799,11 +1856,16 @@ function viewGroup() {
       const mem = list.filter(p => teamIndex(p) === i), ch = mem.reduce((a, p) => a + p.s.chapters, 0);
       const qp = mem.reduce((a, p) => a + p.s.perfect, 0);  // each perfect quiz adds one point
       return { t, i, mem, ch, qp, avg: mem.length ? ch / mem.length / TOTAL * 100 : 0, pts: mem.length ? (ch + qp) / mem.length : 0 };
-    }).sort((a, b) => b.pts - a.pts).map((x, rank) => `<div class="team" style="--tc:${TEAM_COLORS[x.i]}">
-      <h3>${crest(x.i)}<span>${esc(x.t)}</span>${rank === 0 && x.avg > 0 ? ' <span class="rank1">Leading</span>' : ""}</h3>
+    }).sort((a, b) => b.pts - a.pts || (tribeBase()[a.i] || 9) - (tribeBase()[b.i] || 9) || a.i - b.i).map((x, k, all) => {
+      const place = 1 + all.filter(o => o.pts > x.pts + 1e-9).length, tied = all.filter(o => Math.abs(o.pts - x.pts) < 1e-9).length > 1;
+      const was = tribeBase()[x.i], move = was && was !== place ? (was > place ? `<span class="tmv up" title="Up from ${ORD[was]}">▲ ${was - place}</span>` : `<span class="tmv down" title="Down from ${ORD[was]}">▼ ${place - was}</span>`) : "";
+      return `<div class="team${place === 1 && x.pts > 0 ? " lead" : ""}" data-tribe="${x.i}" style="--tc:${TEAM_COLORS[x.i]}">
+      <div class="trank"><b>${ORD[place]}</b>${tied && x.pts > 0 ? "<span>tied</span>" : ""}${move}</div>
+      <h3>${crest(x.i)}<span>${esc(x.t)}</span>${place === 1 && x.pts > 0 && !tied ? ' <span class="rank1">Leading</span>' : ""}</h3>
       <div class="meter"><i data-w="${x.avg}" data-k="m-team${x.i}" style="width:${x.avg}%"></i></div>
       <p class="small"><b>${Math.round(x.avg)}%</b> average · ${x.ch} chapters${x.qp ? ` · ${plural(x.qp, "quiz point")}` : ""} · ${plural(x.mem.length, "member")}</p>
-      <p class="small muted"><i>"${TEAM_VERSES[x.i][0]}"</i> ${TEAM_VERSES[x.i][1]}</p></div>`).join("")}</div></section>`;
+      <p class="small muted"><i>"${TEAM_VERSES[x.i][0]}"</i> ${TEAM_VERSES[x.i][1]}</p></div>`; }).join("")}</div>
+      ${Object.keys(tribeBase()).length ? `<p class="small muted">Arrows show changes since ${tribeBaseLabel()}.</p>` : ""}</section>`;
   const cols = Array.from({ length: DAYS + 1 }, () => []);
   list.forEach(p => cols[p.s.n].push(p));
   const myN = state.me ? stats(state.me).n : -1;
@@ -2008,7 +2070,9 @@ function render(force) {
   const v = { today: viewToday, journey: viewJourney, plan: () => back("today", "Back to Today") + viewPlan(), group: viewGroup, victories: viewVictories,
     me: () => (state.canLead ? `<section class="card row between"><div><p class="eyebrow">Leader</p><b>Group settings, tribes and tools</b></div><button class="btn sm" data-tab="leader">Open leader tools</button></section>` : "") + viewEditor(false),
     leader: () => back("me", "Back to Me") + viewLeader(), read: viewRead, quiz: viewQuiz }[state.tab] || viewToday;
+  const tribesBefore = state.tab === "group" ? tribeRects() : null;
   main.innerHTML = v();
+  if (state.tab === "group") { if (tribesBefore && Object.keys(tribesBefore).length) slideTribes(tribesBefore); else requestAnimationFrame(introSlide); recordTribes(); }
   animateValues();
   if (state.tab === "journey") setupMapGestures();
   if (state.tab === "group") { const t = $("#track"), m = $("#trackme"); if (t && m) t.scrollLeft = Math.max(0, m.parentElement.offsetLeft - t.clientWidth / 2); }
