@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { useStore } from "@/store.js";
 import { STOPS, DAYS } from "@/lib/data.js";
 import { stats } from "@/lib/player.js";
 import { plural } from "@/lib/util.js";
+import { MAP_W, MAP_H } from "@/lib/journey.js";
 import { mapZoom } from "@/lib/mapCamera.js";
 import { Icon } from "@/components/ui/Icon.jsx";
 import { Meter } from "@/components/ui/Meter.jsx";
@@ -13,11 +15,30 @@ import StopList from "./StopList.jsx";
 // The road from Bethlehem to Jerusalem: an interactive map, the selected stop's story, and every stop.
 export default function Journey() {
   const { me, stop, canLead, mode } = useStore();
+  const [expanded, setExpanded] = useState(false);
   const n = stats(me).n;
   const zoomed = mapZoom() > 1.01;
   const nextI = STOPS.findIndex(s => s.day > n);
   const next = STOPS[nextI];
   const sel = stop ?? (next ? Math.max(0, nextI - 1) : STOPS.length - 1);
+  // Full screen: Escape closes it, and the page behind stops scrolling.
+  useEffect(() => {
+    if (!expanded) {
+      return;
+    }
+    const onKey = e => {
+      if (e.key === "Escape") {
+        setExpanded(false);
+      }
+    };
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = overflow;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [expanded]);
   return (
     <>
       <section className="card stack">
@@ -37,11 +58,18 @@ export default function Journey() {
         </p>
         <Meter k="m-journey" pct={(n / DAYS) * 100} />
       </section>
-      <section className="journey">
-        <div className="card map-card">
+      <section className={"journey" + (expanded ? " map-open" : "")}>
+        <div
+          className={"card map-card" + (expanded ? " expanded" : "")}
+          style={{ "--map-ratio": MAP_W / MAP_H }}
+        >
           <div className={"map-wrap" + (zoomed ? " zoomed" : "")}>
             <JourneyMap />
-            <ZoomControls zoomed={zoomed} />
+            <ZoomControls
+              zoomed={zoomed}
+              expanded={expanded}
+              onToggleExpand={() => setExpanded(!expanded)}
+            />
           </div>
           <p className="small muted map-hint">
             {zoomed

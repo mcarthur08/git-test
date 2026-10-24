@@ -2311,6 +2311,29 @@ input[type="password"] {
 .map-hint {
   text-align: center;
 }
+/* Full screen: the map keeps its shape and is as large as the screen allows. The page's slide-in animation
+   would otherwise make this section the containing block for the fixed card. */
+.journey.map-open {
+  animation: none;
+}
+.map-card.expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  border-radius: 0;
+  border: 0;
+  padding: 8px;
+  background: #0e0b09;
+  align-content: center;
+  justify-items: center;
+}
+.map-card.expanded .map-wrap {
+  width: min(100%, calc((100vh - 56px) * var(--map-ratio)));
+  width: min(100%, calc((100dvh - 56px) * var(--map-ratio)));
+}
+.map-card.expanded .map-wrap .map {
+  touch-action: none;
+}
 .m-name {
   font: 700 4.2px var(--font-body);
   fill: #2a1c0e;

@@ -1,9 +1,16 @@
 import { Icon } from "@/components/ui/Icon.jsx";
 import { mapControl } from "@/lib/mapCamera.js";
 
-export default function ZoomControls({ zoomed }) {
+export default function ZoomControls({ zoomed, expanded, onToggleExpand }) {
   return (
     <div className="map-ctl" role="group" aria-label="Map zoom">
+      <button
+        onClick={onToggleExpand}
+        aria-label={expanded ? "Close full screen map" : "Expand the map to full screen"}
+        aria-pressed={expanded}
+      >
+        <Icon k={expanded ? "collapse" : "expand"} />
+      </button>
       <button onClick={() => mapControl("in")} aria-label="Zoom in">
         +
       </button>
