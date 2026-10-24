@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "nt70-quest"
+    "default": "nt70-quest",
+    "staging": "nt-quest"
   }
 }
