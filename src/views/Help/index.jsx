@@ -2,6 +2,7 @@ import { GUIDE } from "@/lib/data.js";
 import { Icon } from "@/components/ui/Icon.jsx";
 import { AppVersion } from "@/components/ui/AppVersion.jsx";
 import { BackButton } from "@/components/ui/BackButton.jsx";
+import { InstallCard } from "@/components/ui/InstallCard.jsx";
 import { ReminderCard } from "@/components/ui/ReminderCard.jsx";
 
 const Tip = ({ ic, title, children }) => (
@@ -44,6 +45,7 @@ export default function Help() {
           </Tip>
         </ul>
       </section>
+      <InstallCard />
       <ReminderCard />
       <AppVersion />
     </>

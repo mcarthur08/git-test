@@ -11,6 +11,7 @@ import CheersReceivedCard from "./CheersReceivedCard.jsx";
 import CatchUpCard from "./CatchUpCard.jsx";
 import TripCard from "./TripCard.jsx";
 import ProgressDetails from "./ProgressDetails.jsx";
+import { InstallCard } from "@/components/ui/InstallCard.jsx";
 
 // The home screen: today's reading, how far you are, and what to do next.
 export default function Today() {
@@ -41,6 +42,7 @@ export default function Today() {
         readOnly={readOnly}
       />
       <ProgressSummary s={s} />
+      <InstallCard />
       <QuizNudge me={me} />
       <CheersReceivedCard />
       <CatchUpCard s={s} target={target} behind={behind} readOnly={readOnly} />

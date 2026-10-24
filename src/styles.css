@@ -3060,6 +3060,12 @@ input[type="time"] {
 .remind .row {
   gap: 10px;
 }
+.install-steps {
+  margin: 0;
+  padding-left: 1.2em;
+  display: grid;
+  gap: 4px;
+}
 .pgroup {
   display: grid;
   gap: 8px;

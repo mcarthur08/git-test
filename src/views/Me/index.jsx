@@ -1,5 +1,6 @@
 import { useStore } from "@/store.js";
 import { ReminderCard } from "@/components/ui/ReminderCard.jsx";
+import { InstallCard } from "@/components/ui/InstallCard.jsx";
 import { AppVersion } from "@/components/ui/AppVersion.jsx";
 import { setTab } from "@/actions";
 import Editor from "./Editor.jsx";
@@ -20,6 +21,7 @@ export default function Me() {
           </button>
         </section>
       ) : null}
+      <InstallCard />
       <ReminderCard />
       <Editor />
       <AppVersion />
