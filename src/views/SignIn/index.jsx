@@ -4,6 +4,7 @@ import { parseISO, fmtDate, plural } from "@/lib/util.js";
 import { planDay, dayDate } from "@/lib/player.js";
 import { Icon } from "@/components/ui/Icon.jsx";
 import { Avatar } from "@/components/ui/Avatar.jsx";
+import { InstallCard } from "@/components/ui/InstallCard.jsx";
 import SignInCard from "./SignInCard.jsx";
 
 const FEATS = [
@@ -74,6 +75,7 @@ export default function SignIn() {
         ))}
       </div>
       <SignInCard />
+      <InstallCard />
       <ul className="w-feats">
         {FEATS.map(([ic, t, d]) => (
           <li key={t}>
