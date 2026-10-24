@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:staging": "vite build --mode staging",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\" vite.config.js index.html",
     "lint": "eslint --ext .js,.jsx src vite.config.js"

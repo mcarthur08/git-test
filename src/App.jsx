@@ -7,6 +7,7 @@ import { Avatar } from "@/components/ui/Avatar.jsx";
 import { BackButton } from "@/components/ui/BackButton.jsx";
 import { Toast } from "@/components/ui/Toast.jsx";
 import { Reveal } from "@/components/ui/Reveal.jsx";
+import { TestBadge } from "@/components/ui/TestBadge.jsx";
 import SignIn from "@/views/SignIn/index.jsx";
 import Editor from "@/views/Me/Editor.jsx";
 import Today from "@/views/Today/index.jsx";
@@ -105,6 +106,7 @@ export default function App() {
       </main>
       <Toast />
       <Reveal />
+      <TestBadge />
     </>
   );
 }
