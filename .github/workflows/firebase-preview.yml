@@ -1,0 +1,34 @@
+# Publishes a temporary preview of every pull request to a Firebase Hosting preview channel and
+# comments the URL on the PR. Previews expire after 7 days. They use the live Firebase project,
+# so sign-ins and Firestore data are the real ones. Needs the same secret as the live deploy.
+name: Firebase preview
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Preview channel name
+        default: test
+jobs:
+  preview:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT70_QUEST }}
+          projectId: nt70-quest
+          channelId: ${{ github.event_name == 'workflow_dispatch' && inputs.channel || '' }}
+          expires: 7d
