@@ -26,10 +26,10 @@ What you'll set up:
 
 1. On the project overview page, click the **Web** icon (`</>`).
 2. Nickname: `NT70 Quest`. Leave "Firebase Hosting" unchecked. Click **Register app**.
-3. Firebase shows a `firebaseConfig = { ... }` block. Copy the values into **`firebase-config.js`** in this repository, replacing the placeholders:
+3. Firebase shows a `firebaseConfig = { ... }` block. Copy the values into **`src/firebase-config.js`** in this repository, replacing the placeholders:
 
    ```js
-   window.NT70_FIREBASE = {
+   export const FIREBASE_CONFIG = {
      apiKey: "AIza...",
      authDomain: "nt70-quest.firebaseapp.com",
      projectId: "nt70-quest",
@@ -74,7 +74,7 @@ These rules mean:
 
 ## 6. Put the site online with GitHub Pages
 
-1. Commit the updated `firebase-config.js` to the repository.
+1. Commit the updated `src/firebase-config.js` to the repository. The site is now a Vite + React app, so run `npm ci && npm run build` and publish the `dist/` folder (the Firebase workflow in step 9 does this for you; plain "Deploy from a branch" no longer works).
 2. On GitHub, open the repository's **Settings › Pages**.
 3. Under **Build and deployment**, choose **Deploy from a branch**. Pick the branch with the app (`master` after this work is merged, or `claude/bible-reading-tracker-avatars-oz590y` for now) and the `/ (root)` folder. Click **Save**.
 4. After a minute or two the site is live at **`https://mcarthur08.github.io/git-test/`**.
@@ -157,7 +157,7 @@ This needs the latest `firestore.rules` published (step 5).
 
 Each series of updates gets a version number and a "What's new" popup. Everyone sees it once, the first time they open the app after it goes live. Anyone who skipped a release sees every version they missed in one popup, newest first. They can see it again any time from **Me › What's new**, where the current version is shown.
 
-To announce a new release, add an entry at the **top** of `RELEASES` in `index.html`:
+To announce a new release, add an entry at the **top** of `RELEASES` in `src/lib/data.js`:
 
 ```js
 { v: "1.2", from: "2026-10-31T06:00", title: "A short headline", items: [
@@ -168,7 +168,7 @@ To announce a new release, add an entry at the **top** of `RELEASES` in `index.h
 - **Version:** bump the middle number for new features (1.2, 1.3…) and the last number for bug-fix-only releases (1.2.1).
 - **`from`:** the local date and time the popup starts showing. Leave it in the past to show it right away.
 - **Icons:** today, plan, group, victories, me, journey, book, flame, check, star, crown, target, lock.
-- **The "How it works" guide** (the **?** in the header) is the `GUIDE` list in `index.html`. Edit it there.
+- **The "How it works" guide** (the **?** in the header) is the `GUIDE` list in `src/lib/data.js`. Edit it there.
 - People who join after a release went out don't get its popup.
 
 ## Good to know
@@ -176,14 +176,43 @@ To announce a new release, add an entry at the **top** of `RELEASES` in `index.h
 - **Ages.** Google accounts need the user to be 13 or older, unless a parent manages the account through Family Link. Email-link sign-in works with any email address. Check your church's policy on collecting youth emails and parental consent.
 - **What's stored.** Bible name, character choices, team, and which days were read and when. The sign-in email lives in Firebase Authentication and is never shown to other youth.
 - **Email limits.** The free plan limits how many sign-in emails can go out per day. If a big group signs up at once, encourage Google sign-in, or check **Authentication › Usage** in Firebase.
-- **Solo mode.** Until `firebase-config.js` has real values, the site still works, but progress saves only on each device.
+- **Solo mode.** Until `src/firebase-config.js` has real values, the site still works, but progress saves only on each device.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `index.html` | The app |
-| `firebase-config.js` | Your Firebase project settings (step 2) |
+| `index.html`, `src/` | The React app (Vite). See "Code layout" below. |
+| `src/firebase-config.js` | Your Firebase project settings (step 2) |
 | `firestore.rules` | Database security rules (step 5) |
 | `firebase.json`, `.firebaserc`, `.github/workflows/firebase-hosting.yml` | Firebase Hosting setup and automatic deploys (step 9) |
-| `manifest.webmanifest`, `icon-*.png`, `apple-touch-icon.png` | Home-screen app name and icons |
+| `public/` | Manifest, icons, service worker (`sw.js`), offline page, and the KJV text in `public/kjv/` |
+
+To work on it locally: `npm install`, then `npm run dev`.
+
+## Installing and offline use (PWA)
+
+NT70 Quest is a progressive web app. On a phone, **Share › Add to Home Screen** (iPhone) or **⋮ › Install app** (Android and Chrome) puts it on the home screen and opens it full-screen.
+
+A service worker (`public/sw.js`) saves the app and the whole KJV text on the first visit, so the app opens and every reading works with no connection. Signing in and syncing progress still need a connection.
+
+- It only runs on the deployed (HTTPS) site and in `npm run preview`, not in `npm run dev`.
+- After a new deploy, people see a "A new version is ready · Reload" message the next time they open the app.
+- If you ever need to force everyone to refetch everything, change `VERSION` at the top of `public/sw.js`.
+- Icons and colours come from `public/manifest.webmanifest`.
+
+## Code layout
+
+```
+src/
+  main.jsx, App.jsx      Entry point, and which screen shows
+  store.js               The one shared app state (useStore / setState)
+  actions/               Everything the app does: saving, sign-in, rewards, boot (one file per topic)
+  lib/                   Pure logic with no React: data.js (plan, releases, guide), player.js, avatar.js, journey.js, quiz.js
+  components/ui/         Small reusable pieces: Icon, Avatar, Meter, Reveal, Toast, ReminderCard...
+  components/layout/     The header and tab bar
+  views/<Screen>/        One folder per screen (Today, Journey, Plan, Group, Victories, Me, Leader, Reader, Quiz, Help, SignIn),
+                         with index.jsx composing small cards
+```
+
+Imports use `@/` for `src/` (for example `@/lib/data.js`).

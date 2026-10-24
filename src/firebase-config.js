@@ -2,7 +2,7 @@
 // Paste the "firebaseConfig" values from Firebase console > Project settings > Your apps > Web app.
 // These values are safe to publish; your Firestore security rules protect the data.
 // Until real values are pasted, the app runs in solo mode (progress saved on each device only).
-window.NT70_FIREBASE = {
+export const FIREBASE_CONFIG = {
   apiKey: "AIzaSyB0GQC-zEYRsdrO6uTnGlYHEkEGUhblflk",
   authDomain: "nt70-quest.firebaseapp.com",
   projectId: "nt70-quest",
