@@ -155,13 +155,13 @@ This needs the latest `firestore.rules` published (step 5).
 
 ## Group chat (leaders)
 
-The **Chat** tab is one conversation for the whole group. It needs the latest `firestore.rules` published (step 5).
+The group chat (the chat bubble at the top, next to the **?**) is one conversation for the whole group. It needs the latest `firestore.rules` published (step 5).
 
 - **Questions:** people tick **This is a question**. The **Open questions** filter lists the unanswered ones. Leaders, or the person who asked, tap **Mark answered**.
 - **Pin:** leaders can pin a message, for example an announcement, to the top of the chat.
 - **Remove:** authors can delete their own messages, and leaders can remove anyone's.
 - **Reports:** anyone can tap **Report** on a message. Reported messages appear at the top of **Leader** tools, where you can **Remove message** or **Keep it**.
-- A number on the Chat tab shows new messages since that device last opened the chat. There are no push notifications.
+- A number on the chat bubble shows new messages since that device last opened the chat. There are no push notifications.
 
 ## Announcing updates ("What's new")
 

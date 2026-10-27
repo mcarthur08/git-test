@@ -68,7 +68,12 @@ function View() {
     case "help":
       return <Help />;
     case "chat":
-      return <Chat />;
+      return (
+        <>
+          <BackButton tab="today" label="Back to Today" />
+          <Chat />
+        </>
+      );
     default:
       return <Today />;
   }

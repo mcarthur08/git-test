@@ -39,9 +39,9 @@ export default function Help() {
           </Tip>
           <Tip ic="chat" title="Group chat">
             <p className="muted">
-              Ask questions and share thoughts in the <b>Chat</b> tab. Tick{" "}
-              <b>This is a question</b> so a leader can find and answer it. See something that isn't
-              right? Tap <b>Report</b> and a leader will take a look.
+              Ask questions and share thoughts in the group chat: tap the chat bubble at the top.
+              Tick <b>This is a question</b> so a leader can find and answer it. See something that
+              isn't right? Tap <b>Report</b> and a leader will take a look.
             </p>
           </Tip>
           <Tip ic="lock" title="Forgot your password?">

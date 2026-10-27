@@ -400,8 +400,8 @@ export const TABS = [
   ["help", "How it works", "Help"]
 ];
 
-// The tab bar shows six; the Plan opens from Today and Leader tools from Me.
-export const NAV_TABS = ["today", "journey", "group", "chat", "victories", "me"];
+// The tab bar shows five; the Plan opens from Today, Leader tools from Me, and Chat and Help from the header.
+export const NAV_TABS = ["today", "journey", "group", "victories", "me"];
 export const CHAT_MAX = 500; // characters per chat message
 
 export const CHEER_KINDS = { pray: "🙏", fire: "🔥" };
@@ -612,7 +612,7 @@ export const RELEASES = [
       [
         "chat",
         "Group chat",
-        "A new Chat tab for questions and comments with the whole group. A number shows when there's something new."
+        "Tap the chat bubble at the top for questions and comments with the whole group. A number shows when there's something new."
       ],
       [
         "target",
@@ -701,7 +701,7 @@ export const GUIDE = [
   [
     "me",
     "Something not working?",
-    "Ask in the <b>Chat</b> tab or message a youth leader. Closing and reopening the app fixes most things."
+    "Ask in the group chat (the bubble at the top) or message a youth leader. Closing and reopening the app fixes most things."
   ]
 ];
 
