@@ -68,8 +68,12 @@ export async function setPinned(id, pinned) {
   }
 }
 
-// Only leaders can read reports, so each device remembers what it reported.
-export const reportedByMe = () => lsGet("nt70.reported") || [];
+// Per-account keys, so two people sharing a phone don't share chat state.
+const key = name => `nt70.${name}.${getState().uid || "local"}`;
+
+// Only leaders can read reports, so each device remembers what this account reported.
+export const reportedByMe = () => lsGet(key("reported")) || [];
+export const chatSeenStored = () => lsGet(key("chatSeen")) || "";
 
 export async function reportMessage(id) {
   const s = getState();
@@ -77,7 +81,7 @@ export async function reportMessage(id) {
     await s.db
       .doc(`reports/${id}_${s.uid}`)
       .set({ msg: id, uid: s.uid, at: new Date().toISOString() });
-    lsSet("nt70.reported", [...reportedByMe(), id].slice(-200));
+    lsSet(key("reported"), [...reportedByMe(), id].slice(-200));
     setState({ chatSeen: getState().chatSeen }); // redraw so the button shows "Reported"
     toast("Reported. A leader will take a look.");
   } catch (e) {
@@ -101,9 +105,9 @@ export async function dismissReports(msgId) {
 // Unread badge: messages from others newer than the last time this device had the chat open.
 export function markChatSeen() {
   const last = getState().messages.reduce((m, x) => (x.at > m ? x.at : m), "");
-  const seen = getState().chatSeen || lsGet("nt70.chatSeen") || "";
+  const seen = getState().chatSeen || chatSeenStored();
   if (last && last > seen) {
-    lsSet("nt70.chatSeen", last);
+    lsSet(key("chatSeen"), last);
     setState({ chatSeen: last });
   }
 }

@@ -10,7 +10,7 @@ import { savePending } from "./saving.js";
 import { ensureTeam, checkTransfer } from "./tribes.jsx";
 import { setAuth } from "./auth.js";
 import { client } from "./firebaseClient.js";
-import { markChatSeen } from "./chat.js";
+import { markChatSeen, chatSeenStored } from "./chat.js";
 
 export async function startFirebase(cfg) {
   client.ns = (await import("firebase/compat/app")).default;
@@ -101,10 +101,10 @@ export function startShared(db, uid, perms) {
     canLead: perms.canLead,
     isOwner: perms.isOwner,
     readOnly: perms.readOnly,
-    chatSeen: lsGet("nt70.chatSeen") || "",
     phase: "loading",
     ...(tab ? { tab } : {})
   });
+  setState({ chatSeen: chatSeenStored() }); // read after uid is set: it's stored per account
 
   db.collection("cheers").onSnapshot(
     snap => {
