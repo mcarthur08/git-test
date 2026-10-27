@@ -391,6 +391,7 @@ export const TABS = [
   ["journey", "Journey", "Journey"],
   ["plan", "Plan", "Plan"],
   ["group", "Group", "Group"],
+  ["chat", "Chat", "Chat"],
   ["victories", "Victories", "Victories"],
   ["me", "Me", "Me"],
   ["leader", "Leader", "Leader"],
@@ -399,8 +400,9 @@ export const TABS = [
   ["help", "How it works", "Help"]
 ];
 
-// The tab bar shows five; the Plan opens from Today and Leader tools from Me.
-export const NAV_TABS = ["today", "journey", "group", "victories", "me"];
+// The tab bar shows six; the Plan opens from Today and Leader tools from Me.
+export const NAV_TABS = ["today", "journey", "group", "chat", "victories", "me"];
+export const CHAT_MAX = 500; // characters per chat message
 
 export const CHEER_KINDS = { pray: "🙏", fire: "🔥" };
 export const RD_SIZES = [0.95, 1.05, 1.15, 1.28, 1.42, 1.6];
@@ -603,6 +605,29 @@ export const STOPS = [
 // (local time), then shows once per device to anyone who hasn't seen that version.
 export const RELEASES = [
   {
+    v: "1.3",
+    from: "2026-10-28T06:00",
+    title: "Talk it over",
+    items: [
+      [
+        "chat",
+        "Group chat",
+        "A new Chat tab for questions and comments with the whole group. A number shows when there's something new."
+      ],
+      [
+        "target",
+        "Ask a question",
+        "Tick This is a question and a leader can find it, answer it and mark it answered."
+      ],
+      ["pin", "Pinned notes", "Leaders can pin important messages to the top of the chat."],
+      [
+        "flag",
+        "Keep it kind",
+        "See something that isn't right? Tap Report and a leader will take a look."
+      ]
+    ]
+  },
+  {
     v: "1.2",
     from: "2026-10-24T06:00",
     title: "Easier every day",
@@ -676,7 +701,7 @@ export const GUIDE = [
   [
     "me",
     "Something not working?",
-    "Message a youth leader in the group chat. Closing and reopening the app fixes most things."
+    "Ask in the <b>Chat</b> tab or message a youth leader. Closing and reopening the app fixes most things."
   ]
 ];
 

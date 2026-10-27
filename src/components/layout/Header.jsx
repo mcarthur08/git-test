@@ -41,14 +41,26 @@ function SaveStatus({ status }) {
   );
 }
 
+// New chat messages from other people since this device last had the chat open.
+function useUnread() {
+  const { messages, chatSeen, uid } = useStore();
+  return messages.filter(m => m.uid !== uid && m.at > (chatSeen || "")).length;
+}
+
 function TabBar({ tab }) {
   const tabs = TABS.filter(([k]) => NAV_TABS.includes(k));
+  const unread = useUnread();
   return (
     <nav className="tabs wrap" aria-label="Sections">
       {tabs.map(([k, , label]) => (
         <button key={k} onClick={() => setTab(k)} aria-current={tab === k ? "page" : undefined}>
           <Icon k={k} />
           <span>{label}</span>
+          {k === "chat" && unread && tab !== "chat" ? (
+            <i className="tab-badge" aria-label={`${unread} new`}>
+              {unread > 9 ? "9+" : unread}
+            </i>
+          ) : null}
         </button>
       ))}
     </nav>

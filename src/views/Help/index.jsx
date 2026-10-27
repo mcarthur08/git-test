@@ -37,6 +37,13 @@ export default function Help() {
               adds a point for your tribe.
             </p>
           </Tip>
+          <Tip ic="chat" title="Group chat">
+            <p className="muted">
+              Ask questions and share thoughts in the <b>Chat</b> tab. Tick{" "}
+              <b>This is a question</b> so a leader can find and answer it. See something that isn't
+              right? Tap <b>Report</b> and a leader will take a look.
+            </p>
+          </Tip>
           <Tip ic="lock" title="Forgot your password?">
             <p className="muted">
               Make a new username, then ask a leader to tap <b>Recover</b> on your old character.

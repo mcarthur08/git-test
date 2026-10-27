@@ -20,6 +20,10 @@ let state = {
   writeError: null,
   cheers: [],
   replies: [],
+  messages: [],
+  reports: [],
+  chatFilter: "all", // all | open (unanswered questions)
+  chatSeen: "",
   openDisc: {},
   kjv: {},
   tab: "today",

@@ -10,6 +10,7 @@ import { savePending } from "./saving.js";
 import { ensureTeam, checkTransfer } from "./tribes.jsx";
 import { setAuth } from "./auth.js";
 import { client } from "./firebaseClient.js";
+import { markChatSeen } from "./chat.js";
 
 export async function startFirebase(cfg) {
   client.ns = (await import("firebase/compat/app")).default;
@@ -100,6 +101,7 @@ export function startShared(db, uid, perms) {
     canLead: perms.canLead,
     isOwner: perms.isOwner,
     readOnly: perms.readOnly,
+    chatSeen: lsGet("nt70.chatSeen") || "",
     phase: "loading",
     ...(tab ? { tab } : {})
   });
@@ -133,6 +135,35 @@ export function startShared(db, uid, perms) {
     },
     () => {}
   );
+  db.collection("messages").onSnapshot(
+    snap => {
+      const messages = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(
+          m =>
+            m && typeof m.text === "string" && typeof m.uid === "string" && typeof m.at === "string"
+        )
+        .sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0));
+      setState({ messages });
+      if (getState().tab === "chat" && !document.hidden) {
+        markChatSeen();
+      }
+    },
+    () => {}
+  );
+  // Only leaders can read reports.
+  if (perms.canLead) {
+    db.collection("reports").onSnapshot(
+      snap => {
+        setState({
+          reports: snap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(r => r && typeof r.msg === "string")
+        });
+      },
+      () => {}
+    );
+  }
   db.doc("config/plan").onSnapshot(
     snap => {
       setState({ config: normConfig(snap.exists ? snap.data() : DEFAULT_CONFIG) });

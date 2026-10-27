@@ -19,6 +19,7 @@ import Leader from "@/views/Leader/index.jsx";
 import Reader from "@/views/Reader/index.jsx";
 import Quiz from "@/views/Quiz/index.jsx";
 import Help from "@/views/Help/index.jsx";
+import Chat from "@/views/Chat/index.jsx";
 
 // Which screen is showing: the sign-in / join flow first, then one view per tab.
 function View() {
@@ -66,6 +67,8 @@ function View() {
       return <Quiz />;
     case "help":
       return <Help />;
+    case "chat":
+      return <Chat />;
     default:
       return <Today />;
   }

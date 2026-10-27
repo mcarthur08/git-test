@@ -12,6 +12,16 @@ export { setSave, saveMe, flush, savePending, retrySave } from "./saving.js";
 export { loadBooks } from "./books.js";
 export { startQuiz, prepareQuiz, quizPick, quizNext } from "./quiz.jsx";
 export { toggleCheer, postReply, deleteReply } from "./social.js";
+export {
+  postMessage,
+  deleteMessage,
+  setAnswered,
+  setPinned,
+  reportMessage,
+  reportedByMe,
+  dismissReports,
+  markChatSeen
+} from "./chat.js";
 export { toggleDay, markThrough, applyDone } from "./progress.jsx";
 export {
   pickTeam,

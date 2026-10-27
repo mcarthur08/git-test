@@ -59,6 +59,31 @@ service cloud.firestore {
       allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isLeader());
     }
 
+    // Group chat: anyone signed in posts (500 characters). Leaders pin and mark questions answered;
+    // the person who asked can mark their own question answered. Authors and leaders delete.
+    match /messages/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'text', 'q', 'at'])
+        && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 500
+        && request.resource.data.q is bool && request.resource.data.at is string;
+      allow update: if signedIn() && (
+        (isLeader() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answered', 'pinned']))
+        || (resource.data.uid == request.auth.uid && resource.data.q == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answered'])))
+        && (!('answered' in request.resource.data) || request.resource.data.answered is bool)
+        && (!('pinned' in request.resource.data) || request.resource.data.pinned is bool);
+      allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isLeader());
+    }
+
+    // Chat reports: one per person per message (id "<message>_<reporter>"); only leaders read them.
+    match /reports/{id} {
+      allow read, delete: if isLeader();
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid
+        && id == request.resource.data.msg + '_' + request.auth.uid
+        && request.resource.data.keys().hasOnly(['msg', 'uid', 'at']);
+    }
+
     // Account recovery: a leader points an old character at a new username; that username claims it.
     match /transfers/{u} {
       allow read: if isLeader() || isUser(u);
