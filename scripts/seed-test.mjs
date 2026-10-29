@@ -115,6 +115,9 @@ const LOOKS = {
 };
 
 /* ---------- write ---------- */
+// Every document this script writes has an id starting "sample-", so a reset removes only those
+// and leaves testers' own characters, chat, cheers and reports alone.
+const sample = id => id.startsWith("sample-");
 async function clear(collection, only) {
   const snap = await db.collection(collection).get();
   const docs = only ? snap.docs.filter(d => only(d.id)) : snap.docs;
@@ -125,12 +128,12 @@ async function clear(collection, only) {
 async function main() {
   if (reset) {
     const n =
-      (await clear("players", id => id.startsWith("sample-"))) +
-      (await clear("messages")) +
-      (await clear("replies")) +
-      (await clear("cheers")) +
-      (await clear("reports"));
-    console.log(`Reset: removed ${n} test documents (real test accounts' characters were kept).`);
+      (await clear("players", sample)) +
+      (await clear("messages", sample)) +
+      (await clear("replies", sample)) +
+      (await clear("cheers", sample)) +
+      (await clear("reports", sample));
+    console.log(`Reset: removed ${n} test documents (testers' own records were kept).`);
   }
 
   await db.doc("config/plan").set({
@@ -208,9 +211,19 @@ async function main() {
     ["cheer", "sample-11", "Day " + planDay + " done! Who's reading tonight?", false, 0, {}]
   ];
   msgs.forEach(([id, uid, text, q, ago, extra], i) => {
-    batch.set(db.doc("messages/" + id), { uid, text, q, at: at(daysAgo(ago), 10 + i), ...extra });
+    batch.set(db.doc("messages/sample-" + id), {
+      uid,
+      text,
+      q,
+      at: at(daysAgo(ago), 10 + i),
+      ...extra
+    });
   });
-  batch.set(db.doc("reports/fav_sample-06"), { msg: "fav", uid: "sample-06", at: at(today, 11) });
+  batch.set(db.doc("reports/sample-fav_sample-06"), {
+    msg: "sample-fav",
+    uid: "sample-06",
+    at: at(today, 11)
+  });
 
   // Victory Moment discussion (week 1)
   batch.set(db.doc("replies/sample-r1"), {
