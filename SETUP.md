@@ -153,6 +153,20 @@ Username accounts have no real email, so a forgotten password can't be reset. Mo
 
 This needs the latest `firestore.rules` published (step 5).
 
+## Reading bookmark
+
+In the in-app reader, each person's place is saved as they scroll. It only ever moves forward, and tapping a verse bookmarks it on purpose. **Continue reading** on Today opens the reader at that verse. The bookmark is stored in `bookmarks/<account>`, so it follows the account to other devices once the latest `firestore.rules` are published (step 5). Until then it is kept on each device.
+
+## Group chat (leaders)
+
+The group chat (the chat bubble at the top, next to the **?**) is one conversation for the whole group. It needs the latest `firestore.rules` published (step 5).
+
+- **Questions:** people tick **This is a question**. The **Open questions** filter lists the unanswered ones. Leaders, or the person who asked, tap **Mark answered**.
+- **Pin:** leaders can pin a message, for example an announcement, to the top of the chat.
+- **Remove:** authors can delete their own messages, and leaders can remove anyone's.
+- **Reports:** anyone can tap **Report** on a message. Reported messages appear at the top of **Leader** tools, where you can **Remove message** or **Keep it**.
+- A number on the chat bubble shows new messages since that device last opened the chat. There are no push notifications.
+
 ## Announcing updates ("What's new")
 
 Each series of updates gets a version number and a "What's new" popup. Everyone sees it once, the first time they open the app after it goes live. Anyone who skipped a release sees every version they missed in one popup, newest first. They can see it again any time from **Me › What's new**, where the current version is shown.

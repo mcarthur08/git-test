@@ -1,5 +1,6 @@
 import { useStore } from "@/store.js";
 import { Icon } from "@/components/ui/Icon.jsx";
+import { fmtQuiz } from "@/lib/player.js";
 import { startQuiz, openReader, setTab } from "@/actions";
 
 export default function QuizResult({ q, p }) {
@@ -10,7 +11,7 @@ export default function QuizResult({ q, p }) {
   const msg =
     score === total
       ? "Perfect! You earned a quiz point for your tribe."
-      : score >= 3
+      : score >= Math.ceil(total * 0.6)
       ? "Nicely done. You were paying attention!"
       : "Good effort. A quick reread will lock it in.";
   return (
@@ -24,7 +25,9 @@ export default function QuizResult({ q, p }) {
       </div>
       <h2>{score === total ? "Perfect score" : "Quiz complete"}</h2>
       <p className="muted">{msg}</p>
-      {best !== undefined ? <p className="small muted">Best for this day: {best}/5</p> : null}
+      {best !== undefined ? (
+        <p className="small muted">Best for this day: {fmtQuiz(best)}</p>
+      ) : null}
       <div className="row" style={{ justifyContent: "center" }}>
         <button className="btn" onClick={() => startQuiz(q.day)}>
           Try new questions

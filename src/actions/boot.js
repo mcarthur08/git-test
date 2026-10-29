@@ -10,6 +10,8 @@ import { savePending } from "./saving.js";
 import { ensureTeam, checkTransfer } from "./tribes.jsx";
 import { setAuth } from "./auth.js";
 import { client } from "./firebaseClient.js";
+import { markChatSeen, chatSeenStored } from "./chat.js";
+import { loadMark, takeRemoteMark } from "./bookmark.js";
 
 export async function startFirebase(cfg) {
   client.ns = (await import("firebase/compat/app")).default;
@@ -86,6 +88,7 @@ export function startLocal() {
     ...(me ? {} : { draft: newDraft() }),
     ...(tab ? { tab } : {})
   });
+  loadMark();
   if (me) {
     ensureTeam();
   }
@@ -103,6 +106,17 @@ export function startShared(db, uid, perms) {
     phase: "loading",
     ...(tab ? { tab } : {})
   });
+  setState({ chatSeen: chatSeenStored() }); // read after uid is set: it's stored per account
+  loadMark();
+  // The reading bookmark follows the account across devices.
+  db.doc("bookmarks/" + uid).onSnapshot(
+    snap => {
+      if (snap.exists) {
+        takeRemoteMark(snap.data());
+      }
+    },
+    () => {}
+  );
 
   db.collection("cheers").onSnapshot(
     snap => {
@@ -133,6 +147,35 @@ export function startShared(db, uid, perms) {
     },
     () => {}
   );
+  db.collection("messages").onSnapshot(
+    snap => {
+      const messages = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(
+          m =>
+            m && typeof m.text === "string" && typeof m.uid === "string" && typeof m.at === "string"
+        )
+        .sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0));
+      setState({ messages });
+      if (getState().tab === "chat" && !document.hidden) {
+        markChatSeen();
+      }
+    },
+    () => {}
+  );
+  // Only leaders can read reports.
+  if (perms.canLead) {
+    db.collection("reports").onSnapshot(
+      snap => {
+        setState({
+          reports: snap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(r => r && typeof r.msg === "string")
+        });
+      },
+      () => {}
+    );
+  }
   db.doc("config/plan").onSnapshot(
     snap => {
       setState({ config: normConfig(snap.exists ? snap.data() : DEFAULT_CONFIG) });

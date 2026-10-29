@@ -8,7 +8,7 @@ import { loadBooks, prepareQuiz } from "@/actions";
 import QuizQuestion from "./QuizQuestion.jsx";
 import QuizResult from "./QuizResult.jsx";
 
-// The daily quiz: load the day's text, build five questions, ask them, show the score.
+// The daily quiz: load the day's text, build seven questions, ask them, show the score.
 export default function Quiz() {
   const { quiz: q, kjv } = useStore();
   const p = PLAN[(q ? q.day : 1) - 1];

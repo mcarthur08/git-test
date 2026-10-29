@@ -3122,3 +3122,235 @@ input[type="time"] {
   display: block;
   font-family: var(--font-display);
 }
+
+/* ---------- 1.3 group chat ---------- */
+.chatbtn {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.chatbtn svg {
+  width: 22px;
+  height: 22px;
+}
+.chatbtn.on {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.chatbtn + .helpbtn {
+  margin-left: 0;
+}
+.tab-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--rose, #e0566b);
+  color: #fff;
+  font: 800 0.72rem/20px var(--font-body);
+  font-style: normal;
+  text-align: center;
+  letter-spacing: 0;
+  box-shadow: 0 0 0 2px #120e0b;
+}
+.chat-head .seg button {
+  white-space: nowrap;
+}
+.msgs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.msg {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--line);
+}
+.reports .msg {
+  grid-template-columns: minmax(0, 1fr);
+}
+.msg.mine {
+  background: rgba(217, 174, 85, 0.07);
+  border-color: rgba(217, 174, 85, 0.3);
+}
+.msg.question {
+  border-left: 3px solid var(--gold);
+}
+.msg.question.answered {
+  border-left-color: var(--teal);
+}
+.msg .bubble {
+  width: 40px;
+  height: 40px;
+}
+.msg-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.msg-head b {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.msg-text {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.msg-acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 16px;
+}
+.msg-acts .btn {
+  margin-top: 8px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 1px solid var(--line);
+}
+.tag svg {
+  width: 13px;
+  height: 13px;
+}
+.tag.q {
+  color: var(--gold-hi);
+  border-color: rgba(217, 174, 85, 0.5);
+  background: rgba(217, 174, 85, 0.1);
+}
+.tag.ok {
+  color: var(--teal);
+  border-color: currentColor;
+}
+.tag.pin {
+  color: var(--gold);
+}
+.pinned {
+  border-color: rgba(217, 174, 85, 0.5);
+  background: linear-gradient(rgba(217, 174, 85, 0.08), rgba(217, 174, 85, 0.02));
+  display: grid;
+  gap: 10px;
+}
+.pinned .eyebrow svg {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+}
+.compose {
+  display: grid;
+  gap: 10px;
+  position: sticky;
+  bottom: 8px;
+  z-index: 3;
+  box-shadow: 0 -8px 30px -10px #000;
+}
+.compose textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--ink);
+  background: #0f0c0a;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+  resize: vertical;
+  min-height: 72px;
+}
+.qtoggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.qtoggle input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--gold);
+}
+.reports h3 svg {
+  width: 18px;
+  height: 18px;
+  vertical-align: -3px;
+  color: var(--rose, #e0566b);
+}
+@media (max-width: 640px) {
+  .compose {
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  }
+}
+/* Phones: room for the chat bubble, ? and avatar beside the title */
+@media (max-width: 480px) {
+  .bar {
+    gap: 8px;
+  }
+  .brand h1 {
+    font-size: 1.05rem;
+    letter-spacing: 0.03em;
+  }
+  .brand .brand-mark {
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+  }
+  .helpbtn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Reading bookmark */
+.rd-tip {
+  text-align: center;
+  margin: -4px 0 10px;
+}
+.vs {
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.6s;
+}
+.vs-flash {
+  background-color: rgba(217, 174, 85, 0.32);
+}
+.continue {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-color: rgba(217, 174, 85, 0.45);
+}
+.continue > .stack {
+  flex: 1;
+}
+.continue b {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+}
+
+/* Quiz answers that are whole verses or longer phrases: one per row, left-aligned, easier to read */
+.qz-opts:has(.long) {
+  grid-template-columns: 1fr;
+}
+.qz-opt.long {
+  text-align: left;
+  font-weight: 500;
+  line-height: 1.45;
+}

@@ -24,7 +24,7 @@ export default function ChapterText({ chs, kjv, failed, ready, label }) {
         <h3>{c.one ? c.b : `${c.b} ${c.c}`}</h3>
         <p>
           {verses.map((t, v) => (
-            <span key={v}>
+            <span key={v} className="vs" data-ci={i} data-v={v + 1}>
               {v ? " " : ""}
               <sup>{v + 1}</sup>
               {t}

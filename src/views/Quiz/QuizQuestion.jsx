@@ -22,13 +22,16 @@ export default function QuizQuestion({ q }) {
         </span>
       </div>
       <h3>{cur.prompt}</h3>
-      <blockquote className="qz-verse" dangerouslySetInnerHTML={{ __html: cur.body }} />
+      {cur.body ? (
+        <blockquote className="qz-verse" dangerouslySetInnerHTML={{ __html: cur.body }} />
+      ) : null}
       <div className="qz-opts">
         {cur.options.map(o => (
           <button
             key={o}
             className={
               "qz-opt" +
+              (o.length > 40 ? " long" : "") +
               (answered ? (o === cur.answer ? " right" : o === picked ? " wrong" : " dim") : "")
             }
             disabled={answered}

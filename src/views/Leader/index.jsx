@@ -1,5 +1,6 @@
 import { useStore } from "@/store.js";
 import SettingsForm from "./SettingsForm.jsx";
+import Reports from "./Reports.jsx";
 
 const InviteSteps = ({ children }) => (
   <section className="card stack">
@@ -18,6 +19,7 @@ export default function Leader() {
   const { mode, backend } = useStore();
   return (
     <>
+      {mode === "shared" ? <Reports /> : null}
       <SettingsForm />
       {backend === "firebase" ? (
         <InviteSteps>
