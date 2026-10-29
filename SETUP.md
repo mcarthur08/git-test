@@ -157,6 +157,42 @@ This needs the latest `firestore.rules` published (step 5).
 
 In the in-app reader, each person's place is saved as they scroll. It only ever moves forward, and tapping a verse bookmarks it on purpose. **Continue reading** on Today opens the reader at that verse. The bookmark is stored in `bookmarks/<account>`, so it follows the account to other devices once the latest `firestore.rules` are published (step 5). Until then it is kept on each device.
 
+## Test environment (nt-quest)
+
+A second Firebase project, `nt-quest` (display name "nt70-quest-test"), is a full copy of the app with its **own sign-ins and its own database**. Testing there never touches the real group. Test builds show a red **Test environment · not the real group** bar.
+
+| What | Where it goes |
+|---|---|
+| Pull request previews | A temporary `nt-quest--pr…web.app` link posted on each PR |
+| Stable test site | https://nt-quest.web.app, from the `staging` branch (or **Actions › Deploy test site › Run workflow** to publish `master`) |
+| Database rules | Published to the test project automatically whenever `firestore.rules` changes (**Test database rules** workflow). Live rules stay manual (step 5). |
+| Sample data | **Actions › Seed test data › Run workflow**: 12 sample readers across the tribes, chat (pinned note, answered and open questions, a report), cheers and replies |
+| Local development | `npm run dev` uses the test project |
+
+Only `npm run build` (the live deploy and GitHub Pages) uses the real project. `npm run build:staging` and `npm run dev` use the test one.
+
+### One-time setup
+
+1. **The project.** The test project already exists: project ID `nt-quest` (its display name in the console may read "nt70-quest-test"). Ask an owner to add you under **Project settings › Users and permissions** if you can't open it.
+2. **Web app settings.** These are already in `TEST_CONFIG` in `src/firebase-config.js` (web app `nt70-quest` in that project).
+3. **Sign-in.** Go to **Authentication › Get started › Sign-in method** and turn on:
+   - **Google**
+   - **Email/Password**, with **both** switches on: passwords for username sign-in, and **Email link**
+4. **Database.** Go to **Firestore Database › Create database**, choose `nam5`, and pick **production mode**. The rules are published for you in step 7.
+5. **Hosting.** Go to **Hosting › Get started** and click **Next** through to the end. This creates `nt-quest.web.app`.
+6. **Deploy key.** Open <https://console.cloud.google.com/iam-admin/serviceaccounts?project=nt-quest> and click **Create service account** (`github-deploy`).
+   - Give it the roles **Firebase Admin**, **API Keys Viewer** and **Service Usage Consumer**.
+   - Click it, then **Keys › Add key › JSON**.
+   - On GitHub, go to **Settings › Secrets and variables › Actions › New repository secret**. Name it `FIREBASE_SERVICE_ACCOUNT_NT_QUEST` and paste the whole file. Then delete the file.
+7. **First run.** Under **Actions**, run **Test database rules**, then **Deploy test site**.
+8. **Google sign-in on the test site.** Open <https://console.cloud.google.com/apis/credentials?project=nt-quest> and click **Web client (auto created by Google Service)**.
+   - Under **Authorized JavaScript origins**, add `https://nt-quest.web.app`.
+   - Under **Authorized redirect URIs**, add `https://nt-quest.web.app/__/auth/handler`.
+   - Save.
+9. **Make yourself a test leader.** Sign in on the test site and create a character. Copy your **Account ID** from **Me**. Then run **Actions › Seed test data** with that ID in **leader_uid**. This also fills in the sample group.
+
+PR preview addresses change with each PR. Username sign-in always works there. Google and email-link sign-in need the preview address added under **Authentication › Settings › Authorized domains** in the test project.
+
 ## Group chat (leaders)
 
 The group chat (the chat bubble at the top, next to the **?**) is one conversation for the whole group. It needs the latest `firestore.rules` published (step 5).
@@ -201,8 +237,9 @@ To announce a new release, add an entry at the **top** of `RELEASES` in `src/lib
 | `firestore.rules` | Database security rules (step 5) |
 | `firebase.json`, `.firebaserc`, `.github/workflows/firebase-hosting.yml` | Firebase Hosting setup and automatic deploys (step 9) |
 | `public/` | Manifest, icons, service worker (`sw.js`), offline page, and the KJV text in `public/kjv/` |
+| `firebase.staging.json`, `.github/workflows/firebase-preview.yml`, `firebase-staging.yml`, `test-rules.yml`, `seed-test.yml`, `scripts/seed-test.mjs` | The test environment (see "Test environment") |
 
-To work on it locally: `npm install`, then `npm run dev`.
+To work on it locally: `npm install`, then `npm run dev`. It connects to the test project.
 
 ## Installing and offline use (PWA)
 

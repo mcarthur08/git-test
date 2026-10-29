@@ -1,0 +1,40 @@
+# Fills the TEST project with a sample youth group (readers, chat, cheers, replies, a report).
+# Run it from the Actions tab. The script refuses to touch the real project.
+name: Seed test data
+on:
+  workflow_dispatch:
+    inputs:
+      reset:
+        description: Remove previous sample data first
+        type: boolean
+        default: true
+      leader_uid:
+        description: Account ID to make a leader in the test project (optional, from Me › Account on the test site)
+        required: false
+        default: ""
+concurrency:
+  group: test-seed
+permissions:
+  contents: read
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Seed nt-quest
+        env:
+          KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT_QUEST }}
+          RESET: ${{ inputs.reset }}
+          LEADER: ${{ inputs.leader_uid }}
+        run: |
+          printf '%s' "$KEY" > "$RUNNER_TEMP/key.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/key.json"
+          set --
+          [ "$RESET" = "true" ] && set -- "$@" --reset
+          [ -n "$LEADER" ] && set -- "$@" --leader "$LEADER"
+          node scripts/seed-test.mjs "$@"

@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:staging": "vite build --mode staging",
+    "seed:test": "node scripts/seed-test.mjs",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\" vite.config.js index.html",
     "lint": "eslint --ext .js,.jsx src vite.config.js"
@@ -18,6 +20,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
     "eslint": "^8.57.0",
+    "firebase-admin": "^12.7.0",
     "prettier": "^2.8.8",
     "vite": "^4.5.3"
   }

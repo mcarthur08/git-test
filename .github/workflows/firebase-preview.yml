@@ -1,6 +1,6 @@
-# Publishes a temporary preview of every pull request to a Firebase Hosting preview channel and
-# comments the URL on the PR. Previews expire after 7 days. They use the live Firebase project,
-# so sign-ins and Firestore data are the real ones. Needs the same secret as the live deploy.
+# Publishes a temporary preview of every pull request to the TEST Firebase project
+# (nt-quest) and comments the URL on the PR. Previews expire after 7 days and use test
+# sign-ins and test data, never the real group. Skips quietly until the test key is added.
 name: Firebase preview
 on:
   pull_request:
@@ -9,6 +9,9 @@ on:
       channel:
         description: Preview channel name
         default: test
+concurrency:
+  group: preview-${{ github.event.pull_request.number || inputs.channel }}
+  cancel-in-progress: true
 jobs:
   preview:
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
@@ -17,18 +20,27 @@ jobs:
       contents: read
       checks: write
       pull-requests: write
+    env:
+      HAS_TEST_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT_QUEST != '' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - if: env.HAS_TEST_KEY != 'true'
+        run: echo "::notice::No FIREBASE_SERVICE_ACCOUNT_NT_QUEST secret yet, so no preview. See SETUP.md, Test environment."
+      - if: env.HAS_TEST_KEY == 'true'
+        uses: actions/checkout@v4
+      - if: env.HAS_TEST_KEY == 'true'
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
-      - run: npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - if: env.HAS_TEST_KEY == 'true'
+        run: npm ci
+      - if: env.HAS_TEST_KEY == 'true'
+        run: npm run build:staging
+      - if: env.HAS_TEST_KEY == 'true'
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT70_QUEST }}
-          projectId: nt70-quest
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT_QUEST }}
+          projectId: nt-quest
           channelId: ${{ github.event_name == 'workflow_dispatch' && inputs.channel || '' }}
           expires: 7d
