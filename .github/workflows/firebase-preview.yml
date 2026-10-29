@@ -1,5 +1,5 @@
 # Publishes a temporary preview of every pull request to the TEST Firebase project
-# (nt70-quest-test) and comments the URL on the PR. Previews expire after 7 days and use test
+# (nt-quest) and comments the URL on the PR. Previews expire after 7 days and use test
 # sign-ins and test data, never the real group. Skips quietly until the test key is added.
 name: Firebase preview
 on:
@@ -21,10 +21,10 @@ jobs:
       checks: write
       pull-requests: write
     env:
-      HAS_TEST_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT70_QUEST_TEST != '' }}
+      HAS_TEST_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT_QUEST != '' }}
     steps:
       - if: env.HAS_TEST_KEY != 'true'
-        run: echo "::notice::No FIREBASE_SERVICE_ACCOUNT_NT70_QUEST_TEST secret yet, so no preview. See SETUP.md, Test environment."
+        run: echo "::notice::No FIREBASE_SERVICE_ACCOUNT_NT_QUEST secret yet, so no preview. See SETUP.md, Test environment."
       - if: env.HAS_TEST_KEY == 'true'
         uses: actions/checkout@v4
       - if: env.HAS_TEST_KEY == 'true'
@@ -35,12 +35,12 @@ jobs:
       - if: env.HAS_TEST_KEY == 'true'
         run: npm ci
       - if: env.HAS_TEST_KEY == 'true'
-        run: npm run build:test
+        run: npm run build:staging
       - if: env.HAS_TEST_KEY == 'true'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT70_QUEST_TEST }}
-          projectId: nt70-quest-test
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT_QUEST }}
+          projectId: nt-quest
           channelId: ${{ github.event_name == 'workflow_dispatch' && inputs.channel || '' }}
           expires: 7d

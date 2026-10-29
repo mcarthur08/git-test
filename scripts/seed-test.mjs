@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
-const TEST_PROJECT = "nt70-quest-test";
+const TEST_PROJECT = "nt-quest";
 const LIVE_PROJECT = "nt70-quest";
 
 const args = process.argv.slice(2);

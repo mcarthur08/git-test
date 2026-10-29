@@ -1,4 +1,4 @@
-# Publishes the stable test site, https://nt70-quest-test.web.app, from the `staging` branch.
+# Publishes the stable test site, https://nt-quest.web.app, from the `staging` branch.
 # It uses the TEST Firebase project. To put work there: git push origin <branch>:staging
 name: Deploy test site
 on:
@@ -20,9 +20,9 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run build:test
+      - run: npm run build:staging
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT70_QUEST_TEST }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT_QUEST }}
           channelId: live
-          projectId: nt70-quest-test
+          projectId: nt-quest

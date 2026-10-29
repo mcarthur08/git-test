@@ -26,9 +26,9 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Seed nt70-quest-test
+      - name: Seed nt-quest
         env:
-          KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT70_QUEST_TEST }}
+          KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT_QUEST }}
           RESET: ${{ inputs.reset }}
           LEADER: ${{ inputs.leader_uid }}
         run: |

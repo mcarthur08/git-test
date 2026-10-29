@@ -4,7 +4,7 @@
 name: Test database rules
 on:
   push:
-    paths: [firestore.rules, firebase.test.json, .github/workflows/test-rules.yml]
+    paths: [firestore.rules, firebase.staging.json, .github/workflows/test-rules.yml]
   workflow_dispatch:
 concurrency:
   group: test-rules
@@ -14,15 +14,15 @@ jobs:
   rules:
     runs-on: ubuntu-latest
     env:
-      KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT70_QUEST_TEST }}
+      KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NT_QUEST }}
     steps:
       - if: env.KEY == ''
-        run: echo "::notice::No FIREBASE_SERVICE_ACCOUNT_NT70_QUEST_TEST secret yet. See SETUP.md, Test environment."
+        run: echo "::notice::No FIREBASE_SERVICE_ACCOUNT_NT_QUEST secret yet. See SETUP.md, Test environment."
       - if: env.KEY != ''
         uses: actions/checkout@v4
       - if: env.KEY != ''
-        name: Publish rules to nt70-quest-test
+        name: Publish rules to nt-quest
         run: |
           printf '%s' "$KEY" > "$RUNNER_TEMP/key.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/key.json"
-          npx --yes firebase-tools deploy --only firestore:rules --config firebase.test.json --project nt70-quest-test --non-interactive
+          npx --yes firebase-tools deploy --only firestore:rules --config firebase.staging.json --project nt-quest --non-interactive
