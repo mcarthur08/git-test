@@ -2,6 +2,7 @@ import { useStore } from "@/store.js";
 import { DAYS, PLAN } from "@/lib/data.js";
 import { plural } from "@/lib/util.js";
 import { Icon } from "@/components/ui/Icon.jsx";
+import { fmtQuiz } from "@/lib/player.js";
 import { openReader, toggleDay, startQuiz } from "@/actions";
 
 // Under the text: check the day off, or (once read) go to the next day, take the quiz, or undo.
@@ -37,7 +38,7 @@ export default function FinishBlock({ day, p, s }) {
       )}
       <button className="btn" onClick={() => startQuiz(day)}>
         <Icon k="target" />{" "}
-        {score !== undefined ? `Quiz: ${score}/5 · try again` : "Take the 1-minute quiz"}
+        {score !== undefined ? `Quiz: ${fmtQuiz(score)} · try again` : "Take the 2-minute quiz"}
       </button>
       <button className="linkish" onClick={e => toggleDay(day, e.currentTarget)}>
         Mark Day {day} as not read

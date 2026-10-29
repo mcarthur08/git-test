@@ -1,6 +1,6 @@
 // Running the daily quiz: starting, answering and scoring.
 import { getState, setState } from "@/store.js";
-import { stats, BADGES } from "@/lib/player.js";
+import { stats, BADGES, quizScore } from "@/lib/player.js";
 import { makeQuiz } from "@/lib/quiz.js";
 import { MedalIc } from "@/components/ui/Emblems.jsx";
 import { confetti, queueReveal } from "./ui.js";
@@ -42,10 +42,11 @@ export function quizNext() {
   setState({ quiz: { ...q, i } });
   if (i >= q.qs.length && s.me && !s.readOnly) {
     const score = q.picks.filter((x, k) => x === q.qs[k].answer).length;
-    const prev = (s.me.quiz || {})[q.day];
-    if (prev === undefined || score > prev) {
+    // Keep the best result for the day, compared as a share so old 5-question scores still count.
+    const prev = quizScore((s.me.quiz || {})[q.day]);
+    if (!prev || score / q.qs.length > prev.got / prev.of) {
       const before = stats(s.me);
-      const me = { ...s.me, quiz: { ...(s.me.quiz || {}), [q.day]: score } };
+      const me = { ...s.me, quiz: { ...(s.me.quiz || {}), [q.day]: `${score}/${q.qs.length}` } };
       setState({ me });
       const after = stats(me);
       BADGES.filter(b => b.test(after) && !b.test(before)).forEach(b =>

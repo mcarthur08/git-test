@@ -3344,3 +3344,13 @@ input[type="time"] {
   font-family: var(--font-display);
   font-size: var(--step-1);
 }
+
+/* Quiz answers that are whole verses or longer phrases: one per row, left-aligned, easier to read */
+.qz-opts:has(.long) {
+  grid-template-columns: 1fr;
+}
+.qz-opt.long {
+  text-align: left;
+  font-weight: 500;
+  line-height: 1.45;
+}

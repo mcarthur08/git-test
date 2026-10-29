@@ -33,8 +33,9 @@ export default function Help() {
           ))}
           <Tip ic="target" title="Daily quiz">
             <p className="muted">
-              After you check off a day, try 5 quick questions from that reading. A perfect score
-              adds a point for your tribe.
+              After you check off a day, take the 7-question challenge on that reading: who said it,
+              who did it, what happened, and which verses you read. A perfect score adds a point for
+              your tribe.
             </p>
           </Tip>
           <Tip ic="book" title="Your place in the reading">

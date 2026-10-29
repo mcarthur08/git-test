@@ -621,6 +621,11 @@ export const RELEASES = [
       ],
       ["pin", "Pinned notes", "Leaders can pin important messages to the top of the chat."],
       [
+        "target",
+        "A tougher quiz",
+        "7 questions now: who said it, who did it, what happened, and which verses were in your reading."
+      ],
+      [
         "book",
         "Pick up where you left off",
         "The reader saves your place as you go, and you can tap any verse to bookmark it. Continue reading from Today, on any device."

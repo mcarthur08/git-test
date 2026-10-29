@@ -1,4 +1,5 @@
-// Daily quiz: 5 questions built from the day's KJV text.
+// Daily quiz: 7 questions built from the day's KJV text: who said it, who did it, what happened,
+// which verse was in the reading, and finish the verse.
 import { PLAN, CHAPTERS } from "./data.js";
 
 const esc = s =>
@@ -218,10 +219,143 @@ export function blankVerse(v, tok) {
     .join(" ");
 }
 
+/* ---------- Event questions: who said it, who did it, what happened ---------- */
+// Groups who speak and act in the narrative, alongside named people.
+// prettier-ignore
+const GROUPS = [
+  "the disciples", "his disciples", "the apostles", "the Pharisees", "the Sadducees", "the scribes",
+  "the chief priests", "the elders", "the high priest", "the Jews", "the multitude", "the people",
+  "the soldiers", "the centurion", "the angel", "the devil", "the woman", "the servants",
+  "the officers", "the governor", "the young man", "the damsel", "the ruler", "the lawyer",
+  "the leper", "the jailor", "the chief captain", "the king", "the steward", "the thief"
+];
+// Named words that are places or nations, never the person who spoke or acted.
+// prettier-ignore
+const NOT_PEOPLE = new Set([
+  "Israel", "Jerusalem", "Egypt", "Galilee", "Judaea", "Asia", "Macedonia", "Achaia", "Rome",
+  "Babylon", "Sodom", "Capernaum", "Bethlehem", "Nazareth", "Samaria", "Syria", "Jordan",
+  "Jews", "Gentiles", "Greeks", "Christ", "Lord", "God", "Gentile", "Antioch", "Ephesus", "Corinth"
+]);
+// Well-known people, used when a day's reading has too few speakers to choose from.
+// prettier-ignore
+export const QUIZ_PEOPLE = [
+  "Jesus", "Peter", "John", "Paul", "Pilate", "Herod", "Judas", "Thomas", "Philip", "Andrew",
+  "Martha", "Mary", "Nicodemus", "Barnabas", "Stephen", "The disciples", "The Pharisees",
+  "The chief priests", "The multitude"
+];
+// "the disciples" or "The disciples"; names must start with a capital letter.
+const GROUP_RE = GROUPS.map(g => `[${g[0].toUpperCase()}${g[0]}]${g.slice(1)}`).join("|");
+const WHO = `(Simon Peter|John the Baptist|Mary Magdalene|Judas Iscariot|${GROUP_RE}|[A-Z][a-z]+)`;
+const LEAD = "(?:^|[;:.?!] |, and |, then |, but )(?:And |Then |But |Now |So |and |then |but )?";
+const SPEECH = new RegExp(
+  `${LEAD}${WHO} (?:answered and said|answering said|said|saith|cried|spake|answered|asked)` +
+    `(?: unto [^,:;]+| to [^,:;]+| among themselves)?[,:] (.+)$`
+);
+const SPEECH_AFTER = new RegExp(
+  `^(?:And |Then |But )?(?:said|saith|answered) ${WHO}(?: unto [^,:;]+)?[,:] (.+)$`
+);
+const NOT_DEED =
+  /^(said|saith|answered|answering|spake|asked|cried|is|was|were|are|be|being|had|hath|have|shall|will|would|should|could|may|might|must|did|do|doth|also|himself|herself|therefore|then|not)$/;
+const DEED = new RegExp(`${LEAD}${WHO} ([a-z]+)\\b([^;:.?!]*)`, "g");
+const DEED_VERB =
+  /^(went|came|took|saw|began|sat|rose|arose|fell|gave|brought|cast|ran|stood|wept|fled|hid|met|sought|shewed|put|left|set|bare|bore|knew|heard|found|led|brake|smote|struck|caught|bound|loosed|spit|wrote|dwelt|abode|[a-z]{3,}ed)$/;
+
+const cap = w => w.charAt(0).toUpperCase() + w.slice(1);
+// "Simon Peter" and "Peter" are one person; groups start with a capital letter.
+function whoName(raw) {
+  const w = raw.trim();
+  const low = w.toLowerCase();
+  if (GROUPS.includes(low)) {
+    return cap(low === "his disciples" ? "the disciples" : low);
+  }
+  if (w === "Simon Peter") {
+    return "Peter";
+  }
+  if (/^(John the Baptist|Mary Magdalene|Judas Iscariot)$/.test(w)) {
+    return w;
+  }
+  return NT_NAMES.has(w) && !NOT_PEOPLE.has(w) ? w : null;
+}
+const words = s => s.trim().split(/\s+/).length;
+const clip = (s, n) => {
+  const w = s.trim().split(/\s+/);
+  return w.length > n ? w.slice(0, n).join(" ") + "…" : s.trim();
+};
+
+// Every "X said, …" in some verses: { who, quote, v }
+export function speeches(verses) {
+  const out = [];
+  verses.forEach(v => {
+    const m = v.t.match(SPEECH) || v.t.match(SPEECH_AFTER);
+    const who = m && whoName(m[1]);
+    // Just the spoken words: drop a leading "and said," and stop where the story picks up again.
+    const quote =
+      m &&
+      m[2]
+        .replace(/^(?:and )?(?:said|saying|saith),\s*/i, "")
+        .split(
+          /[.?!;:] (?:And|Then|But|So|Now) (?:he|she|they|when|[A-Z][a-z]+)\b|[.?!;:] [A-Z][a-z]+ (?:said|saith|answered)\b/
+        )[0]
+        .replace(/[.,;:]$/, "");
+    if (who && quote && words(quote) >= 5) {
+      out.push({ who, quote: clip(quote, 28), v });
+    }
+  });
+  return out;
+}
+// Every "X went out, and wept bitterly" in some verses: { who, deed, v }
+export function deeds(verses) {
+  const out = [];
+  verses.forEach(v => {
+    for (const m of v.t.matchAll(DEED)) {
+      const who = whoName(m[1]);
+      const verb = m[2];
+      // Stop before any speech or a second person's action joins the clause.
+      const deed = (verb + m[3])
+        .split(
+          /, (?:and )?(?:he |she |they )?(?:said|saying|saith)\b| and said\b|, and (?:he|she|they|it|there)\b|, and when\b| \(/
+        )[0]
+        .replace(/[,\s]+$/, "");
+      if (
+        who &&
+        DEED_VERB.test(verb) &&
+        !NOT_DEED.test(verb) &&
+        words(deed) >= 4 &&
+        words(deed) <= 24
+      ) {
+        out.push({ who, deed, v });
+        break; // one per verse
+      }
+    }
+  });
+  return out;
+}
+// The whole of each book in today's reading (already loaded for the reader), for wrong answers.
+function bookVerses(day, kjv) {
+  const p = PLAN[day - 1];
+  const books = [...new Set(CHAPTERS.slice(p.from, p.to).map(c => c.b))];
+  const out = [];
+  books.forEach(b =>
+    (kjv[b] || []).forEach((ch, ci) =>
+      ch.forEach((t, i) =>
+        out.push({
+          c: { b, c: ci + 1 },
+          v: i + 1,
+          t,
+          ref: `${b} ${ci + 1}:${i + 1}`,
+          chap: `${b} ${ci + 1}`
+        })
+      )
+    )
+  );
+  return out;
+}
+
+export const QUIZ_LENGTH = 7;
+
 export function makeQuiz(day, kjv) {
   const verses = quizVerses(day, kjv);
   const used = new Set();
-  const chaps = [...new Set(verses.map(v => v.chap))];
   QUIZ_LOWER = new Set(
     verses.flatMap(v =>
       v.t
@@ -235,7 +369,110 @@ export function makeQuiz(day, kjv) {
   ];
   const allNames = [...new Set(verses.flatMap(v => quizWords(v, true).map(x => x.core)))];
   const freshVerse = test => shuffle(verses.filter(v => !used.has(v.ref) && test(v)))[0];
+  // Events in today's chapters (the questions) and in the rest of the same books (wrong answers).
+  const today = new Set(verses.map(v => v.ref));
+  const todayText = new Set(verses.map(v => v.t));
+  const whole = bookVerses(day, kjv);
+  const elsewhere = whole.filter(v => !today.has(v.ref));
+  const said = speeches(verses);
+  const done = deeds(verses);
+  const bookDeeds = deeds(whole);
+  // Speakers and actors from today first, then the rest of the book, then well-known names.
+  const people = [
+    ...new Set([
+      ...shuffle([...said, ...done].map(x => x.who)),
+      ...shuffle([...speeches(elsewhere), ...bookDeeds].map(x => x.who)),
+      ...shuffle(QUIZ_PEOPLE)
+    ])
+  ];
+  const fresh = list => shuffle(list.filter(x => !used.has(x.v.ref)))[0];
+  // Peter is also called Simon, so "Simon" can't be a wrong answer when Peter is right.
+  const others = (ans, n) =>
+    people.filter(w => w !== ans && !(ans === "Peter" && w === "Simon")).slice(0, n);
   const make = {
+    said() {
+      const x = fresh(said);
+      if (!x) {
+        return null;
+      }
+      used.add(x.v.ref);
+      return {
+        kind: "Who said it?",
+        prompt: "Who said this?",
+        body: `“${esc(x.quote)}”`,
+        options: shuffle([x.who, ...others(x.who, 3)]),
+        answer: x.who,
+        v: x.v
+      };
+    },
+    did() {
+      const x = fresh(done);
+      if (!x) {
+        return null;
+      }
+      used.add(x.v.ref);
+      return {
+        kind: "Who did it?",
+        prompt: "Who did this?",
+        body: `<b>Who</b> ${esc(x.deed)}?`,
+        options: shuffle([x.who, ...others(x.who, 3)]),
+        answer: x.who,
+        v: x.v
+      };
+    },
+    what() {
+      const x = fresh(done.filter(d => words(d.deed) >= 5));
+      if (!x) {
+        return null;
+      }
+      // Wrong answers: things other people did, from today or elsewhere in the book.
+      const wrong = [
+        ...new Set(
+          shuffle(
+            [...done, ...bookDeeds].filter(
+              d => d.who !== x.who && d.v.ref !== x.v.ref && words(d.deed) >= 4
+            )
+          ).map(d => clip(d.deed, 14))
+        )
+      ];
+      const ans = clip(x.deed, 14);
+      const opts = wrong.filter(d => d !== ans).slice(0, 3);
+      if (opts.length < 3) {
+        return null;
+      }
+      used.add(x.v.ref);
+      return {
+        kind: "What happened?",
+        prompt: `In ${x.v.chap}, what did ${x.who.replace(/^The /, "the ")} do?`,
+        body: "",
+        options: shuffle([ans, ...opts]),
+        answer: ans,
+        v: x.v
+      };
+    },
+    inReading() {
+      const near = n => v => Math.abs(words(v.t) - n) <= Math.max(4, n * 0.4);
+      const x = freshVerse(v => words(v.t) >= 8 && words(v.t) <= 26);
+      if (!x) {
+        return null;
+      }
+      // A verse repeated in today's reading (e.g. "He that hath an ear…") can't be a wrong answer.
+      const opts = [...new Set(shuffle(elsewhere.filter(near(words(x.t)))).map(v => v.t))]
+        .filter(t => !todayText.has(t))
+        .slice(0, 3);
+      if (opts.length < 3) {
+        return null;
+      }
+      used.add(x.ref);
+      return {
+        kind: "Was it in the reading?",
+        prompt: "Which of these verses is from today's reading?",
+        body: "",
+        options: shuffle([x.t, ...opts]),
+        answer: x.t,
+        v: x
+      };
+    },
     finish() {
       const v = freshVerse(v => v.t.split(" ").length >= 8 && quizWords(v, false).length);
       if (!v) {
@@ -275,38 +512,28 @@ export function makeQuiz(day, kjv) {
         answer: ans,
         v
       };
-    },
-    chapter() {
-      if (chaps.length < 2) {
-        return null;
-      }
-      const v = freshVerse(v => v.t.split(" ").length >= 10);
-      if (!v) {
-        return null;
-      }
-      used.add(v.ref);
-      // 3-chapter days borrow a neighboring chapter so there are always 4 choices
-      const p = PLAN[day - 1];
-      const near = [CHAPTERS[p.from - 1], CHAPTERS[p.to]]
-        .filter(Boolean)
-        .map(c => (c.one ? c.b : `${c.b} ${c.c}`));
-      const opts = [...shuffle(chaps.filter(c => c !== v.chap)), ...near].slice(0, 3);
-      return {
-        kind: "Where was it?",
-        prompt: "Which chapter is this verse from?",
-        body: esc(v.t),
-        options: shuffle([v.chap, ...opts]),
-        answer: v.chap,
-        v
-      };
     }
   };
-  const order =
-    chaps.length >= 2
-      ? ["chapter", "finish", "name", "finish", "chapter"]
-      : ["finish", "name", "finish", "name", "finish"];
-  return order
-    .map(k => make[k]() || make.finish() || make.name())
-    .filter(Boolean)
-    .slice(0, 5);
+  // Event questions first; when a reading has few (the letters), verse questions fill in, no more
+  // than three of a kind.
+  const order = ["said", "did", "what", "inReading", "said", "did", "finish"];
+  const fallback = ["said", "did", "what", "inReading", "finish", "name"];
+  const kinds = {};
+  const out = [];
+  for (const want of order) {
+    // A short reading may need a fourth of one kind.
+    for (const k of [want, ...fallback, "inReading", "finish"]) {
+      const last = k === "finish" && out.length < order.indexOf(want) + 1;
+      if ((kinds[k] || 0) >= 3 && !last) {
+        continue;
+      }
+      const q = make[k]();
+      if (q) {
+        kinds[k] = (kinds[k] || 0) + 1;
+        out.push(q);
+        break;
+      }
+    }
+  }
+  return out;
 }
