@@ -17,9 +17,10 @@ export function setTab(t) {
   window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
 }
 
-export function openReader(day, from) {
+// jump: { ci, v } scrolls to that verse once the text is on screen (Continue reading).
+export function openReader(day, from, jump) {
   const s = getState();
-  setState({ readDay: day, readFrom: from || s.tab });
+  setState({ readDay: day, readFrom: from || s.tab, readJump: jump || null });
   if (s.tab === "read") {
     window.scrollTo({ top: 0 });
   } else {

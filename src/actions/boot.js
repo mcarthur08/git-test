@@ -11,6 +11,7 @@ import { ensureTeam, checkTransfer } from "./tribes.jsx";
 import { setAuth } from "./auth.js";
 import { client } from "./firebaseClient.js";
 import { markChatSeen, chatSeenStored } from "./chat.js";
+import { loadMark, takeRemoteMark } from "./bookmark.js";
 
 export async function startFirebase(cfg) {
   client.ns = (await import("firebase/compat/app")).default;
@@ -87,6 +88,7 @@ export function startLocal() {
     ...(me ? {} : { draft: newDraft() }),
     ...(tab ? { tab } : {})
   });
+  loadMark();
   if (me) {
     ensureTeam();
   }
@@ -105,6 +107,16 @@ export function startShared(db, uid, perms) {
     ...(tab ? { tab } : {})
   });
   setState({ chatSeen: chatSeenStored() }); // read after uid is set: it's stored per account
+  loadMark();
+  // The reading bookmark follows the account across devices.
+  db.doc("bookmarks/" + uid).onSnapshot(
+    snap => {
+      if (snap.exists) {
+        takeRemoteMark(snap.data());
+      }
+    },
+    () => {}
+  );
 
   db.collection("cheers").onSnapshot(
     snap => {

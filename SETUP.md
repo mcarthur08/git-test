@@ -153,6 +153,10 @@ Username accounts have no real email, so a forgotten password can't be reset. Mo
 
 This needs the latest `firestore.rules` published (step 5).
 
+## Reading bookmark
+
+In the in-app reader, each person's place is saved as they scroll. It only ever moves forward, and tapping a verse bookmarks it on purpose. **Continue reading** on Today opens the reader at that verse. The bookmark is stored in `bookmarks/<account>`, so it follows the account to other devices once the latest `firestore.rules` are published (step 5). Until then it is kept on each device.
+
 ## Group chat (leaders)
 
 The group chat (the chat bubble at the top, next to the **?**) is one conversation for the whole group. It needs the latest `firestore.rules` published (step 5).

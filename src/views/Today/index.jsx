@@ -4,6 +4,7 @@ import { parseISO } from "@/lib/util.js";
 import { stats, planDay, nextUndone } from "@/lib/player.js";
 import StartBanner from "./StartBanner.jsx";
 import RecapCard from "./RecapCard.jsx";
+import ContinueCard from "./ContinueCard.jsx";
 import Hero from "./Hero.jsx";
 import ProgressSummary from "./ProgressSummary.jsx";
 import QuizNudge from "./QuizNudge.jsx";
@@ -26,6 +27,7 @@ export default function Today() {
     <>
       <StartBanner start={start} pd={pd} />
       <RecapCard />
+      <ContinueCard s={s} />
       {readOnly ? (
         <div className="note warn">
           You can look around, but your progress can't be saved yet. Ask your leader for access.

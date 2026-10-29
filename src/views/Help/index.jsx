@@ -37,6 +37,12 @@ export default function Help() {
               adds a point for your tribe.
             </p>
           </Tip>
+          <Tip ic="book" title="Your place in the reading">
+            <p className="muted">
+              Reading in the app? Your place is saved as you go, and you can tap any verse to
+              bookmark it. Tap <b>Continue</b> on Today to pick up right there, on any device.
+            </p>
+          </Tip>
           <Tip ic="chat" title="Group chat">
             <p className="muted">
               Ask questions and share thoughts in the group chat: tap the chat bubble at the top.

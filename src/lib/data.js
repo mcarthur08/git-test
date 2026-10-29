@@ -606,7 +606,7 @@ export const STOPS = [
 export const RELEASES = [
   {
     v: "1.3",
-    from: "2026-10-28T06:00",
+    from: "2026-10-30T06:00",
     title: "Talk it over",
     items: [
       [
@@ -620,6 +620,11 @@ export const RELEASES = [
         "Tick This is a question and a leader can find it, answer it and mark it answered."
       ],
       ["pin", "Pinned notes", "Leaders can pin important messages to the top of the chat."],
+      [
+        "book",
+        "Pick up where you left off",
+        "The reader saves your place as you go, and you can tap any verse to bookmark it. Continue reading from Today, on any device."
+      ],
       [
         "flag",
         "Keep it kind",

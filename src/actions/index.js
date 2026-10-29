@@ -10,6 +10,7 @@ export {
 } from "./navigation.js";
 export { setSave, saveMe, flush, savePending, retrySave } from "./saving.js";
 export { loadBooks } from "./books.js";
+export { autoMark, setMark, markRef, flushMark, validMark } from "./bookmark.js";
 export { startQuiz, prepareQuiz, quizPick, quizNext } from "./quiz.jsx";
 export { toggleCheer, postReply, deleteReply } from "./social.js";
 export {

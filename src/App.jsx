@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { setState, useStore } from "@/store.js";
 import { draftFrom } from "@/lib/player.js";
-import { boot, checkWhatsNew, checkGuide } from "@/actions";
+import { boot, checkWhatsNew, checkGuide, flushMark } from "@/actions";
 import Header from "@/components/layout/Header.jsx";
 import { Avatar } from "@/components/ui/Avatar.jsx";
 import { BackButton } from "@/components/ui/BackButton.jsx";
@@ -92,7 +92,9 @@ export default function App() {
   }, [phase, meId]);
   useEffect(() => {
     const onVisible = () => {
-      if (!document.hidden) {
+      if (document.hidden) {
+        flushMark();
+      } else {
         checkWhatsNew();
       }
     };

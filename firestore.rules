@@ -84,6 +84,17 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['msg', 'uid', 'at']);
     }
 
+    // Reading bookmark: the verse each person stopped at in the in-app reader. Only they read or write it.
+    match /bookmarks/{uid} {
+      allow read, delete: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['day', 'ci', 'v', 'at', 'manual'])
+        && request.resource.data.day is int && request.resource.data.day >= 1 && request.resource.data.day <= 70
+        && request.resource.data.ci is int && request.resource.data.ci >= 0 && request.resource.data.ci < 10
+        && request.resource.data.v is int && request.resource.data.v >= 1 && request.resource.data.v <= 200
+        && request.resource.data.at is string && request.resource.data.manual is bool;
+    }
+
     // Account recovery: a leader points an old character at a new username; that username claims it.
     match /transfers/{u} {
       allow read: if isLeader() || isUser(u);
