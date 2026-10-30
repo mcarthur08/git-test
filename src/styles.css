@@ -481,6 +481,30 @@ main.enter > *:nth-child(n + 6) {
 .pt.cheer .pt-head {
   animation: lift 1.6s var(--ease) 1;
 }
+.fb .fb-body {
+  transform-origin: 100px 400px;
+}
+.fb .fb-head {
+  transform-origin: 100px 80px;
+}
+.fb .pt-eyes {
+  transform-origin: 100px 92px;
+}
+.fb.live .fb-body {
+  animation: breathe 4.2s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.fb.live .fb-head {
+  animation: sway 7s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.fb.live .pt-eyes {
+  animation: blink 5.5s infinite;
+  animation-delay: var(--d, 0s);
+}
+.fb.cheer .fb-head {
+  animation: lift 1.6s var(--ease) 1;
+}
 .fg .fg-body {
   transform-origin: 30px 78px;
 }
@@ -584,18 +608,18 @@ main.enter > *:nth-child(n + 6) {
   width: 100%;
   height: 100%;
 }
-.frame-fig {
-  position: absolute;
-  right: 8px;
-  bottom: 6px;
-  width: 22%;
-  aspect-ratio: 3 / 4;
-  z-index: 3;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
+/* The full-body character stands on a strip of ground in a tall frame. */
+.frame.full {
+  aspect-ratio: 5 / 9;
+  background: linear-gradient(#4a3826, #2b2016) bottom / 100% 5% no-repeat,
+    radial-gradient(70% 45% at 50% 34%, #6a4527 0%, #3a2617 50%, #160f0b 100%);
 }
-.frame-fig .av {
+.frame .fb {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+  z-index: 3;
 }
 .frame.glow {
   box-shadow: 0 0 0 1px #6e5330, 0 0 0 4px #1a1410, 0 0 0 5px var(--gold),
@@ -1877,6 +1901,9 @@ button.team:hover {
   color: var(--gold-hi);
   overflow-wrap: anywhere;
 }
+.preview .frame.full {
+  max-width: 250px;
+}
 .preview .alias {
   font-family: var(--font-display);
   font-weight: 700;
@@ -2216,6 +2243,9 @@ input[type="password"] {
 }
 .reveal-art .frame.mid {
   width: 150px;
+}
+.reveal-art .frame.full.mid {
+  width: 120px;
 }
 .reveal-art .medal {
   width: 124px;
@@ -2790,8 +2820,8 @@ code {
   .preview {
     position: static;
   }
-  .preview .frame {
-    max-width: 260px;
+  .preview .frame.full {
+    max-width: 200px;
   }
   .two {
     grid-template-columns: 1fr;
@@ -2868,7 +2898,8 @@ code {
     gap: 18px;
   }
   .hero .frame {
-    max-width: 220px;
+    max-width: 180px;
+    margin-inline: auto;
   }
   .hero-day {
     font-size: var(--step-2);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normLook, mixHex, avatarSVG, portraitSVG, figureSVG } from "./avatar.js";
+import { normLook, mixHex, avatarSVG, portraitSVG, figureSVG, fullSVG } from "./avatar.js";
 import {
   UNLOCK,
   allowedFor,
@@ -225,6 +225,90 @@ describe("avatar drawing", () => {
     const b = ids(portraitSVG({ g: "m" }, 3));
     expect(a.length).toBeGreaterThan(0);
     expect(a.filter(id => b.includes(id))).toEqual([]);
+  });
+
+  it("is flat: no gradients or blur filters, only solid fills and clip paths", () => {
+    for (let i = 0; i < 100; i++) {
+      const svg = portraitSVG(randomLook(), ri(DAYS + 1));
+      expect(svg).not.toMatch(/<(linearGradient|radialGradient|filter)\b|\sfilter=/);
+      expect(svg).not.toMatch(/fill="url\(/);
+    }
+  });
+
+  it("keeps the animation hooks the stylesheet targets", () => {
+    const p = portraitSVG({ g: "m" }, 5, { live: true });
+    ["pt-body", "pt-head", "pt-eyes"].forEach(c => expect(p).toContain(`class="${c}"`));
+    const f = figureSVG({ g: "m" }, 5, { live: true });
+    ["fg-body", "fg-head"].forEach(c => expect(f).toContain(`class="${c}"`));
+  });
+
+  it("crops the full portrait tight, the bust to the head, and honours a custom window", () => {
+    const vb = svg => /viewBox="([^"]+)"/.exec(svg)[1];
+    expect(vb(portraitSVG({ g: "m" }, 0))).toBe("14 20 172 206");
+    expect(vb(portraitSVG({ g: "m" }, 0, { bust: true }))).toBe("46 30 108 108");
+    expect(vb(portraitSVG({ g: "m" }, 0, { vb: "66 76 68 30" }))).toBe("66 76 68 30");
+  });
+
+  it("keeps the full-portrait crop at the frame shape of 5:6", () => {
+    const m = /viewBox="[\d.]+ [\d.]+ ([\d.]+) ([\d.]+)"/.exec(portraitSVG({ g: "m" }, 0));
+    expect(Number(m[1]) / Number(m[2])).toBeCloseTo(5 / 6, 1);
+  });
+
+  describe("the full-body character", () => {
+    const BAD_FULL = /undefined|NaN|\[object|null/;
+
+    it("is a tall svg with the animation hooks the stylesheet targets", () => {
+      const svg = fullSVG({ g: "m" }, 5, { live: true });
+      expect(svg).toMatch(/viewBox="0 0 200 400"/);
+      ["fb-body", "fb-head", "pt-eyes"].forEach(c => expect(svg).toContain(`class="${c}"`));
+      expect(svg).toContain("fb av live");
+      expect(fullSVG({ g: "m" }, 5, { cheer: true })).toContain("cheer");
+    });
+
+    it("draws every item, hat and head covering for both genders without a missing value", () => {
+      ["m", "f"].forEach(g => {
+        UNLOCK.item.forEach((_, item) =>
+          UNLOCK.hat.forEach((__, hat) => {
+            const svg = fullSVG({ g, item, hat, tunic: 6, sash: 4 }, DAYS);
+            expect(svg, `${g} item ${item} hat ${hat}`).not.toMatch(BAD_FULL);
+          })
+        );
+        COVERS[g].forEach((_, cover) => {
+          expect(fullSVG({ g, cover }, DAYS), `${g} cover ${cover}`).not.toMatch(BAD_FULL);
+        });
+      });
+    });
+
+    it("draws random looks without a missing value", () => {
+      for (let i = 0; i < 100; i++) {
+        expect(fullSVG(randomLook(), ri(DAYS + 1))).not.toMatch(BAD_FULL);
+      }
+    });
+
+    it("shows each held item, so no item is lost when the corner figure is gone", () => {
+      const none = fullSVG({ g: "m", item: 0 }, DAYS);
+      UNLOCK.item.forEach(([name], item) => {
+        if (item > 0) {
+          expect(fullSVG({ g: "m", item }, DAYS), name).not.toBe(none);
+        }
+      });
+    });
+
+    it("gives each character its own element ids and never repeats one inside a figure", () => {
+      const ids = svg => [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
+      const a = ids(fullSVG({ g: "f" }, DAYS));
+      const b = ids(fullSVG({ g: "f" }, DAYS));
+      expect(new Set(a).size).toBe(a.length);
+      expect(a.filter(id => b.includes(id))).toEqual([]);
+    });
+
+    it("is chosen by avatarSVG's full option and cached by look", () => {
+      const a = avatarSVG({ g: "m", skin: 2 }, 0, { full: true });
+      expect(a).toContain("fb av");
+      expect(avatarSVG({ g: "m", skin: 2, bogus: 1 }, 0, { full: true })).toBe(a);
+      expect(avatarSVG({ g: "m", skin: 2 }, 0)).not.toBe(a);
+      expect(avatarSVG({ g: "m", skin: 2 }, 0, { portrait: true })).not.toBe(a);
+    });
   });
 
   it("does not repeat an id within one portrait", () => {
