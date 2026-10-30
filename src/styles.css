@@ -2283,10 +2283,11 @@ input[type="password"] {
 .map-wrap.zoomed .map:active {
   cursor: grabbing;
 }
+/* On the open sea at the left, below the compass: the towns along the right edge stay uncovered. */
 .map-ctl {
   position: absolute;
-  right: 10px;
-  top: 10px;
+  left: 10px;
+  top: 72px;
   display: grid;
   gap: 6px;
   z-index: 2;
@@ -2873,6 +2874,7 @@ code {
   }
   .hero .frame {
     max-width: 220px;
+    margin-inline: auto;
   }
   .hero-day {
     font-size: var(--step-2);
