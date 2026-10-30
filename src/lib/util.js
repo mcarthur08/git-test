@@ -4,7 +4,9 @@ export const pad = n => String(n).padStart(2, "0");
 export const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 export const parseISO = s => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || "");
-  return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+  const d = m && new Date(+m[1], +m[2] - 1, +m[3]);
+  // Date rolls 31 Feb over to March, so a real date must come back out the way it went in.
+  return d && d.getMonth() === +m[2] - 1 && d.getDate() === +m[3] ? d : null;
 };
 export const daysBetween = (a, b) =>
   Math.round(

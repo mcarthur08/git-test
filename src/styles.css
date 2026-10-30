@@ -484,6 +484,30 @@ main.enter > *:nth-child(n + 6) {
 .pt.cheer .pt-head {
   animation: lift 1.6s var(--ease) 1;
 }
+.fb .fb-body {
+  transform-origin: 100px 400px;
+}
+.fb .fb-head {
+  transform-origin: 100px 80px;
+}
+.fb .pt-eyes {
+  transform-origin: 100px 92px;
+}
+.fb.live .fb-body {
+  animation: breathe 4.2s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.fb.live .fb-head {
+  animation: sway 7s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.fb.live .pt-eyes {
+  animation: blink 5.5s infinite;
+  animation-delay: var(--d, 0s);
+}
+.fb.cheer .fb-head {
+  animation: lift 1.6s var(--ease) 1;
+}
 .fg .fg-body {
   transform-origin: 30px 78px;
 }
@@ -587,18 +611,18 @@ main.enter > *:nth-child(n + 6) {
   width: 100%;
   height: 100%;
 }
-.frame-fig {
-  position: absolute;
-  right: 8px;
-  bottom: 6px;
-  width: 22%;
-  aspect-ratio: 3 / 4;
-  z-index: 3;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
+/* The full-body character stands on a strip of ground in a tall frame. */
+.frame.full {
+  aspect-ratio: 5 / 9;
+  background: linear-gradient(#4a3826, #2b2016) bottom / 100% 5% no-repeat,
+    radial-gradient(70% 45% at 50% 34%, #6a4527 0%, #3a2617 50%, #160f0b 100%);
 }
-.frame-fig .av {
+.frame .fb {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+  z-index: 3;
 }
 .frame.glow {
   box-shadow: 0 0 0 1px #6e5330, 0 0 0 4px #1a1410, 0 0 0 5px var(--gold),
@@ -1881,6 +1905,9 @@ button.team:hover {
   color: var(--gold-hi);
   overflow-wrap: anywhere;
 }
+.preview .frame.full {
+  max-width: 250px;
+}
 .preview .alias {
   font-family: var(--font-display);
   font-weight: 700;
@@ -1985,6 +2012,48 @@ button.team:hover {
   border-color: var(--gold);
   box-shadow: 0 0 0 1px var(--gold), 0 0 16px -4px rgba(242, 213, 140, 0.6);
   color: var(--gold-hi);
+}
+.roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+.role {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 6px 4px;
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  min-height: 44px;
+  transition: transform 0.15s var(--spring), border-color 0.2s, box-shadow 0.2s;
+}
+.role:hover {
+  border-color: var(--bronze);
+}
+.role:active {
+  transform: scale(0.96);
+}
+.role[aria-pressed="true"] {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 0 16px -4px rgba(242, 213, 140, 0.6);
+  color: var(--gold-hi);
+}
+.rprev {
+  width: 64px;
+  height: 114px;
+  border-radius: 4px;
+  overflow: hidden;
+  display: block;
+  background: radial-gradient(80% 60% at 50% 40%, #5a3b22, #1a1310);
+}
+.rprev .av {
+  width: 100%;
+  height: 100%;
 }
 .fprev {
   width: 72px;
@@ -2220,6 +2289,9 @@ input[type="password"] {
 }
 .reveal-art .frame.mid {
   width: 150px;
+}
+.reveal-art .frame.full.mid {
+  width: 120px;
 }
 .reveal-art .medal {
   width: 124px;
@@ -2817,8 +2889,8 @@ code {
   .preview {
     position: static;
   }
-  .preview .frame {
-    max-width: 260px;
+  .preview .frame.full {
+    max-width: 200px;
   }
   .two {
     grid-template-columns: 1fr;
@@ -2895,7 +2967,7 @@ code {
     gap: 18px;
   }
   .hero .frame {
-    max-width: 220px;
+    max-width: 180px;
     margin-inline: auto;
   }
   .hero-day {
@@ -3429,4 +3501,150 @@ input[type="time"] {
   letter-spacing: 0.06em;
   text-align: center;
   text-transform: uppercase;
+}
+
+/* Character editor: the character stays pinned while the options below it change. */
+.editor {
+  --prev-h: 204px;
+}
+.editor .preview {
+  top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px) + 16px);
+}
+.editor .preview .frame.full {
+  max-width: clamp(110px, calc((100vh - 440px) * 0.555), 250px);
+}
+.pv-info {
+  display: contents;
+}
+/* The pinned block has to fit in the window, so only the character, name and save button stay. */
+.pv-sum,
+.pv-note {
+  display: none;
+}
+.editor .ed-main {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+.etabs {
+  position: sticky;
+  top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px));
+  z-index: 3;
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: #1e1712;
+  border-bottom: 1px solid var(--line);
+}
+.etabs::-webkit-scrollbar {
+  display: none;
+}
+.etabs button {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.etabs button:hover {
+  border-color: var(--bronze);
+}
+.etabs button[aria-selected="true"] {
+  background: linear-gradient(var(--gold-hi), var(--gold));
+  color: var(--gold-ink);
+  border-color: #6e4f1e;
+}
+#epanel {
+  scroll-margin-top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px) + 72px);
+}
+@media (max-width: 760px) {
+  .editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .editor .preview {
+    position: sticky;
+    top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px));
+    z-index: 4;
+    box-sizing: border-box;
+    height: var(--prev-h);
+    margin: -22px -22px 0;
+    padding: 12px 22px;
+    grid-template-columns: 100px minmax(0, 1fr);
+    gap: 14px;
+    align-content: center;
+    align-items: center;
+    justify-items: stretch;
+    background: linear-gradient(#211a15, #1e1712);
+    border-bottom: 1px solid var(--line);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .editor .preview .frame.full {
+    width: 100px;
+    max-width: none;
+  }
+  .pv-info {
+    display: grid;
+    gap: 6px;
+    align-content: center;
+    min-width: 0;
+  }
+  .editor .preview .alias,
+  .pv-sum {
+    margin: 0;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pv-note {
+    display: none;
+  }
+  .preview.taken .pv-sum {
+    display: none;
+  }
+  .editor .preview .btn {
+    width: 100%;
+  }
+  .editor .ed-main {
+    padding-top: 12px;
+  }
+  .etabs {
+    top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px) + var(--prev-h));
+    margin-inline: -22px;
+    padding-inline: 22px;
+  }
+  #epanel {
+    scroll-margin-top: calc(
+      var(--top-h, 66px) + env(safe-area-inset-top, 0px) + var(--prev-h) + 72px
+    );
+  }
+}
+@media (max-width: 640px) {
+  .editor .preview {
+    margin: -18px -16px 0;
+    padding-inline: 16px;
+  }
+  .etabs {
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+}
+@media (min-width: 761px) {
+  /* Room for the pinned character to stay in view even when a tab's options are short. */
+  .editor {
+    min-height: calc(100vh - var(--top-h, 66px));
+    align-items: start;
+  }
 }

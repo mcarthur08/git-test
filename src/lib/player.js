@@ -212,7 +212,14 @@ export function normConfig(c) {
       Array.isArray(c.teams) && typeof c.teams[i] === "string"
         ? c.teams[i].trim().slice(0, 30)
         : "";
-    teams.push(t && !teams.includes(t) ? t : def);
+    teams.push(t && !teams.includes(t) ? t : "");
+  });
+  // A default can already be taken by a custom name in another slot, so fall back to one that is free.
+  const free = DEFAULT_TEAMS.filter(def => !teams.includes(def));
+  DEFAULT_TEAMS.forEach((def, i) => {
+    if (!teams[i]) {
+      teams[i] = free.includes(def) ? def : free.find(f => !teams.includes(f));
+    }
   });
   return {
     start: parseISO(c.start) ? c.start : "",
@@ -331,7 +338,8 @@ export function newDraftFor(g) {
       mouth: r([0, 3]),
       cover: f ? r([1, 2, 3]) : r([0, 1, 1]),
       mantle: f ? Math.floor(Math.random() * 3) : r([0, 1, 4]),
-      jewel: f ? r([1, 2]) : 0
+      jewel: f ? r([1, 2]) : 0,
+      hem: 0
     }
   };
 }

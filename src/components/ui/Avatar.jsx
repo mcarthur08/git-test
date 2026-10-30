@@ -2,24 +2,21 @@ import { useMemo } from "react";
 import { avatarSVG } from "@/lib/avatar.js";
 import { Svg } from "./Icon.jsx";
 
-// opts: portrait | bust | vb | live | cheer. The SVG is built once per look, so re-renders don't redraw every portrait.
-export function Avatar({ look, n, portrait, bust, vb, live, cheer }) {
+// opts: full | portrait | bust | vb | live | cheer. The SVG is built once per look, so re-renders don't redraw every portrait.
+export function Avatar({ look, n, full, portrait, bust, vb, live, cheer }) {
   const key = JSON.stringify(look || {});
   const html = useMemo(
-    () => avatarSVG(look, n, { portrait, bust, vb, live, cheer }),
-    [key, n, portrait, bust, vb, live, cheer]
+    () => avatarSVG(look, n, { full, portrait, bust, vb, live, cheer }),
+    [key, n, full, portrait, bust, vb, live, cheer]
   );
   return <Svg html={html} />;
 }
 
-// The painted portrait with the little full-body figure in the corner.
+// The full-body character on its stage.
 export function Frame({ look, n, className = "", glow, cheer }) {
   return (
-    <div className={"frame" + (className ? " " + className : "") + (glow ? " glow" : "")}>
-      <Avatar look={look} n={n} portrait live cheer={cheer} />
-      <div className="frame-fig">
-        <Avatar look={look} n={n} live />
-      </div>
+    <div className={"frame full" + (className ? " " + className : "") + (glow ? " glow" : "")}>
+      <Avatar look={look} n={n} full live cheer={cheer} />
     </div>
   );
 }

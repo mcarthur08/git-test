@@ -8,5 +8,6 @@ export default defineConfig({
   base: "./",
   plugins: [react()],
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
-  build: { outDir: "dist" }
+  build: { outDir: "dist" },
+  test: { environment: "jsdom", include: ["src/**/*.test.js"] }
 });

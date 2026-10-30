@@ -13,8 +13,41 @@ import {
   MANTLES,
   JEWELS
 } from "@/lib/data.js";
+import { rolesFor, roleName, roleBlurb, applyRole, wearsRole } from "@/lib/roles.js";
+import { Avatar } from "@/components/ui/Avatar.jsx";
+import { setRole, setLook } from "@/actions";
 import { plural } from "@/lib/util.js";
 import { Swatches, Unlockables, FeaturePicker } from "./controls.jsx";
+
+// One-tap outfits. Each button shows the role on the current character.
+export function RoleSection({ d, g, n }) {
+  const look = { ...d.look, g };
+  return (
+    <div className="group">
+      <h3 className="ghead">Choose a role</h3>
+      <div className="roles">
+        {rolesFor(g).map(role => (
+          <button
+            key={role.id}
+            className="role"
+            onClick={() => setRole(role)}
+            aria-pressed={wearsRole(look, role, n)}
+            title={roleBlurb(role, g)}
+          >
+            <span className="rprev">
+              <Avatar look={applyRole(look, role, n).look} n={n} full />
+            </span>
+            <span>{roleName(role, g)}</span>
+          </button>
+        ))}
+      </div>
+      <p className="small muted">
+        A role picks the clothes and item. Face and hair stay yours, and you can change any piece
+        after.
+      </p>
+    </div>
+  );
+}
 
 export function FaceSection({ d, g, n }) {
   return (
@@ -89,6 +122,26 @@ export function ClothingSection({ d, g, n }) {
           {g === "f"
             ? "Women's garments were often dyed with indigo, madder root and saffron, with embroidered edges."
             : "Men usually wore undyed or earth-toned wool, often with woven stripes."}
+        </p>
+      </div>
+      <div className="field">
+        <span className="lbl">Length</span>
+        <div className="opts">
+          {["Full length", g === "f" ? "Work dress (calf-length)" : "Work tunic (knee-length)"].map(
+            (label, i) => (
+              <button
+                key={i}
+                className="opt"
+                onClick={() => setLook("hem", i)}
+                aria-pressed={(d.look.hem || 0) === i}
+              >
+                {label}
+              </button>
+            )
+          )}
+        </div>
+        <p className="small muted">
+          Fishermen, farmers and builders hitched their tunics up to work.
         </p>
       </div>
       <div className="two">

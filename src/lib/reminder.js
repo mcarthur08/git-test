@@ -56,7 +56,7 @@ export function downloadICS(r) {
     `DTEND:${r.end}`,
     `RRULE:FREQ=DAILY;COUNT=${r.count}`,
     `SUMMARY:${REM_TITLE}`,
-    `DESCRIPTION:${REM_TEXT.replace(/,/g, ",")}`,
+    `DESCRIPTION:${REM_TEXT.replace(/[\\;,]/g, "\\$&")}`,
     `URL:${APP_URL}`,
     "BEGIN:VALARM",
     "ACTION:DISPLAY",

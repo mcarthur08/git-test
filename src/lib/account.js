@@ -8,8 +8,8 @@ export const cleanUsername = v =>
     .replace(/\s+/g, ".")
     .replace(/[^a-z0-9._-]/g, "")
     .replace(/([._-])[._-]+/g, "$1")
-    .replace(/^[._-]+|[._-]+$/g, "")
-    .slice(0, 24);
+    .slice(0, 24)
+    .replace(/^[._-]+|[._-]+$/g, "");
 export const usernameOf = email =>
   email && email.endsWith("@" + USER_DOMAIN) ? email.slice(0, -USER_DOMAIN.length - 1) : "";
 
