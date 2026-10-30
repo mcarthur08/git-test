@@ -3,9 +3,14 @@ import { getState } from "@/store.js";
 import { allPlayers } from "@/lib/player.js";
 import { buildCast } from "@/lib/cana/cast.js";
 import { LAYOUTS, layoutFor } from "@/lib/cana/layout.js";
+import { createSound } from "@/lib/cana/sound.js";
+import { lsGet, lsSet } from "@/lib/util.js";
 import { PHASES, STORY } from "@/lib/cana/story.js";
 import { closeScene } from "@/actions";
 import { Icon } from "@/components/ui/Icon.jsx";
+
+// whether the person turned the wedding's sound off, remembered between visits
+const SOUND_KEY = "nt70.cana.sound";
 
 const STEP_NAMES = {
   feast: "The wedding feast",
@@ -25,13 +30,29 @@ export default function CanaScene() {
   const canvas = useRef(null);
   const ctl = useRef(null);
   const kindRef = useRef(null);
+  const sound = useRef(null);
   const phaseRef = useRef("feast");
   const [phase, setPhase] = useState("feast");
   const [hint, setHint] = useState("");
   const [state, setState] = useState("loading"); // loading | ready | failed
+  const [muted, setMuted] = useState(false);
+  const [hasSound, setHasSound] = useState(true);
   const [kind, setKind] = useState(null); // "portrait" or "landscape", once the box has been measured
   const closeBtn = useRef(null);
   const box = useRef(null);
+
+  // The sound lasts as long as the scene is open, through any rebuild of the hall. It starts silent in the browser's
+  // eyes until the first tap, which is why every tap and key press in the scene calls unlock.
+  useEffect(() => {
+    const s = createSound({ muted: lsGet(SOUND_KEY) === "off" });
+    sound.current = s;
+    setMuted(s.isMuted());
+    setHasSound(s.supported);
+    return () => {
+      s.destroy();
+      sound.current = null;
+    };
+  }, []);
 
   // which hall fits the box, now and whenever the box changes shape
   useLayoutEffect(() => {
@@ -77,6 +98,7 @@ export default function CanaScene() {
           host: host.current,
           cast,
           layout: LAYOUTS[kind],
+          sound: sound.current,
           startPhase: phaseRef.current,
           reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
           hooks: {
@@ -150,6 +172,17 @@ export default function CanaScene() {
     };
   }, []);
 
+  const toggleSound = () => {
+    const next = !muted;
+    setMuted(next);
+    lsSet(SOUND_KEY, next ? "off" : "on");
+    if (sound.current) {
+      sound.current.setMuted(next);
+      sound.current.unlock();
+    }
+  };
+  const unlock = () => sound.current && sound.current.unlock();
+
   const step = PHASES.indexOf(phase) + 1;
   const act = fn => () => ctl.current && fn(ctl.current);
   const ready = state === "ready";
@@ -160,20 +193,35 @@ export default function CanaScene() {
       aria-modal="true"
       aria-label="The wedding at Cana"
       ref={box}
+      onPointerDown={unlock}
+      onKeyDown={unlock}
     >
       <header className="cana-bar">
         <div className="cana-title">
           <b>The wedding at Cana</b>
           <span>John 2:1–11</span>
         </div>
-        <button
-          ref={closeBtn}
-          className="cana-close"
-          aria-label="Leave the wedding"
-          onClick={closeScene}
-        >
-          <Icon k="collapse" />
-        </button>
+        <div className="cana-tools">
+          {hasSound ? (
+            <button
+              className="cana-close"
+              aria-label="Sound"
+              aria-pressed={!muted}
+              title={muted ? "Turn the sound on" : "Turn the sound off"}
+              onClick={toggleSound}
+            >
+              <Icon k={muted ? "mute" : "sound"} />
+            </button>
+          ) : null}
+          <button
+            ref={closeBtn}
+            className="cana-close"
+            aria-label="Leave the wedding"
+            onClick={closeScene}
+          >
+            <Icon k="collapse" />
+          </button>
+        </div>
       </header>
       <div className="cana-host" ref={host}>
         <canvas

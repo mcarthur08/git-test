@@ -214,6 +214,7 @@ export async function startCana({
   host,
   cast,
   layout,
+  sound = null,
   startPhase = "feast",
   hooks = {},
   reduced = false
@@ -231,6 +232,21 @@ export async function startCana({
     MUSICIAN_SPOTS,
     HEAD_TABLE
   } = layout;
+  // Sounds are sent through here, so the scene does not need to care whether there is any sound, and so nothing is
+  // heard while the story is only being passed through to catch up after the hall is rebuilt.
+  let restoring = false;
+  const snd = new Proxy(
+    {},
+    {
+      get:
+        (_, name) =>
+        (...args) => {
+          if (!restoring && sound && typeof sound[name] === "function") {
+            sound[name](...args);
+          }
+        }
+    }
+  );
   const onPhase = name => {
     if (hooks.onPhase) {
       hooks.onPhase(name);
@@ -502,13 +518,16 @@ export async function startCana({
     try {
       await go(p, CISTERN.use, stale);
       p.face = -1;
+      snd.draw();
       await pause(700, stale);
       p.variant = "jar";
       await go(p, jar.def.pour, stale);
       await pause(450, stale);
       p.face = 1;
+      snd.pour(700);
       await tween(700, t => jar.setLevel(t));
       jar.setLevel(1);
+      snd.fillDone();
       if (jars.every(j => j.full)) {
         director.send({ type: "ALL_FILLED" });
       }
@@ -544,6 +563,7 @@ export async function startCana({
     jars.forEach((j, i) =>
       run(async stale => {
         await pause(300 + i * 380, stale);
+        snd.wine(i);
         for (let k = 0; k < 6; k++) {
           spawnSparkle(j.def.x, j.def.y - 12);
         }
@@ -563,6 +583,7 @@ export async function startCana({
       s.variant = null;
       master.face = 1;
       pose(master, "cheer", 1600);
+      snd.clink();
       say(master, lineFor("master", "celebrate"), 4200);
       await pause(1800, stale);
       director.send({ type: "TASTED" });
@@ -570,6 +591,7 @@ export async function startCana({
   }
   function startCelebrating() {
     celebrating = true;
+    snd.cheer();
     [...guests, ...servants, mary].forEach(p => pose(p, "cheer", 1400));
     run(async stale => {
       // the bridegroom and bride dance, then go back to their seats
@@ -594,6 +616,7 @@ export async function startCana({
           await go(s, { x: g.x + (g.x < 180 ? 22 : -22), y: g.y + 4 }, stale);
           s.variant = null;
           pose(g, "cheer", 1400);
+          snd.clink();
           say(g, "Thank you!", 2000);
           await pause(5000, stale);
         }
@@ -604,6 +627,7 @@ export async function startCana({
   function enterPhase(name) {
     epoch++;
     phase = name;
+    snd.phase(name);
     onPhase(name);
     if (name === "feast") {
       celebrating = false;
@@ -671,12 +695,20 @@ export async function startCana({
     startGuest(g, 300 + i * 650);
   });
   // rebuilt part-way through (the hall changed shape), so carry on from where the story was
+  restoring = true;
   for (let k = 0; k < PHASES.indexOf(startPhase); k++) {
     director.send({ type: "SKIP" });
+  }
+  restoring = false;
+  if (sound) {
+    sound.phase(phase);
   }
   // the earlier parts were only passed through, so what was said in them is not left hanging in the air
   people.forEach(p => p.clearBubble());
   onPhase(phase);
+  if (sound && startPhase === "feast") {
+    sound.phase("feast");
+  }
 
   // ---- what you can do ----
   const info = {
@@ -702,6 +734,7 @@ export async function startCana({
       const side = o.x > me.x ? -1 : 1;
       await go(me, { x: o.x + side * 24, y: o.y + 3 }, stale);
       greet(me, o);
+      snd.blip();
       if (machines.get(o.id)) {
         machines.get(o.id).send({ type: "GOAL", goal: { kind: "talk", x: o.x, y: o.y, ms: 3200 } });
       }
@@ -727,6 +760,7 @@ export async function startCana({
       await go(me, { x: g.x + (g.x < 180 ? 22 : -22), y: g.y + 4 }, stale);
       me.variant = null;
       pose(g, "cheer", 1400);
+      snd.clink();
       say(g, "Thank you!", 2000);
       pose(me, "wave", 1500);
     });
@@ -805,6 +839,7 @@ export async function startCana({
 
   // ---- the loop ----
   let notes = 0;
+  let stepClock = 0;
   const step = ticker => {
     const dt = Math.min(0.05, ticker.deltaMS / 1000);
     clock += dt * 1000;
@@ -825,6 +860,15 @@ export async function startCana({
     }
     for (const p of people) {
       p.update(dt, clock, reduced);
+    }
+    if (me && me.path.length) {
+      stepClock += dt;
+      if (stepClock > 0.34) {
+        stepClock = 0;
+        snd.step();
+      }
+    } else {
+      stepClock = 0.25;
     }
     for (let i = particles.length - 1; i >= 0; i--) {
       const q = particles[i];

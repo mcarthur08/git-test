@@ -3998,6 +3998,14 @@ input[type="time"] {
   font-size: 0.8rem;
   color: #d9c9b2;
 }
+.cana-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cana-close[aria-pressed="false"] {
+  opacity: 0.7;
+}
 .cana-close {
   display: grid;
   place-items: center;
