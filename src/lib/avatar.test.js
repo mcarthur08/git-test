@@ -19,6 +19,9 @@ import {
   DAYS
 } from "./data.js";
 
+// Every figure gets its own random element ids, so two drawings only match once those are left out.
+const strip = svg => svg.replace(/(id="|#)[^"')]+/g, "$1");
+
 const allowedNow = (key, g, n) =>
   allowedFor(key, g)
     .filter(([e]) => e[2] <= n)
@@ -289,10 +292,13 @@ describe("avatar drawing", () => {
     });
 
     it("shows each held item, so no item is lost when the corner figure is gone", () => {
-      const none = fullSVG({ g: "m", item: 0 }, DAYS);
-      UNLOCK.item.forEach(([name], item) => {
+      // a few items are only for women, so each is drawn on someone who can wear it
+      UNLOCK.item.forEach(([name, , , who], item) => {
         if (item > 0) {
-          expect(fullSVG({ g: "m", item }, DAYS), name).not.toBe(none);
+          const g = who || "m";
+          expect(strip(fullSVG({ g, item }, DAYS)), name).not.toBe(
+            strip(fullSVG({ g, item: 0 }, DAYS))
+          );
         }
       });
     });

@@ -3,6 +3,9 @@ import { ROLES, rolesFor, roleName, roleBlurb, applyRole, wearsRole } from "./ro
 import { UNLOCK, COVERS, MANTLES, JEWELS, allowedFor, DAYS } from "./data.js";
 import { fullSVG } from "./avatar.js";
 
+// Every figure gets its own random element ids, so two drawings only match once those are left out.
+const strip = svg => svg.replace(/(id="|#)[^"')]+/g, "$1");
+
 const base = g => ({ g, skin: 2, hair: 1, face: 1 });
 const NEW_PROPS = [
   "harp",
@@ -191,7 +194,7 @@ describe("the work tunic", () => {
     ["m", "f"].forEach(g => {
       const long = fullSVG({ g, hem: 0 }, DAYS);
       const short = fullSVG({ g, hem: 1 }, DAYS);
-      expect(short, g).not.toBe(long);
+      expect(strip(short), g).not.toBe(strip(long));
       expect(short, g).not.toMatch(/undefined|NaN|\[object|null/);
     });
   });
@@ -233,7 +236,7 @@ describe("the props the roles use", () => {
     NEW_PROPS.forEach(v => {
       const item = UNLOCK.item.findIndex(e => e[1] === v);
       const g = UNLOCK.item[item][3] || "m";
-      expect(fullSVG({ g, item }, DAYS), v).not.toBe(fullSVG({ g, item: 0 }, DAYS));
+      expect(strip(fullSVG({ g, item }, DAYS)), v).not.toBe(strip(fullSVG({ g, item: 0 }, DAYS)));
     });
   });
 

@@ -5,6 +5,8 @@ import { shade } from "./util.js";
 import { buildParts } from "./portrait.js";
 
 const INK = "#2B1B12";
+// Arm poses for the scenes: [the arm on the left of the picture, the one on the right], in degrees about the shoulder.
+export const POSES = { wave: [120, 0], wave2: [150, 0], up: [155, 155], up2: [135, 135] };
 // The portrait's head (about 100 units tall) is scaled to about a sixth of the figure's height.
 const HEAD = "translate(34 -21) scale(.66)";
 
@@ -250,7 +252,10 @@ export function fullSVG(look, n, opts = {}) {
       100 - sw - 1
     }" cy="209" rx="6.4" ry="8" fill="${skin}" stroke="${INK}" stroke-width="1.8"/>` +
     `</g>`;
-  const arms = arm(tunic) + mirror(arm(tunicD));
+  // Poses lift an arm (or both) about the shoulder: a wave, or the arms thrown up when cheering or dancing.
+  const lift = (a, svg) => (a ? `<g transform="rotate(${a} ${100 - sw + 6} 88)">${svg}</g>` : svg);
+  const [liftL, liftR] = POSES[opts.pose] || [0, 0];
+  const arms = lift(liftL, arm(tunic)) + mirror(lift(liftR, arm(tunicD)));
 
   // ---- feet and sandals ----
   const foot =
@@ -1019,7 +1024,7 @@ export function fullSVG(look, n, opts = {}) {
   const d = opts.live ? ` style="--d:${(-Math.random() * 4).toFixed(2)}s"` : "";
   return `<svg class="fb av${opts.live ? " live" : ""}${
     opts.cheer ? " cheer" : ""
-  }" viewBox="0 0 200 400" aria-hidden="true"${d}>${defs}${outline}
+  }" viewBox="${opts.vb || "0 0 200 400"}" aria-hidden="true"${d}>${defs}${outline}
     <ellipse cx="100" cy="395" rx="50" ry="5" fill="#000" opacity=".3"/>
     <g class="fb-body" filter="url(#ol${u})">
       <g transform="${HEAD}">${hairBack}${coverBack}</g>

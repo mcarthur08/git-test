@@ -1,0 +1,186 @@
+import { useEffect, useRef, useState } from "react";
+import { getState } from "@/store.js";
+import { allPlayers } from "@/lib/player.js";
+import { buildCast } from "@/lib/cana/cast.js";
+import { PHASES, STORY } from "@/lib/cana/story.js";
+import { closeScene } from "@/actions";
+import { Icon } from "@/components/ui/Icon.jsx";
+
+const STEP_NAMES = {
+  feast: "The wedding feast",
+  wineRuns: "The wine runs out",
+  fillJars: "Fill the waterpots",
+  drawOut: "Draw out and taste",
+  celebrate: "The good wine"
+};
+
+// The wedding at Cana (John 2:1–11) as a place you can walk around in: guests, servants and the wedding party move
+// about on their own, and you can walk, greet people, help fill the six stone pots and share the wine. The scene
+// itself (PixiJS) is loaded only when this opens, so the rest of the app stays light.
+export default function CanaScene() {
+  const host = useRef(null);
+  const canvas = useRef(null);
+  const ctl = useRef(null);
+  const [phase, setPhase] = useState("feast");
+  const [hint, setHint] = useState("");
+  const [state, setState] = useState("loading"); // loading | ready | failed
+  const closeBtn = useRef(null);
+  const box = useRef(null);
+
+  useEffect(() => {
+    let gone = false;
+    let started = null;
+    (async () => {
+      try {
+        const { startCana } = await import("./engine.js");
+        const { me, players } = getState();
+        const list = allPlayers(players, me);
+        const cast = buildCast({ me: me && list.find(p => p.id === me.id), others: list });
+        started = await startCana({
+          canvas: canvas.current,
+          host: host.current,
+          cast,
+          reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
+          hooks: {
+            onPhase: p => !gone && setPhase(p),
+            onHint: h => {
+              if (!gone) {
+                setHint(h);
+                setTimeout(() => !gone && setHint(""), 3600);
+              }
+            }
+          }
+        });
+        if (gone) {
+          started.destroy();
+          return;
+        }
+        ctl.current = started;
+        setState("ready");
+      } catch (err) {
+        console.error(err);
+        if (!gone) {
+          setState("failed");
+        }
+      }
+    })();
+    return () => {
+      gone = true;
+      ctl.current = null;
+      if (started) {
+        started.destroy();
+      }
+    };
+  }, []);
+
+  // Escape closes it, the page behind stops scrolling, and Tab stays inside.
+  useEffect(() => {
+    const opener = document.activeElement;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeBtn.current?.focus({ preventScroll: true });
+    const onKey = e => {
+      if (e.key === "Escape") {
+        closeScene();
+      } else if (e.key === "Tab" && box.current) {
+        const items = [...box.current.querySelectorAll("button:not([disabled])")];
+        if (!items.length) {
+          return;
+        }
+        const i = items.indexOf(document.activeElement);
+        const next = e.shiftKey
+          ? i <= 0
+            ? items.length - 1
+            : i - 1
+          : i === items.length - 1
+          ? 0
+          : i + 1;
+        e.preventDefault();
+        items[next].focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = overflow;
+      document.removeEventListener("keydown", onKey);
+      opener?.focus?.({ preventScroll: true });
+    };
+  }, []);
+
+  const step = PHASES.indexOf(phase) + 1;
+  const act = fn => () => ctl.current && fn(ctl.current);
+  const ready = state === "ready";
+  return (
+    <div
+      className="cana"
+      role="dialog"
+      aria-modal="true"
+      aria-label="The wedding at Cana"
+      ref={box}
+    >
+      <header className="cana-bar">
+        <div className="cana-title">
+          <b>The wedding at Cana</b>
+          <span>John 2:1–11</span>
+        </div>
+        <button
+          ref={closeBtn}
+          className="cana-close"
+          aria-label="Leave the wedding"
+          onClick={closeScene}
+        >
+          <Icon k="collapse" />
+        </button>
+      </header>
+      <div className="cana-host" ref={host}>
+        <canvas
+          ref={canvas}
+          aria-label="The courtyard at the wedding. Use the buttons below to take part."
+        />
+        {state === "loading" ? <p className="cana-note">Setting the tables…</p> : null}
+        {state === "failed" ? (
+          <p className="cana-note">
+            Your device could not start the scene. You can still read the story below.
+          </p>
+        ) : null}
+      </div>
+      <section className="cana-caption" aria-live="polite">
+        <p className="cana-step">
+          {step} of {PHASES.length} · {STEP_NAMES[phase]}
+        </p>
+        {STORY[phase].quotes.map(([ref, text]) => (
+          <p className="cana-verse" key={ref}>
+            <span>{ref}</span> {text}
+          </p>
+        ))}
+      </section>
+      <p className="cana-hint small" role="status">
+        {hint || "Tap the floor to walk, a guest to say hello, or a water pot to help."}
+      </p>
+      <div className="cana-actions" role="group" aria-label="Take part">
+        <button className="btn sm" disabled={!ready} onClick={act(c => c.helpWithJars())}>
+          Fill a pot
+        </button>
+        <button className="btn sm" disabled={!ready} onClick={act(c => c.greetNearest())}>
+          Say hello
+        </button>
+        <button className="btn sm" disabled={!ready} onClick={act(c => c.dance())}>
+          Dance
+        </button>
+        <button className="btn sm" disabled={!ready} onClick={act(c => c.offerCup())}>
+          Share a cup
+        </button>
+        <button
+          className="btn sm"
+          disabled={!ready || phase === "celebrate"}
+          onClick={act(c => c.skip())}
+        >
+          Next part
+        </button>
+        <button className="btn sm" disabled={!ready} onClick={act(c => c.replay())}>
+          Start again
+        </button>
+      </div>
+    </div>
+  );
+}

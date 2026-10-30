@@ -1,7 +1,7 @@
 import { STOPS } from "@/lib/data.js";
 import { plural, readingURL } from "@/lib/util.js";
 import { Icon } from "@/components/ui/Icon.jsx";
-import { selectStop } from "@/actions";
+import { selectStop, openScene } from "@/actions";
 import StopScene from "./StopScene.jsx";
 import Keepsake from "./Keepsake.jsx";
 
@@ -39,6 +39,13 @@ export default function StopCard({ sel, n, canPeek }) {
           Read {plural(s.day - n, "more day")} to walk here and unlock this stop.
         </p>
       )}
+      {open && s.scene ? (
+        <div className="row">
+          <button className="btn go sm" onClick={() => openScene(s.scene)}>
+            <Icon k="group" /> Step into the wedding
+          </button>
+        </div>
+      ) : null}
       <Keepsake stop={s} n={n} />
       <div className="row" style={{ justifyContent: "space-between" }}>
         <button

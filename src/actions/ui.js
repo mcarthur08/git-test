@@ -63,3 +63,6 @@ export function clearArrival() {
   clearTimeout(arrivalTimer);
   setState({ arrival: null });
 }
+
+export const openScene = name => setState({ scene: name });
+export const closeScene = () => setState({ scene: null });

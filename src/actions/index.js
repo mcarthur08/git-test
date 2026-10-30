@@ -8,7 +8,9 @@ export {
   openViewer,
   closeViewer,
   arrive,
-  clearArrival
+  clearArrival,
+  openScene,
+  closeScene
 } from "./ui.js";
 export {
   setTab,

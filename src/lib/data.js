@@ -505,6 +505,7 @@ export const STOPS = [
     day: 24,
     place: "Cana",
     title: "Water into wine",
+    scene: "cana",
     keepsake: "cup",
     ref: "John 2:1–11",
     x: 229,

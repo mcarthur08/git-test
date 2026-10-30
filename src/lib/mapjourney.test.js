@@ -6,6 +6,9 @@ import { seenKey, stopsCrossed, legMs, walkPlan, walkAt } from "./walk.js";
 import { fullSVG } from "./avatar.js";
 import { MAP_BASE } from "./journey.js";
 
+// Every figure gets its own random element ids, so two drawings only match once those are left out.
+const strip = svg => svg.replace(/(id="|#)[^"')]+/g, "$1");
+
 const BAD = /undefined|NaN|\[object|null/;
 
 describe("stop scenes", () => {
@@ -116,7 +119,7 @@ describe("keepsakes", () => {
       ["m", "f"].forEach(g => {
         const none = fullSVG({ g, item: 0 }, DAYS);
         const svg = fullSVG({ g, item: i }, DAYS);
-        expect(svg, `${s.place} ${g}`).not.toBe(none);
+        expect(strip(svg), `${s.place} ${g}`).not.toBe(strip(none));
         expect(svg, `${s.place} ${g}`).not.toMatch(BAD);
       });
     });

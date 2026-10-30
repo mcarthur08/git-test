@@ -49,6 +49,7 @@ let state = {
   saveStatus: "",
   toast: null,
   reveals: [],
+  scene: null, // the name of the scene that is open, such as "cana"
   arrival: null, // { i, id }: the stop the character has just reached on the map
   viewer: null, // { look, n, name, sub } while the full-screen character is open
   teamChecked: false,

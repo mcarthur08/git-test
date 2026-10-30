@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { setState, useStore } from "@/store.js";
 import { draftFrom } from "@/lib/player.js";
 import { boot, checkWhatsNew, checkGuide, flushMark } from "@/actions";
@@ -23,6 +23,9 @@ import Reader from "@/views/Reader/index.jsx";
 import Quiz from "@/views/Quiz/index.jsx";
 import Help from "@/views/Help/index.jsx";
 import Chat from "@/views/Chat/index.jsx";
+
+// The scenes bring their own drawing engine, so they load only when one is opened.
+const CanaScene = lazy(() => import("@/views/Cana/CanaScene.jsx"));
 
 // Which screen is showing: the sign-in / join flow first, then one view per tab.
 function View() {
@@ -83,7 +86,7 @@ function View() {
 }
 
 export default function App() {
-  const { phase, tab, draft, me } = useStore();
+  const { phase, tab, draft, me, scene } = useStore();
   useEffect(() => {
     boot();
   }, []);
@@ -118,6 +121,11 @@ export default function App() {
         <View />
       </main>
       <Toast />
+      {scene === "cana" ? (
+        <Suspense fallback={null}>
+          <CanaScene />
+        </Suspense>
+      ) : null}
       <ArrivalBanner />
       <CharacterViewer />
       <Reveal />
