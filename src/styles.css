@@ -2311,6 +2311,34 @@ input[type="password"] {
 .map-hint {
   text-align: center;
 }
+/* Full screen: the map card is portalled to <body> (so the page's slide-in transform can't contain it), keeps
+   its shape, and leaves room for the selected stop's story underneath. */
+.map-card {
+  --map-ratio: 0.643; /* MAP_W / MAP_H in lib/journey.js */
+}
+.map-card.expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow-y: auto;
+  border-radius: 0;
+  border: 0;
+  padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px))
+    max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
+  background: #0e0b09;
+  align-content: start;
+  justify-items: center;
+}
+.map-card.expanded .map-wrap {
+  width: min(100%, calc((100vh - 240px) * var(--map-ratio)));
+  width: min(100%, calc((100dvh - 240px) * var(--map-ratio)));
+}
+.map-card.expanded .map-wrap .map {
+  touch-action: none;
+}
+.map-card.expanded .stop-card {
+  width: min(100%, 68ch);
+}
 .m-name {
   font: 700 4.2px var(--font-body);
   fill: #2a1c0e;
