@@ -117,6 +117,7 @@ export default function App() {
       </main>
       <Toast />
       <Reveal />
+      <TestBadge />
     </>
   );
 }

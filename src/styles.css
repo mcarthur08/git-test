@@ -2311,33 +2311,28 @@ input[type="password"] {
 .map-hint {
   text-align: center;
 }
-/* Full screen: the map card is portalled to <body> (so the page's slide-in transform can't contain it), keeps
-   its shape, and leaves room for the selected stop's story underneath. */
-.map-card {
-  --map-ratio: 0.643; /* MAP_W / MAP_H in lib/journey.js */
+/* Full screen: the map keeps its shape and is as large as the screen allows. The page's slide-in animation
+   would otherwise make this section the containing block for the fixed card. */
+.journey.map-open {
+  animation: none;
 }
 .map-card.expanded {
   position: fixed;
   inset: 0;
   z-index: 20;
-  overflow-y: auto;
   border-radius: 0;
   border: 0;
-  padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px))
-    max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
+  padding: 8px;
   background: #0e0b09;
-  align-content: start;
+  align-content: center;
   justify-items: center;
 }
 .map-card.expanded .map-wrap {
-  width: min(100%, calc((100vh - 240px) * var(--map-ratio)));
-  width: min(100%, calc((100dvh - 240px) * var(--map-ratio)));
+  width: min(100%, calc((100vh - 56px) * var(--map-ratio)));
+  width: min(100%, calc((100dvh - 56px) * var(--map-ratio)));
 }
 .map-card.expanded .map-wrap .map {
   touch-action: none;
-}
-.map-card.expanded .stop-card {
-  width: min(100%, 68ch);
 }
 .m-name {
   font: 700 4.2px var(--font-body);
@@ -3087,6 +3082,21 @@ input[type="time"] {
 }
 .remind .row {
   gap: 10px;
+}
+.test-badge {
+  position: fixed;
+  left: 50%;
+  bottom: 4px;
+  transform: translateX(-50%);
+  z-index: 60;
+  padding: 2px 10px;
+  border-radius: 99px;
+  background: #b04a39;
+  color: #fff;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
 }
 .install-steps {
   margin: 0;
