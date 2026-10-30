@@ -2267,6 +2267,7 @@ input[type="password"] {
   overflow: hidden;
 }
 .map-wrap .map {
+  aspect-ratio: 360 / 560; /* MAP_W / MAP_H: the box keeps the map's shape whatever view the camera is showing */
   touch-action: pan-y;
   cursor: zoom-in;
   user-select: none;
@@ -2334,9 +2335,9 @@ input[type="password"] {
 .map-card.expanded .map-wrap .map {
   touch-action: none;
 }
-/* A phone turned sideways: the map fills the whole screen, clear of the notch and rounded corners. JourneyMap
-   measures the space and shows a matching slice of the map, which you drag up and down. */
-@media (orientation: landscape) and (max-height: 600px) {
+/* Turned sideways: the map fills the whole screen, clear of the notch and rounded corners. JourneyMap measures
+   the space and shows a matching slice of the map, which you drag up and down. */
+@media (orientation: landscape) {
   .map-card.expanded {
     padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px))
       max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
