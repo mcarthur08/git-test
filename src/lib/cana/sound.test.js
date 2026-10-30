@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { ROOT, SCALE, MOODS, degreeFreq, melodyBar, mulberry } from "./music.js";
-import { createSound, voices } from "./sound.js";
+import { createSound, voices, playBar } from "./sound.js";
 import { PHASES } from "./story.js";
 
 afterEach(() => {
@@ -126,7 +126,15 @@ describe("the music", () => {
 
 // A pretend AudioContext that records what is made, so the sound can be tested without a speaker.
 function fakeAudio() {
-  const log = { nodes: 0, started: 0, closed: false, resumed: 0, suspended: 0, targets: [] };
+  const log = {
+    list: [],
+    nodes: 0,
+    started: 0,
+    closed: false,
+    resumed: 0,
+    suspended: 0,
+    targets: []
+  };
   const param = () => ({
     value: 0,
     setValueAtTime() {
@@ -148,15 +156,19 @@ function fakeAudio() {
   });
   const node = extra => {
     log.nodes++;
-    return {
+    const n = {
       connect: x => x,
-      disconnect() {},
+      disconnect() {
+        n.disconnected = true;
+      },
       start() {
         log.started++;
       },
       stop() {},
       ...extra
     };
+    log.list.push(n);
+    return n;
   };
   class Ctx {
     constructor() {
@@ -170,10 +182,13 @@ function fakeAudio() {
       return node({ gain: param() });
     }
     createOscillator() {
-      return node({ frequency: param(), type: "sine" });
+      return node({ frequency: param(), type: "sine", setPeriodicWave() {} });
     }
     createBiquadFilter() {
       return node({ frequency: param(), Q: param(), type: "lowpass" });
+    }
+    createPeriodicWave() {
+      return {};
     }
     createDynamicsCompressor() {
       return node({});
@@ -370,5 +385,67 @@ describe("the sound", () => {
     ["step", "draw", "pour", "fillDone", "wine", "clink", "cheer", "blip", "cue"].forEach(name =>
       expect(typeof voices[name], name).toBe("function")
     );
+  });
+
+  it("makes few audio nodes for each sound, so they cannot pile up", () => {
+    const budget = {
+      step: 4,
+      draw: 12,
+      pour: 14,
+      fillDone: 6,
+      wine: 6,
+      clink: 6,
+      cheer: 22,
+      blip: 3,
+      cue: 6
+    };
+    Object.entries(budget).forEach(([name, most]) => {
+      const { Ctx, log } = fakeAudio();
+      const ctx = new Ctx();
+      const out = ctx.createGain();
+      const before = log.nodes;
+      voices[name](ctx, out, 1, 2);
+      expect(log.nodes - before, name).toBeLessThanOrEqual(most);
+    });
+  });
+
+  it("is light enough, a bar of the busiest music making fewer than forty nodes", () => {
+    const { Ctx, log } = fakeAudio();
+    const ctx = new Ctx();
+    const out = ctx.createGain();
+    const rand = mulberry(5);
+    let prev = 7;
+    let worst = 0;
+    for (let bar = 0; bar < 32; bar++) {
+      const before = log.nodes;
+      const r = playBar(ctx, out, MOODS.celebrate, bar, prev, rand, 1);
+      prev = r.last;
+      worst = Math.max(worst, log.nodes - before);
+    }
+    expect(worst).toBeLessThan(40);
+  });
+
+  it("lets every node of a sound go when the sound ends", () => {
+    Object.keys(voices).forEach(name => {
+      const { Ctx, log } = fakeAudio();
+      const ctx = new Ctx();
+      const out = ctx.createGain();
+      const from = log.list.length;
+      voices[name](ctx, out, 1, 2);
+      const made = log.list.slice(from);
+      expect(made.length, name).toBeGreaterThan(0);
+      // every sound source finishes: fire the end of each, then none of what was made may still be connected
+      made.filter(n => typeof n.onended === "function").forEach(n => n.onended());
+      made.forEach(n => expect(n.disconnected, name).toBe(true));
+    });
+    // and the music too
+    const { Ctx, log } = fakeAudio();
+    const ctx = new Ctx();
+    const out = ctx.createGain();
+    const from = log.list.length;
+    playBar(ctx, out, MOODS.celebrate, 3, 7, mulberry(9), 1);
+    const made = log.list.slice(from);
+    made.filter(n => typeof n.onended === "function").forEach(n => n.onended());
+    made.forEach(n => expect(n.disconnected).toBe(true));
   });
 });

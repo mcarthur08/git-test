@@ -1,25 +1,13 @@
 import { Texture } from "pixi.js";
 import { fullSVG, POSES } from "@/lib/full.js";
 import { ITEM } from "@/lib/cana/cast.js";
+import { VB_W, VB_H, UNIT, FIG, BASIC, CARRYING } from "@/lib/cana/budget.js";
+
+export { UNIT, FIG, BASIC, CARRYING };
 
 // Each character is drawn once per pose from the same vector figure the rest of the app uses, then handed to the
 // scene as a small picture. The drawing is a little wider than the figure so a raised arm is not cut off.
-const VB = "-70 -70 340 470";
-const VB_W = 340;
-const VB_H = 470;
-// one drawing unit is this many hall units, so a character stands about 76 units tall
-export const UNIT = 0.19;
-export const FIG = {
-  w: VB_W * UNIT,
-  h: VB_H * UNIT,
-  // the feet are at the bottom of the figure, 70 units below the top margin
-  anchorX: 0.5,
-  anchorY: (400 + 70 - 4) / VB_H
-};
-
-export const BASIC = ["idle", "wave", "wave2", "up", "up2"];
-export const CARRYING = [...BASIC, "jar", "cup"];
-
+const VB = `-70 -70 ${VB_W} ${VB_H}`;
 function look(char, variant) {
   if (variant === "jar") {
     return { ...char.look, item: ITEM.jar };

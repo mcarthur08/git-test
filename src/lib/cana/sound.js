@@ -5,6 +5,8 @@
 import { MOODS, degreeFreq, melodyBar, mulberry } from "./music.js";
 
 // ---- the voices: each makes one sound at time t, into `out` ----
+// Each uses as few audio nodes as it can and lets them go the moment it ends. Over a long visit thousands of sounds are
+// made, and a browser (Safari most of all) can run short of memory if the pieces of finished sounds pile up.
 const noiseBuffers = new WeakMap();
 function noise(ctx) {
   if (!noiseBuffers.has(ctx)) {
@@ -22,12 +24,46 @@ function noise(ctx) {
   return src;
 }
 
+// a plucked string is one oscillator with a ready-made wave (the note and a few softer overtones), not several
+const strings = new WeakMap();
+function stringWave(ctx) {
+  if (!strings.has(ctx)) {
+    strings.set(
+      ctx,
+      ctx.createPeriodicWave(new Float32Array(5), new Float32Array([0, 1, 0.35, 0.12, 0.06]))
+    );
+  }
+  return strings.get(ctx);
+}
+
+// when `src` ends, let it and everything wired after it go, so the browser can free them straight away
+const release = (src, ...nodes) => {
+  src.onended = () => {
+    src.disconnect();
+    nodes.forEach(n => n.disconnect());
+  };
+};
+
 // a quick rise to `peak`, then a fall away over `decay` seconds
 const envelope = (gain, t, attack, peak, decay) => {
   gain.setValueAtTime(0.0001, t);
   gain.linearRampToValueAtTime(peak, t + attack);
   gain.exponentialRampToValueAtTime(0.0001, t + attack + decay);
 };
+
+// one oscillator and one gain: a plain tone that rises, then dies away
+function tone(ctx, out, t, freq, peak, decay, attack = 0.004) {
+  const o = ctx.createOscillator();
+  o.type = "sine";
+  o.frequency.setValueAtTime(freq, t);
+  const g = ctx.createGain();
+  envelope(g.gain, t, attack, peak, decay);
+  o.connect(g);
+  g.connect(out);
+  release(o, g);
+  o.start(t);
+  o.stop(t + attack + decay + 0.1);
+}
 
 export function pluck(ctx, out, t, freq, vel = 0.5, len = 1.4) {
   const g = ctx.createGain();
@@ -36,23 +72,15 @@ export function pluck(ctx, out, t, freq, vel = 0.5, len = 1.4) {
   lp.type = "lowpass";
   lp.frequency.setValueAtTime(Math.min(8000, freq * 7), t);
   lp.frequency.exponentialRampToValueAtTime(freq * 2, t + len * 0.6);
-  const body = ctx.createOscillator();
-  body.type = "triangle";
-  body.frequency.setValueAtTime(freq, t);
-  const upper = ctx.createOscillator();
-  upper.type = "sine";
-  upper.frequency.setValueAtTime(freq * 2.003, t);
-  const upperGain = ctx.createGain();
-  upperGain.gain.setValueAtTime(0.25, t);
-  body.connect(lp);
-  upper.connect(upperGain);
-  upperGain.connect(lp);
+  const o = ctx.createOscillator();
+  o.setPeriodicWave(stringWave(ctx));
+  o.frequency.setValueAtTime(freq, t);
+  o.connect(lp);
   lp.connect(g);
   g.connect(out);
-  body.start(t);
-  upper.start(t);
-  body.stop(t + len + 0.1);
-  upper.stop(t + len + 0.1);
+  release(o, lp, g);
+  o.start(t);
+  o.stop(t + len + 0.1);
 }
 
 export function drum(ctx, out, t, hit, vel = 0.5) {
@@ -65,47 +93,31 @@ export function drum(ctx, out, t, hit, vel = 0.5) {
     envelope(g.gain, t, 0.004, vel * 0.7, 0.18);
     o.connect(g);
     g.connect(out);
+    release(o, g);
     o.start(t);
     o.stop(t + 0.3);
     return;
   }
-  // a "tek": a short tap of noise with the jingle of the little cymbals above it
-  [
-    [4200, 1.2, 0.09, 0.9],
-    [7500, 0.8, 0.16, 0.5]
-  ].forEach(([f, q, decay, level]) => {
-    const n = noise(ctx);
-    const bp = ctx.createBiquadFilter();
-    bp.type = "bandpass";
-    bp.frequency.setValueAtTime(f, t);
-    bp.Q.setValueAtTime(q, t);
-    const g = ctx.createGain();
-    envelope(g.gain, t, 0.002, vel * 0.5 * level, decay);
-    n.connect(bp);
-    bp.connect(g);
-    g.connect(out);
-    n.start(t);
-    n.stop(t + decay + 0.1);
-  });
+  // a "tek": a short tap of noise, with the jingle of the little cymbals in the top of it
+  const n = noise(ctx);
+  const bp = ctx.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.frequency.setValueAtTime(5200, t);
+  bp.Q.setValueAtTime(0.9, t);
+  const g = ctx.createGain();
+  envelope(g.gain, t, 0.002, vel * 0.65, 0.11);
+  n.connect(bp);
+  bp.connect(g);
+  g.connect(out);
+  release(n, bp, g);
+  n.start(t);
+  n.stop(t + 0.2);
 }
 
-// a soft bell: a few partials, the higher ones dying away faster
+// a soft bell: the note and a higher partial that dies away faster
 export function bell(ctx, out, t, freq, vol = 0.2, decay = 2.2) {
-  [
-    [1, 1, decay],
-    [2.76, 0.4, decay * 0.55],
-    [5.4, 0.15, decay * 0.3]
-  ].forEach(([ratio, level, d]) => {
-    const o = ctx.createOscillator();
-    o.type = "sine";
-    o.frequency.setValueAtTime(freq * ratio, t);
-    const g = ctx.createGain();
-    envelope(g.gain, t, 0.004, vol * level, d);
-    o.connect(g);
-    g.connect(out);
-    o.start(t);
-    o.stop(t + d + 0.1);
-  });
+  tone(ctx, out, t, freq, vol, decay);
+  tone(ctx, out, t, freq * 2.76, vol * 0.4, decay * 0.55);
 }
 
 function sweep(ctx, out, t, dur, from, to, peak, q = 1.2) {
@@ -123,6 +135,7 @@ function sweep(ctx, out, t, dur, from, to, peak, q = 1.2) {
   n.connect(bp);
   bp.connect(g);
   g.connect(out);
+  release(n, bp, g);
   n.start(t);
   n.stop(t + dur + 0.1);
 }
@@ -140,6 +153,7 @@ function bubbles(ctx, out, t, dur, count, base = 380) {
     envelope(g.gain, at, 0.004, 0.06, 0.07);
     o.connect(g);
     g.connect(out);
+    release(o, g);
     o.start(at);
     o.stop(at + 0.14);
   }
@@ -156,33 +170,25 @@ export const voices = {
     n.connect(lp);
     lp.connect(g);
     g.connect(out);
+    release(n, lp, g);
     n.start(t);
     n.stop(t + 0.12);
   },
   // water drawn from the cistern
   draw(ctx, out, t) {
     sweep(ctx, out, t, 0.7, 900, 330, 0.2);
-    bubbles(ctx, out, t, 0.7, 5);
+    bubbles(ctx, out, t, 0.7, 3);
   },
   // water poured into a pot, rising in pitch as it fills
   pour(ctx, out, t, ms = 700) {
     const dur = ms / 1000;
     sweep(ctx, out, t, dur, 1300, 2600, 0.17, 1.6);
-    bubbles(ctx, out, t, dur, 6, 520);
+    bubbles(ctx, out, t, dur, 4, 520);
   },
   // a pot is full
   fillDone(ctx, out, t) {
-    [880, 1320].forEach((f, i) => {
-      const o = ctx.createOscillator();
-      o.type = "sine";
-      o.frequency.setValueAtTime(f, t + i * 0.05);
-      const g = ctx.createGain();
-      envelope(g.gain, t + i * 0.05, 0.003, 0.09, 0.28);
-      o.connect(g);
-      g.connect(out);
-      o.start(t + i * 0.05);
-      o.stop(t + i * 0.05 + 0.4);
-    });
+    tone(ctx, out, t, 880, 0.09, 0.28, 0.003);
+    tone(ctx, out, t + 0.05, 1320, 0.09, 0.28, 0.003);
   },
   // a pot turns to wine: a chime, higher for each pot along the row
   wine(ctx, out, t, i = 0) {
@@ -190,20 +196,8 @@ export const voices = {
   },
   // two cups touching
   clink(ctx, out, t) {
-    [
-      [2100, 0, 0.18],
-      [3100, 0.012, 0.12]
-    ].forEach(([f, d, decay]) => {
-      const o = ctx.createOscillator();
-      o.type = "sine";
-      o.frequency.setValueAtTime(f, t + d);
-      const g = ctx.createGain();
-      envelope(g.gain, t + d, 0.002, 0.1, decay);
-      o.connect(g);
-      g.connect(out);
-      o.start(t + d);
-      o.stop(t + d + decay + 0.1);
-    });
+    tone(ctx, out, t, 2100, 0.1, 0.18, 0.002);
+    tone(ctx, out, t + 0.012, 3100, 0.1, 0.12, 0.002);
   },
   // the guests cheer: a swell of voices, with three rising chimes
   cheer(ctx, out, t) {
@@ -219,6 +213,7 @@ export const voices = {
     n.connect(bp);
     bp.connect(g);
     g.connect(out);
+    release(n, bp, g);
     n.start(t);
     n.stop(t + 1.9);
     [7, 9, 11].forEach((d, i) => bell(ctx, out, t + 0.15 + i * 0.16, degreeFreq(d), 0.12, 1.4));
@@ -233,6 +228,7 @@ export const voices = {
     envelope(g.gain, t, 0.004, 0.1, 0.12);
     o.connect(g);
     g.connect(out);
+    release(o, g);
     o.start(t);
     o.stop(t + 0.2);
   },

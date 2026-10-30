@@ -5,6 +5,7 @@ import { personMachine } from "@/lib/cana/person.js";
 import { lineFor } from "@/lib/cana/lines.js";
 import { hash, everyone } from "@/lib/cana/cast.js";
 import { drawCharacter, FIG, BASIC, CARRYING } from "./sprites.js";
+import { resolutionFor, densityFor } from "@/lib/cana/budget.js";
 import { drawFloor, drawLanterns, makeJars, tables, plants, drawCistern } from "./hall.js";
 
 const mulberry = seed => {
@@ -178,7 +179,7 @@ class Person {
     if (moving) {
       bob = reduced ? 0 : -Math.abs(Math.sin(this.t * 9)) * 2.4;
     } else if (this.pose === "wave") {
-      v = Math.floor(this.t * 3.4) % 2 ? "wave" : "wave2";
+      v = Math.floor(this.t * 3.4) % 2 ? "wave" : "idle";
     } else if (this.pose === "dance") {
       v = Math.floor(this.t * 3) % 2 ? "up" : "up2";
       if (!reduced) {
@@ -258,16 +259,39 @@ export async function startCana({
     }
   };
   const app = new Application();
-  const density = Math.min(window.devicePixelRatio || 1, 2) * 1.3;
+  const dpr = window.devicePixelRatio || 1;
+  const boxW = host.clientWidth || 360;
+  const boxH = host.clientHeight || 540;
+  // The drawing surface and the character pictures are only as sharp as this screen can show, which keeps the memory
+  // use down on a phone (a page that uses too much is closed by the browser).
+  const resolution = resolutionFor(dpr, boxW, boxH);
+  const density = densityFor(resolution, Math.min(boxW / WORLD.w, boxH / WORLD.h));
   await app.init({
     canvas,
-    width: host.clientWidth || 360,
-    height: host.clientHeight || 540,
-    antialias: true,
+    width: boxW,
+    height: boxH,
+    antialias: dpr < 2,
+    powerPreference: "low-power",
     backgroundAlpha: 0,
-    resolution: Math.min(window.devicePixelRatio || 1, 2),
+    resolution,
     autoDensity: true
   });
+  // half the frames of a game are plenty for this, and it is much easier on a phone's battery and memory
+  app.ticker.maxFPS = 30;
+  // If the phone takes the graphics away (it does when it is short of memory), give it a moment to give them back,
+  // and if it does not, ask for the scene to be built again.
+  let lostTimer = null;
+  const onLost = e => {
+    e.preventDefault();
+    lostTimer = setTimeout(() => {
+      if (!dead && hooks.onLost) {
+        hooks.onLost();
+      }
+    }, 2500);
+  };
+  const onRestored = () => clearTimeout(lostTimer);
+  canvas.addEventListener("webglcontextlost", onLost);
+  canvas.addEventListener("webglcontextrestored", onRestored);
 
   const grid = layout.buildGrid();
   const find = layout.makeFinder(grid);
@@ -284,8 +308,12 @@ export async function startCana({
   jars.forEach(j => layer.addChild(j.g));
   const lanterns = drawLanterns(layout);
   world.addChild(lanterns.g);
-  const glow = new Graphics();
-  world.addChild(glow);
+  const glows = lanterns.glows.map(l => {
+    const g = new Graphics();
+    g.circle(l.x, l.y, 10).fill({ color: 0xffd46a, alpha: 0.22 });
+    world.addChild(g);
+    return g;
+  });
   const fx = new Container();
   const top = new Container();
   world.addChild(fx, top);
@@ -889,11 +917,8 @@ export async function startCana({
         spawnNote(m.x, m.y - FIG.h * 0.6);
       }
     }
-    glow.clear();
-    lanterns.glows.forEach((l, i) => {
-      glow
-        .circle(l.x, l.y, 9 + Math.sin(clock / 500 + i) * 1.4)
-        .fill({ color: 0xffd46a, alpha: 0.22 });
+    glows.forEach((g, i) => {
+      g.alpha = 0.75 + Math.sin(clock / 500 + i) * 0.25;
     });
   };
   app.ticker.add(step);
@@ -975,7 +1000,21 @@ export async function startCana({
       app.ticker.remove(step);
       app.stage.off("pointertap", tap);
       people.forEach(p => p.clearBubble());
-      app.destroy({ removeView: false }, { children: true, texture: true });
+      // the canvases behind the character pictures are let go now, not at the next garbage collection, which on a
+      // phone can be too late (the graphics context itself is released by PixiJS as it shuts down)
+      const pictures = people.flatMap(p =>
+        Object.values(p.tex).map(t => t.source && t.source.resource)
+      );
+      clearTimeout(lostTimer);
+      canvas.removeEventListener("webglcontextlost", onLost);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
+      app.destroy({ removeView: false }, { children: true, texture: true, textureSource: true });
+      pictures.forEach(c => {
+        if (c && c.width) {
+          c.width = 0;
+          c.height = 0;
+        }
+      });
     }
   };
 }

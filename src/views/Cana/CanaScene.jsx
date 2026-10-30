@@ -37,6 +37,7 @@ export default function CanaScene() {
   const [state, setState] = useState("loading"); // loading | ready | failed
   const [muted, setMuted] = useState(false);
   const [hasSound, setHasSound] = useState(true);
+  const [build, setBuild] = useState(0); // goes up to ask for the scene to be built again
   const [kind, setKind] = useState(null); // "portrait" or "landscape", once the box has been measured
   const closeBtn = useRef(null);
   const box = useRef(null);
@@ -108,6 +109,11 @@ export default function CanaScene() {
                 setPhase(p);
               }
             },
+            onLost: () => {
+              if (!gone) {
+                setBuild(n => n + 1);
+              }
+            },
             onHint: h => {
               if (!gone) {
                 setHint(h);
@@ -136,7 +142,7 @@ export default function CanaScene() {
         started.destroy();
       }
     };
-  }, [kind]);
+  }, [kind, build]);
 
   // Escape closes it, the page behind stops scrolling, and Tab stays inside.
   useEffect(() => {
@@ -225,7 +231,7 @@ export default function CanaScene() {
       </header>
       <div className="cana-host" ref={host}>
         <canvas
-          key={kind || "pending"}
+          key={(kind || "pending") + build}
           ref={canvas}
           aria-label="The courtyard at the wedding. Use the buttons beside or below it to take part."
         />
