@@ -25,7 +25,7 @@ import Help from "@/views/Help/index.jsx";
 import Chat from "@/views/Chat/index.jsx";
 
 // The scenes bring their own drawing engine, so they load only when one is opened.
-const CanaScene = lazy(() => import("@/views/Cana/CanaScene.jsx"));
+const SceneView = lazy(() => import("@/views/play/SceneView.jsx"));
 
 // Which screen is showing: the sign-in / join flow first, then one view per tab.
 function View() {
@@ -121,9 +121,9 @@ export default function App() {
         <View />
       </main>
       <Toast />
-      {scene === "cana" ? (
+      {scene ? (
         <Suspense fallback={null}>
-          <CanaScene />
+          <SceneView scene={scene} key={scene} />
         </Suspense>
       ) : null}
       <ArrivalBanner />

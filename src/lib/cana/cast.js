@@ -237,7 +237,7 @@ export function buildCast({ me, others }) {
       npc("master", "master", NPC.master),
       npc("mary", "mary", NPC.mary)
     ],
-    servants: NPC.servants.map((d, i) => npc(`servant-${i}`, "servant", d)),
+    servants: NPC.servants.map((d, i) => npc(`servant-${i}`, "servant", d, { speed: 1.35 })),
     musicians: NPC.musicians.map((d, i) => npc(`musician-${i}`, "musician", d))
   };
 }

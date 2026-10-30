@@ -553,6 +553,7 @@ export const STOPS = [
     day: 42,
     place: "Bethsaida",
     title: "Feeding the five thousand",
+    scene: "bethsaida",
     keepsake: "loaves",
     ref: "Luke 9:10–17",
     x: 289,

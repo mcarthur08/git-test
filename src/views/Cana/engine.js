@@ -1,215 +1,15 @@
-import { Application, Container, Graphics, Sprite, Text } from "pixi.js";
+import { Graphics } from "pixi.js";
 import { createActor } from "xstate";
 import { directorMachine, PHASES } from "@/lib/cana/story.js";
 import { personMachine } from "@/lib/cana/person.js";
 import { lineFor } from "@/lib/cana/lines.js";
-import { hash, everyone } from "@/lib/cana/cast.js";
-import { drawCharacter, FIG, BASIC, CARRYING } from "./sprites.js";
-import { resolutionFor, densityFor } from "@/lib/cana/budget.js";
+import { hash, everyone, ITEM } from "@/lib/cana/cast.js";
+import { BASIC, CARRYING, FIG } from "@/lib/cana/budget.js";
+import { createKit, dist } from "@/views/play/kit.js";
 import { drawFloor, drawLanterns, makeJars, tables, plants, drawCistern } from "./hall.js";
 
-const mulberry = seed => {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-};
-class Cancelled extends Error {}
-const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-
-// One person in the courtyard: where they stand, the path they are walking, their pose and what they say.
-class Person {
-  constructor(char, tex, top, rand) {
-    this.char = char;
-    this.id = char.id;
-    this.tex = tex;
-    this.rand = rand;
-    this.x = 0;
-    this.y = 0;
-    this.face = 1;
-    this.speed = (50 + rand() * 14) * (char.kind === "servant" ? 1.35 : 1);
-    this.path = [];
-    this.settle = null;
-    this.pose = "idle";
-    this.poseUntil = 0;
-    this.variant = null;
-    this.t = rand() * 20;
-    this.sprite = new Sprite(tex.idle);
-    this.sprite.anchor.set(FIG.anchorX, FIG.anchorY);
-    this.k = FIG.w / tex.idle.width;
-    this.box = new Container();
-    this.box.addChild(this.sprite);
-    if (char.real || char.kind === "me") {
-      const label =
-        char.kind === "me"
-          ? "You"
-          : char.name.length > 12
-          ? char.name.slice(0, 11) + "…"
-          : char.name;
-      this.tag = new Text({
-        text: label,
-        style: {
-          fontFamily: "system-ui, sans-serif",
-          fontSize: 8,
-          fontWeight: "700",
-          fill: char.kind === "me" ? 0xffe2b0 : 0xffffff,
-          stroke: { color: 0x2a1c0e, width: 2.4 }
-        }
-      });
-      this.tag.anchor.set(0.5, 0);
-      this.tag.y = 4;
-      this.box.addChild(this.tag);
-    }
-    this.top = top;
-    this.bubble = null;
-    this.bubbleUntil = 0;
-  }
-
-  place(x, y) {
-    this.x = x;
-    this.y = y;
-    this.box.position.set(x, y);
-    this.box.zIndex = y;
-  }
-
-  // Walk along a list of points. Resolves true on arriving, false if something else sent them elsewhere first.
-  walkTo(path) {
-    if (this.settle) {
-      this.settle(false);
-    }
-    this.path = path ? [...path] : [];
-    return new Promise(res => {
-      if (!this.path.length) {
-        res(!!path);
-        return;
-      }
-      this.settle = res;
-    });
-  }
-
-  stop() {
-    this.path = [];
-    if (this.settle) {
-      const s = this.settle;
-      this.settle = null;
-      s(false);
-    }
-  }
-
-  setPose(pose, ms = 0, now = 0) {
-    this.pose = pose;
-    this.poseUntil = ms ? now + ms : 0;
-  }
-
-  say(text, ms, now) {
-    this.clearBubble();
-    const label = new Text({
-      text,
-      style: {
-        fontFamily: "system-ui, sans-serif",
-        fontSize: 9.5,
-        fontWeight: "600",
-        fill: 0x2a1c0e,
-        align: "center",
-        wordWrap: true,
-        wordWrapWidth: 112
-      }
-    });
-    label.anchor.set(0.5, 1);
-    const w = label.width + 12;
-    const h = label.height + 8;
-    const g = new Graphics();
-    g.roundRect(-w / 2, -h - 6, w, h, 6)
-      .fill({ color: 0xffffff, alpha: 0.96 })
-      .stroke({ width: 1, color: 0x6a4a2e });
-    g.poly([-4, -6.5, 4, -6.5, 0, -1]).fill({ color: 0xffffff, alpha: 0.96 });
-    label.y = -10;
-    const b = new Container();
-    b.addChild(g, label);
-    this.top.addChild(b);
-    this.bubble = b;
-    this.bubbleUntil = now + ms;
-  }
-
-  clearBubble() {
-    if (this.bubble) {
-      this.bubble.destroy({ children: true });
-      this.bubble = null;
-    }
-  }
-
-  update(dt, now, reduced) {
-    this.t += dt;
-    let moving = false;
-    if (this.path.length) {
-      const p = this.path[0];
-      const dx = p.x - this.x;
-      const dy = p.y - this.y;
-      const d = Math.hypot(dx, dy);
-      const step = this.speed * dt;
-      if (Math.abs(dx) > 0.4) {
-        this.face = dx > 0 ? 1 : -1;
-      }
-      if (d <= step) {
-        this.place(p.x, p.y);
-        this.path.shift();
-        if (!this.path.length && this.settle) {
-          const s = this.settle;
-          this.settle = null;
-          s(true);
-        }
-      } else {
-        this.place(this.x + (dx / d) * step, this.y + (dy / d) * step);
-      }
-      moving = true;
-    }
-    if (this.poseUntil && now >= this.poseUntil) {
-      this.pose = "idle";
-      this.poseUntil = 0;
-    }
-    let v = "idle";
-    let bob = 0;
-    let sway = 0;
-    if (this.variant && !this.poseUntil) {
-      v = this.variant;
-    }
-    if (moving) {
-      bob = reduced ? 0 : -Math.abs(Math.sin(this.t * 9)) * 2.4;
-    } else if (this.pose === "wave") {
-      v = Math.floor(this.t * 3.4) % 2 ? "wave" : "idle";
-    } else if (this.pose === "dance") {
-      v = Math.floor(this.t * 3) % 2 ? "up" : "up2";
-      if (!reduced) {
-        bob = -Math.abs(Math.sin(this.t * 6)) * 3.2;
-        sway = Math.sin(this.t * 3) * 0.1;
-      }
-    } else if (this.pose === "cheer") {
-      v = "up";
-      bob = reduced ? 0 : -Math.abs(Math.sin(this.t * 8)) * 3;
-    } else if (!reduced) {
-      bob = Math.sin(this.t * 1.8) * 0.5;
-    }
-    const tex = this.tex[v] || this.tex.idle;
-    if (this.sprite.texture !== tex) {
-      this.sprite.texture = tex;
-    }
-    this.sprite.scale.set(this.k * this.face, this.k);
-    this.sprite.y = bob;
-    this.sprite.rotation = sway;
-    if (this.bubble) {
-      if (now >= this.bubbleUntil) {
-        this.clearBubble();
-      } else {
-        this.bubble.position.set(this.x, this.y - FIG.h * 0.72);
-      }
-    }
-  }
-}
-
-// Starts the wedding at Cana in `canvas`. Returns a controller to steer it and to tear it down.
+// Starts the wedding at Cana in `canvas`. Returns a controller to steer it and to tear it down. The things every scene
+// shares (the drawing surface, the people, the clock, taps and sound) come from the kit; this is the wedding itself.
 export async function startCana({
   canvas,
   host,
@@ -221,7 +21,6 @@ export async function startCana({
   reduced = false
 }) {
   const {
-    WORLD,
     SPAWN,
     CISTERN,
     SEATS,
@@ -233,21 +32,6 @@ export async function startCana({
     MUSICIAN_SPOTS,
     HEAD_TABLE
   } = layout;
-  // Sounds are sent through here, so the scene does not need to care whether there is any sound, and so nothing is
-  // heard while the story is only being passed through to catch up after the hall is rebuilt.
-  let restoring = false;
-  const snd = new Proxy(
-    {},
-    {
-      get:
-        (_, name) =>
-        (...args) => {
-          if (!restoring && sound && typeof sound[name] === "function") {
-            sound[name](...args);
-          }
-        }
-    }
-  );
   const onPhase = name => {
     if (hooks.onPhase) {
       hooks.onPhase(name);
@@ -258,167 +42,43 @@ export async function startCana({
       hooks.onHint(text);
     }
   };
-  const app = new Application();
-  const dpr = window.devicePixelRatio || 1;
-  const boxW = host.clientWidth || 360;
-  const boxH = host.clientHeight || 540;
-  // The drawing surface and the character pictures are only as sharp as this screen can show, which keeps the memory
-  // use down on a phone (a page that uses too much is closed by the browser).
-  const resolution = resolutionFor(dpr, boxW, boxH);
-  const density = densityFor(resolution, Math.min(boxW / WORLD.w, boxH / WORLD.h));
-  await app.init({
-    canvas,
-    width: boxW,
-    height: boxH,
-    antialias: dpr < 2,
-    powerPreference: "low-power",
-    backgroundAlpha: 0,
-    resolution,
-    autoDensity: true
-  });
-  // half the frames of a game are plenty for this, and it is much easier on a phone's battery and memory
-  app.ticker.maxFPS = 30;
-  // If the phone takes the graphics away (it does when it is short of memory), give it a moment to give them back,
-  // and if it does not, ask for the scene to be built again.
-  let lostTimer = null;
-  const onLost = e => {
-    e.preventDefault();
-    lostTimer = setTimeout(() => {
-      if (!dead && hooks.onLost) {
-        hooks.onLost();
-      }
-    }, 2500);
-  };
-  const onRestored = () => clearTimeout(lostTimer);
-  canvas.addEventListener("webglcontextlost", onLost);
-  canvas.addEventListener("webglcontextrestored", onRestored);
+  const kit = await createKit({ canvas, host, layout, sound, hooks, reduced });
+  const { ground, layer, fx, find, S, snd, people, byId, wait, tween, run, go, pause, say, pose } =
+    kit;
+  const { spawnNote, spawnSparkle, toMe, walkMe } = kit;
 
-  const grid = layout.buildGrid();
-  const find = layout.makeFinder(grid);
-  const world = new Container();
-  app.stage.addChild(world);
-  world.addChild(drawFloor(layout));
-  const layer = new Container();
-  layer.sortableChildren = true;
-  world.addChild(layer);
+  // ---- the courtyard ----
+  ground.addChild(drawFloor(layout));
   tables(layout).forEach(t => layer.addChild(t));
   plants(layout).forEach(p => layer.addChild(p));
   layer.addChild(drawCistern(layout.CISTERN));
   const jars = makeJars(layout);
   jars.forEach(j => layer.addChild(j.g));
   const lanterns = drawLanterns(layout);
-  world.addChild(lanterns.g);
+  fx.addChild(lanterns.g);
   const glows = lanterns.glows.map(l => {
     const g = new Graphics();
     g.circle(l.x, l.y, 10).fill({ color: 0xffd46a, alpha: 0.22 });
-    world.addChild(g);
+    fx.addChild(g);
     return g;
   });
-  const fx = new Container();
-  const top = new Container();
-  world.addChild(fx, top);
 
   // ---- the people ----
-  const all = everyone(cast);
-  const people = [];
-  const byId = {};
-  for (const c of all) {
-    const variants =
+  await kit.addPeople(
+    everyone(cast),
+    c =>
       c.kind === "me" || c.kind === "servant"
         ? CARRYING
         : c.kind === "musician"
         ? ["idle", "up", "up2"]
-        : BASIC;
-    const tex = await drawCharacter(c, variants, density);
-    const rand = mulberry(hash(c.id));
-    const p = new Person(c, tex, top, rand);
-    people.push(p);
-    byId[c.id] = p;
-    layer.addChild(p.box);
-  }
-  const me = people.find(p => p.char.kind === "me") || null;
+        : BASIC,
+    { jar: ITEM.jar, cup: ITEM.cup }
+  );
+  const me = kit.me;
   const guests = people.filter(p => p.char.kind === "guest");
   const servants = people.filter(p => p.char.kind === "servant");
   const musicians = people.filter(p => p.char.kind === "musician");
   const [groom, bride, master, mary] = ["groom", "bride", "master", "mary"].map(id => byId[id]);
-
-  // ---- time: a clock, small timers and tweens ----
-  let clock = 0;
-  let epoch = 0; // bumped at each phase of the story, which cancels what the servants were doing
-  let meEpoch = 0; // bumped at each new thing you ask your character to do
-  const timers = [];
-  const tweens = [];
-  const wait = ms => new Promise(res => timers.push({ at: clock + ms, res }));
-  const tween = (ms, fn) => new Promise(res => tweens.push({ t0: clock, ms, fn, res }));
-  const runner = getEpoch => async fn => {
-    const e = getEpoch();
-    const stale = () => e !== getEpoch() || dead;
-    try {
-      await fn(stale);
-    } catch (err) {
-      if (!(err instanceof Cancelled)) {
-        console.error(err);
-      }
-    }
-  };
-  let dead = false;
-  const run = runner(() => epoch);
-  const runMe = runner(() => meEpoch);
-  const go = async (p, point, stale) => {
-    const ok = await p.walkTo(find({ x: p.x, y: p.y }, point));
-    if (!ok || stale()) {
-      throw new Cancelled();
-    }
-  };
-  const pause = async (ms, stale) => {
-    await wait(ms);
-    if (stale()) {
-      throw new Cancelled();
-    }
-  };
-  const say = (p, text, ms = 2800) => p.say(text, ms, clock);
-  const pose = (p, name, ms) => p.setPose(name, ms, clock);
-
-  // ---- particles ----
-  const particles = [];
-  const spawnNote = (x, y) => {
-    if (reduced || particles.length > 40) {
-      return;
-    }
-    const t = new Text({
-      text: Math.random() < 0.5 ? "♪" : "♫",
-      style: {
-        fontSize: 11,
-        fill: [0xb8534a, 0x4a7ab8, 0xc9a04b][(Math.random() * 3) | 0],
-        fontWeight: "700"
-      }
-    });
-    t.position.set(x, y);
-    fx.addChild(t);
-    particles.push({
-      o: t,
-      life: 2.6,
-      age: 0,
-      vx: (Math.random() - 0.5) * 8,
-      vy: -14 - Math.random() * 6
-    });
-  };
-  const spawnSparkle = (x, y) => {
-    if (reduced || particles.length > 60) {
-      return;
-    }
-    const g = new Graphics();
-    g.circle(0, 0, 1.6).fill(0xfff0a0);
-    g.position.set(x + (Math.random() - 0.5) * 14, y + (Math.random() - 0.5) * 4);
-    fx.addChild(g);
-    particles.push({
-      o: g,
-      life: 1.1,
-      age: 0,
-      vx: (Math.random() - 0.5) * 10,
-      vy: -16 - Math.random() * 10
-    });
-  };
 
   // ---- the story's director ----
   const director = createActor(directorMachine).start();
@@ -480,14 +140,15 @@ export async function startCana({
     // a greets b; b waves back and answers a moment later
     a.face = b.x >= a.x ? 1 : -1;
     pose(a, "wave", 1800);
-    say(a, lineFor(roleOf(a), phase, hash(a.id + b.id + Math.floor(clock))), 2600);
+    say(a, lineFor(roleOf(a), phase, hash(a.id + b.id + Math.floor(S.clock))), 2600);
     if (b !== me) {
       b.stop();
     }
     b.face = a.x >= b.x ? 1 : -1;
     pose(b, "wave", 1800);
     wait(900).then(
-      () => !dead && say(b, lineFor(roleOf(b), phase, hash(b.id + a.id + Math.floor(clock))), 2600)
+      () =>
+        !S.dead && say(b, lineFor(roleOf(b), phase, hash(b.id + a.id + Math.floor(S.clock))), 2600)
     );
   };
   const machines = new Map();
@@ -537,7 +198,7 @@ export async function startCana({
       }
     });
     machines.set(p.id, actor);
-    timers.push({ at: clock + delay, res: () => !dead && actor.start() });
+    kit.after(delay, () => actor.start());
   };
 
   // ---- the servants' work ----
@@ -653,7 +314,7 @@ export async function startCana({
   }
 
   function enterPhase(name) {
-    epoch++;
+    kit.nextPart();
     phase = name;
     snd.phase(name);
     onPhase(name);
@@ -681,11 +342,11 @@ export async function startCana({
     } else if (name === "wineRuns") {
       say(mary, lineFor("mary", "wineRuns", 0), 3200);
       wait(3400).then(
-        () => !dead && phase === "wineRuns" && say(mary, lineFor("mary", "wineRuns", 1), 3200)
+        () => !S.dead && phase === "wineRuns" && say(mary, lineFor("mary", "wineRuns", 1), 3200)
       );
       wait(3600).then(
         () =>
-          !dead && phase === "wineRuns" && servants.forEach(s => (s.face = mary.x > s.x ? 1 : -1))
+          !S.dead && phase === "wineRuns" && servants.forEach(s => (s.face = mary.x > s.x ? 1 : -1))
       );
     } else if (name === "fillJars") {
       startFilling();
@@ -723,11 +384,11 @@ export async function startCana({
     startGuest(g, 300 + i * 650);
   });
   // rebuilt part-way through (the hall changed shape), so carry on from where the story was
-  restoring = true;
+  S.restoring = true;
   for (let k = 0; k < PHASES.indexOf(startPhase); k++) {
     director.send({ type: "SKIP" });
   }
-  restoring = false;
+  S.restoring = false;
   if (sound) {
     sound.phase(phase);
   }
@@ -744,19 +405,6 @@ export async function startCana({
     cistern: "The servants draw water from here.",
     table: "The table of the bridegroom and bride."
   };
-  const toMe = fn => {
-    if (!me) {
-      return;
-    }
-    meEpoch++;
-    me.stop();
-    me.variant = null;
-    runMe(fn);
-  };
-  const walkMe = point =>
-    toMe(async stale => {
-      await go(me, point, stale);
-    });
   const greetPerson = o =>
     toMe(async stale => {
       const side = o.x > me.x ? -1 : 1;
@@ -792,11 +440,7 @@ export async function startCana({
       say(g, "Thank you!", 2000);
       pose(me, "wave", 1500);
     });
-  const tap = ev => {
-    if (!me) {
-      return;
-    }
-    const p = world.toLocal(ev.global);
+  const tap = p => {
     let hit = null;
     let best = 22;
     for (const o of people) {
@@ -861,54 +505,11 @@ export async function startCana({
     }
     walkMe(p);
   };
-  app.stage.eventMode = "static";
-  app.stage.hitArea = app.screen;
-  app.stage.on("pointertap", tap);
+  kit.onTap(tap);
 
-  // ---- the loop ----
+  // ---- the music notes over the musicians, and the glow of the lanterns ----
   let notes = 0;
-  let stepClock = 0;
-  const step = ticker => {
-    const dt = Math.min(0.05, ticker.deltaMS / 1000);
-    clock += dt * 1000;
-    for (let i = timers.length - 1; i >= 0; i--) {
-      if (clock >= timers[i].at) {
-        const t = timers.splice(i, 1)[0];
-        t.res();
-      }
-    }
-    for (let i = tweens.length - 1; i >= 0; i--) {
-      const tw = tweens[i];
-      const u = Math.min(1, (clock - tw.t0) / tw.ms);
-      tw.fn(u);
-      if (u >= 1) {
-        tweens.splice(i, 1);
-        tw.res();
-      }
-    }
-    for (const p of people) {
-      p.update(dt, clock, reduced);
-    }
-    if (me && me.path.length) {
-      stepClock += dt;
-      if (stepClock > 0.34) {
-        stepClock = 0;
-        snd.step();
-      }
-    } else {
-      stepClock = 0.25;
-    }
-    for (let i = particles.length - 1; i >= 0; i--) {
-      const q = particles[i];
-      q.age += dt;
-      q.o.x += q.vx * dt;
-      q.o.y += q.vy * dt;
-      q.o.alpha = Math.max(0, 1 - q.age / q.life);
-      if (q.age >= q.life) {
-        q.o.destroy();
-        particles.splice(i, 1);
-      }
-    }
+  kit.frame.push((dt, now) => {
     notes += dt;
     if (notes > (celebrating ? 0.55 : 2.4) && !reduced) {
       notes = 0;
@@ -918,32 +519,15 @@ export async function startCana({
       }
     }
     glows.forEach((g, i) => {
-      g.alpha = 0.75 + Math.sin(clock / 500 + i) * 0.25;
+      g.alpha = 0.75 + Math.sin(now / 500 + i) * 0.25;
     });
-  };
-  app.ticker.add(step);
-
-  // ---- fit the hall to its box ----
-  const fit = () => {
-    const w = host.clientWidth;
-    const h = host.clientHeight;
-    if (!w || !h) {
-      return;
-    }
-    app.renderer.resize(w, h);
-    const s = Math.min(w / WORLD.w, h / WORLD.h);
-    world.scale.set(s);
-    world.position.set((w - WORLD.w * s) / 2, (h - WORLD.h * s) / 2);
-  };
-  fit();
-  const watch = new ResizeObserver(fit);
-  watch.observe(host);
+  });
 
   return {
     phase: () => phase,
     skip: () => director.send({ type: "SKIP" }),
     replay: () => {
-      meEpoch++;
+      S.meEpoch++;
       director.send({ type: "REPLAY" });
     },
     helpWithJars() {
@@ -991,30 +575,9 @@ export async function startCana({
       offerCup();
     },
     destroy() {
-      dead = true;
-      epoch++;
-      meEpoch++;
-      watch.disconnect();
       director.stop();
       machines.forEach(m => m.stop());
-      app.ticker.remove(step);
-      app.stage.off("pointertap", tap);
-      people.forEach(p => p.clearBubble());
-      // the canvases behind the character pictures are let go now, not at the next garbage collection, which on a
-      // phone can be too late (the graphics context itself is released by PixiJS as it shuts down)
-      const pictures = people.flatMap(p =>
-        Object.values(p.tex).map(t => t.source && t.source.resource)
-      );
-      clearTimeout(lostTimer);
-      canvas.removeEventListener("webglcontextlost", onLost);
-      canvas.removeEventListener("webglcontextrestored", onRestored);
-      app.destroy({ removeView: false }, { children: true, texture: true, textureSource: true });
-      pictures.forEach(c => {
-        if (c && c.width) {
-          c.width = 0;
-          c.height = 0;
-        }
-      });
+      kit.destroy();
     }
   };
 }

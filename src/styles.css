@@ -3967,7 +3967,7 @@ input[type="time"] {
 }
 
 /* The wedding at Cana: a full-screen place to walk around in. */
-.cana {
+.play {
   position: fixed;
   inset: 0;
   z-index: 36;
@@ -3979,34 +3979,34 @@ input[type="time"] {
   background: radial-gradient(90% 60% at 50% 30%, #3a2617 0%, #150f0b 100%);
   color: #f6e9d8;
 }
-.cana-bar {
+.play-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
-.cana-title {
+.play-title {
   display: grid;
   line-height: 1.15;
 }
-.cana-title b {
+.play-title b {
   font-family: var(--font-display);
   font-size: 1.1rem;
   color: #f2d58c;
 }
-.cana-title span {
+.play-title span {
   font-size: 0.8rem;
   color: #d9c9b2;
 }
-.cana-tools {
+.play-tools {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.cana-close[aria-pressed="false"] {
+.play-close[aria-pressed="false"] {
   opacity: 0.7;
 }
-.cana-close {
+.play-close {
   display: grid;
   place-items: center;
   flex: none;
@@ -4019,11 +4019,11 @@ input[type="time"] {
   color: #fff;
   cursor: pointer;
 }
-.cana-close svg {
+.play-close svg {
   width: 22px;
   height: 22px;
 }
-.cana-host {
+.play-host {
   position: relative;
   min-height: 0;
   border-radius: 10px;
@@ -4031,12 +4031,12 @@ input[type="time"] {
   background: #2a1c12;
   touch-action: manipulation;
 }
-.cana-host canvas {
+.play-host canvas {
   display: block;
   width: 100%;
   height: 100%;
 }
-.cana-note {
+.play-note {
   position: absolute;
   inset: 0;
   display: grid;
@@ -4047,7 +4047,7 @@ input[type="time"] {
   font-weight: 700;
   color: #f2d58c;
 }
-.cana-caption {
+.play-caption {
   display: grid;
   gap: 3px;
   padding: 8px 12px;
@@ -4056,7 +4056,7 @@ input[type="time"] {
   max-height: 22vh;
   overflow: auto;
 }
-.cana-step {
+.play-step {
   margin: 0;
   font-size: 0.72rem;
   font-weight: 800;
@@ -4064,47 +4064,47 @@ input[type="time"] {
   text-transform: uppercase;
   color: #f2d58c;
 }
-.cana-verse {
+.play-verse {
   margin: 0;
   font-size: 0.86rem;
   line-height: 1.35;
 }
-.cana-verse span {
+.play-verse span {
   font-weight: 800;
   color: #f2d58c;
 }
-.cana-hint {
+.play-hint {
   margin: 0;
   text-align: center;
   color: #d9c9b2;
 }
-.cana-actions {
+.play-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
 }
-.cana-actions .btn {
+.play-actions .btn {
   flex: 1 1 auto;
 }
-.cana-side {
+.play-side {
   display: contents;
 }
 /* A wide screen, or a phone turned sideways: the hall fills the left and the story and buttons sit beside it. */
 @media (min-aspect-ratio: 6/5) and (min-width: 640px) {
-  .cana {
+  .play {
     grid-template-columns: minmax(0, 1fr) 340px;
     grid-template-rows: auto minmax(0, 1fr);
     column-gap: 14px;
   }
-  .cana-bar {
+  .play-bar {
     grid-column: 1 / -1;
   }
-  .cana-host {
+  .play-host {
     grid-column: 1;
     grid-row: 2;
   }
-  .cana-side {
+  .play-side {
     grid-column: 2;
     grid-row: 2;
     display: grid;
@@ -4113,24 +4113,24 @@ input[type="time"] {
     min-height: 0;
     overflow-y: auto;
   }
-  .cana-caption {
+  .play-caption {
     max-height: none;
   }
-  .cana-hint {
+  .play-hint {
     text-align: left;
   }
-  .cana-actions {
+  .play-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
 }
 /* A tablet held upright keeps the tall hall, in a column. */
 @media (min-width: 760px) and (max-aspect-ratio: 6/5) {
-  .cana {
+  .play {
     grid-template-columns: minmax(0, 1fr);
     justify-items: center;
   }
-  .cana > * {
+  .play > * {
     width: min(100%, 520px);
   }
 }

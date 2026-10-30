@@ -8,7 +8,7 @@ import { MOODS, degreeFreq, melodyBar, mulberry } from "./music.js";
 // Each uses as few audio nodes as it can and lets them go the moment it ends. Over a long visit thousands of sounds are
 // made, and a browser (Safari most of all) can run short of memory if the pieces of finished sounds pile up.
 const noiseBuffers = new WeakMap();
-function noise(ctx) {
+export function noise(ctx) {
   if (!noiseBuffers.has(ctx)) {
     const len = Math.floor(ctx.sampleRate * 2);
     const buf = ctx.createBuffer(1, len, ctx.sampleRate);
@@ -37,7 +37,7 @@ function stringWave(ctx) {
 }
 
 // when `src` ends, let it and everything wired after it go, so the browser can free them straight away
-const release = (src, ...nodes) => {
+export const release = (src, ...nodes) => {
   src.onended = () => {
     src.disconnect();
     nodes.forEach(n => n.disconnect());
@@ -45,14 +45,14 @@ const release = (src, ...nodes) => {
 };
 
 // a quick rise to `peak`, then a fall away over `decay` seconds
-const envelope = (gain, t, attack, peak, decay) => {
+export const envelope = (gain, t, attack, peak, decay) => {
   gain.setValueAtTime(0.0001, t);
   gain.linearRampToValueAtTime(peak, t + attack);
   gain.exponentialRampToValueAtTime(0.0001, t + attack + decay);
 };
 
 // one oscillator and one gain: a plain tone that rises, then dies away
-function tone(ctx, out, t, freq, peak, decay, attack = 0.004) {
+export function tone(ctx, out, t, freq, peak, decay, attack = 0.004) {
   const o = ctx.createOscillator();
   o.type = "sine";
   o.frequency.setValueAtTime(freq, t);
@@ -120,7 +120,7 @@ export function bell(ctx, out, t, freq, vol = 0.2, decay = 2.2) {
   tone(ctx, out, t, freq * 2.76, vol * 0.4, decay * 0.55);
 }
 
-function sweep(ctx, out, t, dur, from, to, peak, q = 1.2) {
+export function sweep(ctx, out, t, dur, from, to, peak, q = 1.2) {
   const n = noise(ctx);
   const bp = ctx.createBiquadFilter();
   bp.type = "bandpass";
@@ -141,7 +141,7 @@ function sweep(ctx, out, t, dur, from, to, peak, q = 1.2) {
 }
 
 // small round "bloops", like bubbles in water
-function bubbles(ctx, out, t, dur, count, base = 380) {
+export function bubbles(ctx, out, t, dur, count, base = 380) {
   for (let k = 0; k < count; k++) {
     const at = t + (k / count) * dur;
     const f = base + ((k * 137) % 400);
@@ -272,32 +272,26 @@ export function playBar(ctx, out, mood, bar, prev, rand, at) {
 // A sound for no-one: used when the browser has no Web Audio, so the rest of the scene need not check.
 const quiet = muted => {
   let m = muted;
-  const none = () => {};
-  return {
-    unlock: none,
-    phase: none,
-    step: none,
-    draw: none,
-    pour: none,
-    fillDone: none,
-    wine: none,
-    clink: none,
-    cheer: none,
-    blip: none,
+  const base = {
+    supported: false,
     setMuted: v => {
       m = v;
     },
-    isMuted: () => m,
-    supported: false,
-    destroy: none
+    isMuted: () => m
   };
+  // every other method (a scene may have its own sounds) does nothing
+  return new Proxy(base, { get: (t, k) => (k in t ? t[k] : () => {}) });
 };
 
 // Starts the sound. `Ctx` is the AudioContext to use (the browser's, unless one is given), and `muted` starts it silent.
 export function createSound({
   Ctx = globalThis.AudioContext || globalThis.webkitAudioContext,
   muted = false,
-  seed = 7
+  seed = 7,
+  moods = MOODS,
+  murmurLevels = MURMUR,
+  extra = {},
+  gaps = {}
 } = {}) {
   if (!Ctx) {
     return quiet(muted);
@@ -309,6 +303,9 @@ export function createSound({
     return quiet(muted);
   }
   let off = muted;
+  // a scene can bring its own music moods, murmur levels and sounds (extra: { name: (ctx, out, t, ...args) => {} })
+  const allVoices = { ...voices, ...extra };
+  const GAPS = { ...GAP, ...gaps };
   const master = ctx.createGain();
   master.gain.setValueAtTime(off ? 0 : MASTER, ctx.currentTime);
   const squash = ctx.createDynamicsCompressor();
@@ -358,16 +355,17 @@ export function createSound({
         return;
       }
       const now = ctx.currentTime;
-      if (now - (last[name] ?? -99) < GAP[name]) {
+      if (now - (last[name] ?? -99) < GAPS[name]) {
         return;
       }
       last[name] = now;
-      voices[name](ctx, fxBus, now + 0.01, ...args);
+      allVoices[name](ctx, fxBus, now + 0.01, ...args);
     };
 
   // the music: bars are scheduled a little ahead, so it keeps time however busy the page is
-  let mood = MOODS.feast;
-  let moodName = "feast";
+  const firstMood = Object.keys(moods)[0];
+  let mood = moods[firstMood];
+  let moodName = firstMood;
   const rand = mulberry(seed);
   let bar = 0;
   let prev = 7;
@@ -399,7 +397,7 @@ export function createSound({
     document.addEventListener("visibilitychange", onVisible);
   }
 
-  return {
+  const api = {
     supported: true,
     // call this from a tap or a key press: browsers only start sound after one
     unlock() {
@@ -417,13 +415,13 @@ export function createSound({
     isMuted: () => off,
     // a new part of the story: the music takes its mood, the murmur changes and a bell sounds
     phase(name) {
-      if (!MOODS[name]) {
+      if (!moods[name]) {
         return;
       }
       const changed = name !== moodName;
       moodName = name;
-      mood = MOODS[name];
-      murmur.gain.setTargetAtTime(MURMUR[name], ctx.currentTime, 1.2);
+      mood = moods[name];
+      murmur.gain.setTargetAtTime(murmurLevels[name], ctx.currentTime, 1.2);
       if (changed) {
         sfx("cue")();
       }
@@ -452,4 +450,8 @@ export function createSound({
       ctx.close();
     }
   };
+  Object.keys(extra).forEach(name => {
+    api[name] = sfx(name);
+  });
+  return api;
 }
