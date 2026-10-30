@@ -2334,6 +2334,27 @@ input[type="password"] {
 .map-card.expanded .map-wrap .map {
   touch-action: none;
 }
+/* A phone turned sideways: the map fills the whole screen, clear of the notch and rounded corners. JourneyMap
+   measures the space and shows a matching slice of the map, which you drag up and down. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .map-card.expanded {
+    padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px))
+      max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
+    grid-template-rows: minmax(0, 1fr);
+    align-content: stretch;
+    justify-items: stretch;
+  }
+  .map-card.expanded .map-wrap {
+    width: 100%;
+    height: 100%;
+  }
+  .map-card.expanded .map-wrap .map {
+    height: 100%;
+  }
+  .map-card.expanded .map-hint {
+    display: none;
+  }
+}
 .m-name {
   font: 700 4.2px var(--font-body);
   fill: #2a1c0e;

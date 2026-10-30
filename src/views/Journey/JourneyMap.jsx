@@ -1,26 +1,25 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useStore } from "@/store.js";
+import { useStore, setState } from "@/store.js";
 import { STOPS } from "@/lib/data.js";
 import { stats, allPlayers } from "@/lib/player.js";
 import {
   MAP_BASE,
-  MAP_W,
-  MAP_H,
   routePath,
   buildCrowd,
   buildMe,
   miniViewBox
 } from "@/lib/journey.js";
 import { selectStop } from "@/actions";
+import { mapVB, mapZoom, setMapAspect } from "@/lib/mapCamera.js";
 import MapStop from "./MapStop.jsx";
 import { wireGestures, gesture } from "./mapGestures.js";
 
 // mini = the small window around the player on Today; otherwise the full, zoomable map on Journey.
 export function JourneyMap({ mini }) {
-  const { me, players, mapVB: vb, stop: sel } = useStore();
+  const { me, players, stop: sel } = useStore();
   const ref = useRef(null);
   const myN = me ? stats(me).n : 0;
-  const zoom = mini ? 1 : MAP_W / (vb ? vb[2] : MAP_W);
+  const zoom = mini ? 1 : mapZoom();
   const named = zoom >= 2; // names show once you zoom in close
   const people = useMemo(() => allPlayers(players, me), [players, me]);
   const crowd = useMemo(() => buildCrowd(people, me && me.id, named), [people, me, named]);
@@ -32,9 +31,26 @@ export function JourneyMap({ mini }) {
     }
   }, [mini]);
 
-  const viewBox = mini
-    ? miniViewBox(myN)
-    : (vb || [0, 0, MAP_W, MAP_H]).map(v => v.toFixed(1)).join(" ");
+  // The view takes the shape of the screen area it is drawn in, so a full-screen map turned sideways fills it.
+  useEffect(() => {
+    if (mini || !ref.current) {
+      return;
+    }
+    const svg = ref.current;
+    const watch = new ResizeObserver(() => {
+      const r = svg.getBoundingClientRect();
+      if (r.width && r.height) {
+        setMapAspect(r.width / r.height);
+      }
+    });
+    watch.observe(svg);
+    return () => {
+      watch.disconnect();
+      setState({ mapAspect: null });
+    };
+  }, [mini]);
+
+  const viewBox = mini ? miniViewBox(myN) : mapVB().map(v => v.toFixed(1)).join(" ");
   const onSelect = i => () => {
     if (gesture.dragged) {
       gesture.dragged = false;

@@ -1,4 +1,4 @@
-import { mapVB, mapZoom, setMapVB, zoomMapAt, mapPoint } from "@/lib/mapCamera.js";
+import { mapVB, mapPannable, setMapVB, zoomMapAt, mapPoint } from "@/lib/mapCamera.js";
 
 // True right after a drag or pinch, so the tap that ends it doesn't also select a stop.
 export const gesture = { dragged: false };
@@ -37,7 +37,7 @@ export function wireGestures(svg) {
       }
       return;
     }
-    if (pts.size === 1 && last && mapZoom() > 1.01) {
+    if (pts.size === 1 && last && mapPannable()) {
       const dx = e.clientX - last.x;
       const dy = e.clientY - last.y;
       moved += Math.abs(dx) + Math.abs(dy);

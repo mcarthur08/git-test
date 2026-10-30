@@ -37,6 +37,7 @@ let state = {
   openProgress: false,
   cheering: false,
   mapVB: null,
+  mapAspect: null, // width / height of the screen area the big map is drawn in (null = the map's own shape)
   quiz: null,
   readDay: 1,
   readFrom: "today",
