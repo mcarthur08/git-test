@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { normLook, mixHex, avatarSVG, portraitSVG, figureSVG, fullSVG } from "./avatar.js";
+import { lookSummary } from "./look.js";
 import {
   UNLOCK,
   allowedFor,
@@ -327,5 +328,20 @@ describe("avatar drawing", () => {
     const svg = portraitSVG({ g: "f" }, DAYS);
     const ids = [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
+describe("lookSummary", () => {
+  it("names the gender, the head covering and the mantle or shawl", () => {
+    expect(lookSummary({ g: "m", cover: 1, mantle: 0 }, 0)).toBe(
+      "Brother · Headcloth · Striped wool mantle"
+    );
+    expect(lookSummary({ g: "f", cover: 0, mantle: 4 }, 0)).toBe("Sister · Embroidered plum shawl");
+  });
+
+  it("copes with anything stored", () => {
+    [null, {}, { g: "x", cover: 99, mantle: -1 }].forEach(l =>
+      expect(lookSummary(l, 0)).toMatch(/^(Brother|Sister)/)
+    );
   });
 });

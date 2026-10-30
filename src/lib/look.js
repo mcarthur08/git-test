@@ -63,3 +63,15 @@ export const mixHex = (a, b, t) => {
       .join("")
   );
 };
+
+// "Brother · Headcloth · Striped wool mantle": a line describing what a character wears.
+export const lookSummary = (look, n) => {
+  const L = normLook(look, n);
+  return [
+    L.g === "f" ? "Sister" : "Brother",
+    L.cover ? COVERS[L.g][L.cover][0] : "",
+    `${MANTLES[L.g][L.mantle][0]} ${L.g === "f" ? "shawl" : "mantle"}`
+  ]
+    .filter(Boolean)
+    .join(" · ");
+};

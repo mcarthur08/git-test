@@ -49,6 +49,7 @@ let state = {
   saveStatus: "",
   toast: null,
   reveals: [],
+  viewer: null, // { look, n, name, sub } while the full-screen character is open
   teamChecked: false,
   transferChecked: false
 };

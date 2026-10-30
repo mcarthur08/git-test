@@ -1,28 +1,28 @@
 import { useStore } from "@/store.js";
-import { COVERS, MANTLES } from "@/lib/data.js";
-import { normLook } from "@/lib/avatar.js";
+import { lookSummary } from "@/lib/look.js";
 import { Icon } from "@/components/ui/Icon.jsx";
 import { Frame } from "@/components/ui/Avatar.jsx";
-import { surprise, joinOrSave } from "@/actions";
+import { surprise, joinOrSave, openViewer } from "@/actions";
 
 // The character beside (on a phone, above) the options, with the chosen name and the save button. It stays pinned
 // on screen while the options scroll, so every change can be seen as it is made.
 export default function EditorPreview({ ed }) {
   const readOnly = useStore(s => s.readOnly);
-  const { d, n, g, onboarding, alias, aliasTaken, canSave } = ed;
-  const L = normLook(d.look, n);
+  const { d, n, onboarding, alias, aliasTaken, canSave } = ed;
+  const sub = lookSummary(d.look, n);
   return (
     <div className={"preview" + (aliasTaken ? " taken" : "")}>
-      <Frame look={d.look} n={n} className="big" />
+      <Frame
+        look={d.look}
+        n={n}
+        className="big"
+        onExpand={() => openViewer({ look: d.look, n, name: alias || "Your character", sub })}
+      />
       <div className="pv-info">
         <div className="alias" id="alias-preview">
           {alias || "Choose a name"}
         </div>
-        <p className="small muted pv-sum">
-          {g === "f" ? "Sister" : "Brother"}
-          {L.cover ? " · " + COVERS[g][L.cover][0] : ""} · {MANTLES[g][L.mantle][0]}{" "}
-          {g === "f" ? "shawl" : "mantle"}
-        </p>
+        <p className="small muted pv-sum">{sub}</p>
         <p className="small" id="alias-taken" style={{ color: "var(--rose)" }} hidden={!aliasTaken}>
           Someone already has that name. Add a hometown or pick another.
         </p>
