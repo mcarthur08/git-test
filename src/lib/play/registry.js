@@ -3,6 +3,7 @@
 // so the map can read it cheaply; the scene itself is loaded when it is opened (see views/play/loaders.js).
 import { PHASES as CANA_PHASES, STORY as CANA_STORY } from "../cana/story.js";
 import { PARTS as BETHSAIDA_PARTS, STORY as BETHSAIDA_STORY } from "../bethsaida/story.js";
+import { PARTS as GALILEE_PARTS, STORY as GALILEE_STORY } from "../galilee/story.js";
 
 export const SCENES = {
   cana: {
@@ -50,6 +51,29 @@ export const SCENES = {
       { label: "Sit down", run: "sitDown" },
       { label: "Pass the bread", run: "passBread" },
       { label: "Gather a basket", run: "gatherBasket" },
+      { label: "Say hello", run: "greetNearest" }
+    ]
+  },
+  galilee: {
+    id: "galilee",
+    title: "Peace, be still",
+    ref: "Mark 4:35–41",
+    stop: "Sea of Galilee",
+    enter: "Step into the boat",
+    parts: GALILEE_PARTS,
+    steps: {
+      evening: "Let us pass over",
+      storm: "A great storm",
+      fear: "Carest thou not?",
+      calm: "Peace, be still",
+      marvel: "What manner of man"
+    },
+    story: GALILEE_STORY,
+    hint: "Tap the deck to walk, a person to say hello, or the water to bail it out.",
+    actions: [
+      { label: "Bail water", run: "bail" },
+      { label: "Wake him", run: "wakeHim" },
+      { label: "Hold on", run: "holdOn" },
       { label: "Say hello", run: "greetNearest" }
     ]
   }

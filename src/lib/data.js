@@ -537,6 +537,7 @@ export const STOPS = [
     day: 36,
     place: "Sea of Galilee",
     title: "Peace, be still",
+    scene: "galilee",
     keepsake: "oar",
     ref: "Mark 4:35–41",
     x: 277,
