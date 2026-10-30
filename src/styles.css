@@ -4079,7 +4079,45 @@ input[type="time"] {
 .cana-actions .btn {
   flex: 1 1 auto;
 }
-@media (min-width: 760px) {
+.cana-side {
+  display: contents;
+}
+/* A wide screen, or a phone turned sideways: the hall fills the left and the story and buttons sit beside it. */
+@media (min-aspect-ratio: 6/5) and (min-width: 640px) {
+  .cana {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: 14px;
+  }
+  .cana-bar {
+    grid-column: 1 / -1;
+  }
+  .cana-host {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .cana-side {
+    grid-column: 2;
+    grid-row: 2;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .cana-caption {
+    max-height: none;
+  }
+  .cana-hint {
+    text-align: left;
+  }
+  .cana-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/* A tablet held upright keeps the tall hall, in a column. */
+@media (min-width: 760px) and (max-aspect-ratio: 6/5) {
   .cana {
     grid-template-columns: minmax(0, 1fr);
     justify-items: center;

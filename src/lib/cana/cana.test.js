@@ -17,7 +17,11 @@ import {
   buildGrid,
   tileOf,
   nearestFree,
-  makeFinder
+  makeFinder,
+  PORTRAIT,
+  LANDSCAPE,
+  LAYOUTS,
+  layoutFor
 } from "./layout.js";
 import { PHASES, STORY, phaseText, directorMachine } from "./story.js";
 import { personMachine } from "./person.js";
@@ -397,5 +401,128 @@ describe("character poses for the scenes", () => {
     [ITEM.jar, ITEM.cup, ITEM.harp, ITEM.timbrel].forEach(item =>
       expect(strip(fullSVG({ g: "m", item }, 70)), `item ${item}`).not.toBe(strip(none))
     );
+  });
+});
+
+describe.each([
+  ["portrait", PORTRAIT],
+  ["landscape", LANDSCAPE]
+])("the %s hall", (name, L) => {
+  const grid = L.buildGrid();
+  const free = p => grid[L.tileOf(p.x, p.y).ty][L.tileOf(p.x, p.y).tx] === 0;
+  const places = () => ({
+    spawn: [L.SPAWN],
+    pots: L.JARS.map(j => j.pour),
+    cistern: [L.CISTERN.use],
+    seats: L.SEATS,
+    dance: L.DANCE_SPOTS,
+    wander: L.WANDER_SPOTS,
+    watch: L.WATCH_SPOTS,
+    standby: L.STANDBY,
+    head: Object.values(L.HEAD_SEATS),
+    mary: [L.MARY_SPOT],
+    musicians: L.MUSICIAN_SPOTS
+  });
+
+  it("is a grid over the whole hall, walled round the edge", () => {
+    expect(grid.length).toBe(Math.ceil(L.WORLD.h / L.WORLD.tile));
+    expect(grid[0].length).toBe(Math.ceil(L.WORLD.w / L.WORLD.tile));
+    expect(grid[0].every(c => c === 1)).toBe(true);
+    expect(grid[grid.length - 1].every(c => c === 1)).toBe(true);
+    expect(grid.every(row => row[0] === 1 && row[row.length - 1] === 1)).toBe(true);
+  });
+
+  it("has six pots in a row, a cistern and two guest tables, all blocked and inside the hall", () => {
+    expect(L.JARS.length).toBe(6);
+    expect(L.GUEST_TABLES.length).toBe(2);
+    L.JARS.forEach(j => {
+      expect(free(j), `pot ${j.i}`).toBe(false);
+      expect(j.x).toBeGreaterThan(20);
+      expect(j.x).toBeLessThan(L.WORLD.w - 20);
+    });
+    // the pots do not overlap one another
+    for (let i = 1; i < L.JARS.length; i++) {
+      expect(L.JARS[i].x - L.JARS[i - 1].x).toBeGreaterThanOrEqual(36);
+    }
+    [L.HEAD_TABLE, ...L.GUEST_TABLES, L.CISTERN].forEach(r => {
+      expect(r.x).toBeGreaterThanOrEqual(0);
+      expect(r.y).toBeGreaterThanOrEqual(0);
+      expect(r.x + r.w).toBeLessThanOrEqual(L.WORLD.w);
+      expect(r.y + r.h).toBeLessThanOrEqual(L.WORLD.h);
+    });
+  });
+
+  it("keeps every place someone is meant to stand on free floor inside the hall", () => {
+    Object.entries(places()).forEach(([group, list]) =>
+      list.forEach((p, i) => {
+        expect(free(p), `${group} ${i} at ${p.x},${p.y}`).toBe(true);
+        expect(p.x).toBeGreaterThan(0);
+        expect(p.x).toBeLessThan(L.WORLD.w);
+        expect(p.y).toBeGreaterThan(L.WALL_Y - 5);
+        expect(p.y).toBeLessThan(L.WORLD.h);
+      })
+    );
+    expect(L.DANCE_SPOTS.length).toBeGreaterThanOrEqual(10);
+    expect(new Set(L.SEATS.map(s => s.id)).size).toBe(L.SEATS.length);
+  });
+
+  it("lets everyone walk from the entrance to every place and back", () => {
+    const find = L.makeFinder(grid);
+    Object.entries(places()).forEach(([group, list]) =>
+      list.forEach((p, i) => {
+        const there = find(L.SPAWN, p);
+        expect(there, `${group} ${i}`).not.toBeNull();
+        expect(there[there.length - 1]).toEqual({ x: p.x, y: p.y });
+        expect(find(p, L.SPAWN), `${group} ${i} back`).not.toBeNull();
+      })
+    );
+    expect(find(L.CISTERN.use, L.JARS[5].pour)).not.toBeNull();
+    expect(find(L.JARS[0].pour, L.HEAD_SEATS.master)).not.toBeNull();
+  });
+
+  it("walks to the nearest free spot when asked to go somewhere blocked", () => {
+    const find = L.makeFinder(grid);
+    const table = {
+      x: L.HEAD_TABLE.x + L.HEAD_TABLE.w / 2,
+      y: L.HEAD_TABLE.y + L.HEAD_TABLE.h / 2
+    };
+    expect(free(table)).toBe(false);
+    const path = find(L.SPAWN, table);
+    expect(free(path[path.length - 1])).toBe(true);
+  });
+
+  it("puts the dance floor where people can reach it and the head table behind it", () => {
+    expect(L.DANCE_FLOOR.y).toBeGreaterThan(L.HEAD_TABLE.y + L.HEAD_TABLE.h);
+    L.JARS.forEach(j => expect(j.y).toBeGreaterThan(L.DANCE_FLOOR.y + L.DANCE_FLOOR.ry));
+  });
+});
+
+describe("choosing a hall", () => {
+  it("has a tall hall and a wide hall", () => {
+    expect(Object.keys(LAYOUTS)).toEqual(["portrait", "landscape"]);
+    expect(PORTRAIT.WORLD.h).toBeGreaterThan(PORTRAIT.WORLD.w);
+    expect(LANDSCAPE.WORLD.w).toBeGreaterThan(LANDSCAPE.WORLD.h);
+    expect(PORTRAIT.kind).toBe("portrait");
+    expect(LANDSCAPE.kind).toBe("landscape");
+  });
+
+  it("picks the wide hall for a box that is clearly wider than it is tall", () => {
+    expect(layoutFor(1280, 640).kind).toBe("landscape");
+    expect(layoutFor(844, 340).kind).toBe("landscape");
+    expect(layoutFor(900, 600).kind).toBe("landscape");
+  });
+
+  it("picks the tall hall for a phone held upright, a square box, or no box yet", () => {
+    expect(layoutFor(390, 600).kind).toBe("portrait");
+    expect(layoutFor(700, 700).kind).toBe("portrait");
+    expect(layoutFor(800, 700).kind).toBe("portrait");
+    expect(layoutFor(0, 0).kind).toBe("portrait");
+    expect(layoutFor(500, 0).kind).toBe("portrait");
+  });
+
+  it("keeps the names the tall hall has always had", () => {
+    expect(WORLD).toBe(PORTRAIT.WORLD);
+    expect(JARS).toBe(PORTRAIT.JARS);
+    expect(buildGrid()).toEqual(PORTRAIT.buildGrid());
   });
 });

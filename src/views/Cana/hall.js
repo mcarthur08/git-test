@@ -1,18 +1,8 @@
 import { Graphics } from "pixi.js";
-import {
-  WORLD,
-  WALL_Y,
-  HEAD_TABLE,
-  GUEST_TABLES,
-  JARS,
-  CISTERN,
-  PLANTS,
-  DANCE_FLOOR
-} from "@/lib/cana/layout.js";
 
 // The courtyard drawn with simple shapes: a tiled floor, the back wall with its arches, tables, the dance floor,
 // the cistern, plants and a string of lanterns. The things people use (the six pots) are separate pieces so they
-// can fill up and turn to wine.
+// can fill up and turn to wine. Each piece is drawn for the layout it is given (the tall hall or the wide one).
 export const mix = (a, b, t) => {
   const ch = (c, s) => (c >> s) & 255;
   const m = s => Math.round(ch(a, s) + (ch(b, s) - ch(a, s)) * t);
@@ -22,7 +12,8 @@ export const mix = (a, b, t) => {
 const WATER = 0x5aa6d6;
 const WINE = 0x7a1230;
 
-export function drawFloor() {
+export function drawFloor(layout) {
+  const { WORLD, WALL_Y, HEAD_TABLE, DANCE_FLOOR } = layout;
   const g = new Graphics();
   g.rect(0, 0, WORLD.w, WORLD.h).fill(0xcfa977);
   const t = 30;
@@ -46,18 +37,20 @@ export function drawFloor() {
   // the back wall with three arches
   g.rect(0, 0, WORLD.w, WALL_Y).fill(0xb98f5f);
   g.rect(0, WALL_Y - 8, WORLD.w, 8).fill(0x8d6a40);
-  [70, 180, 290].forEach(cx => {
-    const base = WALL_Y - 8;
-    const top = base - 28;
-    const pts = [cx - 28, base, cx - 28, top];
-    for (let k = 0; k <= 12; k++) {
-      const a = Math.PI - (k / 12) * Math.PI;
-      pts.push(cx + Math.cos(a) * 28, top - Math.sin(a) * 22);
-    }
-    pts.push(cx + 28, top, cx + 28, base);
-    g.poly(pts).fill(0x6a4a2e);
-    g.poly(pts.map((v, i) => (i % 2 ? v + 3 : v))).fill({ color: 0x3a2a1c, alpha: 0.6 });
-  });
+  [0.195, 0.5, 0.805]
+    .map(f => Math.round(WORLD.w * f))
+    .forEach(cx => {
+      const base = WALL_Y - 8;
+      const top = base - 28;
+      const pts = [cx - 28, base, cx - 28, top];
+      for (let k = 0; k <= 12; k++) {
+        const a = Math.PI - (k / 12) * Math.PI;
+        pts.push(cx + Math.cos(a) * 28, top - Math.sin(a) * 22);
+      }
+      pts.push(cx + 28, top, cx + 28, base);
+      g.poly(pts).fill(0x6a4a2e);
+      g.poly(pts.map((v, i) => (i % 2 ? v + 3 : v))).fill({ color: 0x3a2a1c, alpha: 0.6 });
+    });
   // the soft dark at the edges
   g.rect(0, WALL_Y, 8, WORLD.h).fill({ color: 0x000000, alpha: 0.18 });
   g.rect(WORLD.w - 8, WALL_Y, 8, WORLD.h).fill({ color: 0x000000, alpha: 0.18 });
@@ -66,12 +59,16 @@ export function drawFloor() {
 }
 
 // A string of lanterns across the courtyard, drawn over everything. Returns the glow circles so they can pulse.
-export function drawLanterns() {
+export function drawLanterns(layout) {
+  const W = layout.WORLD.w;
   const g = new Graphics();
-  g.moveTo(8, 20).quadraticCurveTo(180, 70, 352, 20).stroke({ width: 1.2, color: 0x2a2018 });
+  g.moveTo(8, 20)
+    .quadraticCurveTo(W / 2, 70, W - 8, 20)
+    .stroke({ width: 1.2, color: 0x2a2018 });
   const glows = [];
-  [40, 90, 135, 180, 225, 270, 320].forEach(x => {
-    const t = (x - 8) / 344;
+  // seven lanterns spaced along the string, however wide the hall is
+  Array.from({ length: 7 }, (_, k) => 40 + (k * (W - 80)) / 6).forEach(x => {
+    const t = (x - 8) / (W - 16);
     const y = (1 - t) * (1 - t) * 20 + 2 * (1 - t) * t * 70 + t * t * 20;
     g.circle(x, y + 5, 4.2).fill(0xffd46a);
     glows.push({ x, y: y + 5 });
@@ -79,9 +76,8 @@ export function drawLanterns() {
   return { g, glows };
 }
 
-export function drawHeadTable() {
+export function drawHeadTable(t) {
   const g = new Graphics();
-  const t = HEAD_TABLE;
   g.roundRect(t.x, t.y, t.w, t.h, 6).fill(0x8a5e34);
   g.roundRect(t.x + 3, t.y + 3, t.w - 6, t.h - 8, 5).fill(0xf4ead2);
   g.rect(t.x + 3, t.y + t.h - 10, t.w - 6, 4).fill({ color: 0xc9a04b, alpha: 0.9 });
@@ -119,9 +115,8 @@ export function drawPlant(p) {
   return g;
 }
 
-export function drawCistern() {
+export function drawCistern(c) {
   const g = new Graphics();
-  const c = CISTERN;
   g.ellipse(c.x + c.w / 2, c.y + c.h - 2, c.w / 2 + 4, 8).fill({ color: 0x000000, alpha: 0.2 });
   g.roundRect(c.x, c.y + 10, c.w, c.h - 12, 8).fill(0xa39a8a);
   g.ellipse(c.x + c.w / 2, c.y + 12, c.w / 2, 11).fill(0xbfb6a4);
@@ -207,6 +202,9 @@ export class Jar {
   }
 }
 
-export const makeJars = () => JARS.map(d => new Jar(d));
-export const tables = () => [drawHeadTable(), ...GUEST_TABLES.map(drawGuestTable)];
-export const plants = () => PLANTS.map(drawPlant);
+export const makeJars = layout => layout.JARS.map(d => new Jar(d));
+export const tables = layout => [
+  drawHeadTable(layout.HEAD_TABLE),
+  ...layout.GUEST_TABLES.map(drawGuestTable)
+];
+export const plants = layout => layout.PLANTS.map(drawPlant);

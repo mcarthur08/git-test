@@ -1,20 +1,6 @@
 import { Application, Container, Graphics, Sprite, Text } from "pixi.js";
 import { createActor } from "xstate";
-import {
-  WORLD,
-  SPAWN,
-  CISTERN,
-  SEATS,
-  DANCE_SPOTS,
-  WANDER_SPOTS,
-  HEAD_SEATS,
-  MARY_SPOT,
-  MUSICIAN_SPOTS,
-  HEAD_TABLE,
-  buildGrid,
-  makeFinder
-} from "@/lib/cana/layout.js";
-import { directorMachine } from "@/lib/cana/story.js";
+import { directorMachine, PHASES } from "@/lib/cana/story.js";
 import { personMachine } from "@/lib/cana/person.js";
 import { lineFor } from "@/lib/cana/lines.js";
 import { hash, everyone } from "@/lib/cana/cast.js";
@@ -32,13 +18,6 @@ const mulberry = seed => {
 };
 class Cancelled extends Error {}
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-const WATCH_SPOTS = [
-  { x: 120, y: 350 },
-  { x: 180, y: 352 },
-  { x: 240, y: 350 },
-  { x: 150, y: 330 },
-  { x: 210, y: 330 }
-];
 
 // One person in the courtyard: where they stand, the path they are walking, their pose and what they say.
 class Person {
@@ -230,7 +209,28 @@ class Person {
 }
 
 // Starts the wedding at Cana in `canvas`. Returns a controller to steer it and to tear it down.
-export async function startCana({ canvas, host, cast, hooks = {}, reduced = false }) {
+export async function startCana({
+  canvas,
+  host,
+  cast,
+  layout,
+  startPhase = "feast",
+  hooks = {},
+  reduced = false
+}) {
+  const {
+    WORLD,
+    SPAWN,
+    CISTERN,
+    SEATS,
+    DANCE_SPOTS,
+    WANDER_SPOTS,
+    WATCH_SPOTS,
+    HEAD_SEATS,
+    MARY_SPOT,
+    MUSICIAN_SPOTS,
+    HEAD_TABLE
+  } = layout;
   const onPhase = name => {
     if (hooks.onPhase) {
       hooks.onPhase(name);
@@ -253,20 +253,20 @@ export async function startCana({ canvas, host, cast, hooks = {}, reduced = fals
     autoDensity: true
   });
 
-  const grid = buildGrid();
-  const find = makeFinder(grid);
+  const grid = layout.buildGrid();
+  const find = layout.makeFinder(grid);
   const world = new Container();
   app.stage.addChild(world);
-  world.addChild(drawFloor());
+  world.addChild(drawFloor(layout));
   const layer = new Container();
   layer.sortableChildren = true;
   world.addChild(layer);
-  tables().forEach(t => layer.addChild(t));
-  plants().forEach(p => layer.addChild(p));
-  layer.addChild(drawCistern());
-  const jars = makeJars();
+  tables(layout).forEach(t => layer.addChild(t));
+  plants(layout).forEach(p => layer.addChild(p));
+  layer.addChild(drawCistern(layout.CISTERN));
+  const jars = makeJars(layout);
   jars.forEach(j => layer.addChild(j.g));
-  const lanterns = drawLanterns();
+  const lanterns = drawLanterns(layout);
   world.addChild(lanterns.g);
   const glow = new Graphics();
   world.addChild(glow);
@@ -523,11 +523,7 @@ export async function startCana({ canvas, host, cast, hooks = {}, reduced = fals
     jars
       .filter(j => !j.full && !j.assigned)
       .sort((a, b) => dist(a.def.pour, from) - dist(b.def.pour, from))[0];
-  const standBy = [
-    { x: 120, y: 440 },
-    { x: 210, y: 452 },
-    { x: 290, y: 440 }
-  ];
+  const standBy = layout.STANDBY;
 
   function startFilling() {
     servants.forEach((s, i) =>
@@ -674,7 +670,13 @@ export async function startCana({ canvas, host, cast, hooks = {}, reduced = fals
     placeAt(g, { x: SPAWN.x + ((i % 5) - 2) * 14, y: SPAWN.y + 4 - (i % 2) * 6 });
     startGuest(g, 300 + i * 650);
   });
-  onPhase("feast");
+  // rebuilt part-way through (the hall changed shape), so carry on from where the story was
+  for (let k = 0; k < PHASES.indexOf(startPhase); k++) {
+    director.send({ type: "SKIP" });
+  }
+  // the earlier parts were only passed through, so what was said in them is not left hanging in the air
+  people.forEach(p => p.clearBubble());
+  onPhase(phase);
 
   // ---- what you can do ----
   const info = {
@@ -787,7 +789,11 @@ export async function startCana({ canvas, host, cast, hooks = {}, reduced = fals
       p.y < HEAD_TABLE.y + HEAD_TABLE.h + 6
     ) {
       return toMe(async stale => {
-        await go(me, { x: 180, y: HEAD_TABLE.y + HEAD_TABLE.h + 18 }, stale);
+        await go(
+          me,
+          { x: HEAD_TABLE.x + HEAD_TABLE.w / 2, y: HEAD_TABLE.y + HEAD_TABLE.h + 18 },
+          stale
+        );
         say(me, info.table, 2800);
       });
     }

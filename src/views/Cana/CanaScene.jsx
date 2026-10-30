@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getState } from "@/store.js";
 import { allPlayers } from "@/lib/player.js";
 import { buildCast } from "@/lib/cana/cast.js";
+import { LAYOUTS, layoutFor } from "@/lib/cana/layout.js";
 import { PHASES, STORY } from "@/lib/cana/story.js";
 import { closeScene } from "@/actions";
 import { Icon } from "@/components/ui/Icon.jsx";
@@ -16,20 +17,55 @@ const STEP_NAMES = {
 
 // The wedding at Cana (John 2:1–11) as a place you can walk around in: guests, servants and the wedding party move
 // about on their own, and you can walk, greet people, help fill the six stone pots and share the wine. The scene
-// itself (PixiJS) is loaded only when this opens, so the rest of the app stays light.
+// itself (PixiJS) is loaded only when this opens, so the rest of the app stays light. The hall comes in two shapes, tall
+// for a phone held upright and wide for a desktop or a phone turned sideways, and is rebuilt (at the same point in the
+// story) if the box it is in changes shape.
 export default function CanaScene() {
   const host = useRef(null);
   const canvas = useRef(null);
   const ctl = useRef(null);
+  const kindRef = useRef(null);
+  const phaseRef = useRef("feast");
   const [phase, setPhase] = useState("feast");
   const [hint, setHint] = useState("");
   const [state, setState] = useState("loading"); // loading | ready | failed
+  const [kind, setKind] = useState(null); // "portrait" or "landscape", once the box has been measured
   const closeBtn = useRef(null);
   const box = useRef(null);
 
+  // which hall fits the box, now and whenever the box changes shape
+  useLayoutEffect(() => {
+    const k = layoutFor(host.current.clientWidth, host.current.clientHeight).kind;
+    kindRef.current = k;
+    setKind(k);
+  }, []);
   useEffect(() => {
+    const el = host.current;
+    let timer;
+    const watch = new ResizeObserver(() => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const k = layoutFor(el.clientWidth, el.clientHeight).kind;
+        if (k !== kindRef.current) {
+          kindRef.current = k;
+          setKind(k);
+        }
+      }, 350);
+    });
+    watch.observe(el);
+    return () => {
+      watch.disconnect();
+      clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!kind) {
+      return undefined;
+    }
     let gone = false;
     let started = null;
+    setState("loading");
     (async () => {
       try {
         const { startCana } = await import("./engine.js");
@@ -40,9 +76,16 @@ export default function CanaScene() {
           canvas: canvas.current,
           host: host.current,
           cast,
+          layout: LAYOUTS[kind],
+          startPhase: phaseRef.current,
           reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
           hooks: {
-            onPhase: p => !gone && setPhase(p),
+            onPhase: p => {
+              phaseRef.current = p;
+              if (!gone) {
+                setPhase(p);
+              }
+            },
             onHint: h => {
               if (!gone) {
                 setHint(h);
@@ -71,7 +114,7 @@ export default function CanaScene() {
         started.destroy();
       }
     };
-  }, []);
+  }, [kind]);
 
   // Escape closes it, the page behind stops scrolling, and Tab stays inside.
   useEffect(() => {
@@ -112,7 +155,7 @@ export default function CanaScene() {
   const ready = state === "ready";
   return (
     <div
-      className="cana"
+      className={"cana " + (kind || "")}
       role="dialog"
       aria-modal="true"
       aria-label="The wedding at Cana"
@@ -134,52 +177,55 @@ export default function CanaScene() {
       </header>
       <div className="cana-host" ref={host}>
         <canvas
+          key={kind || "pending"}
           ref={canvas}
-          aria-label="The courtyard at the wedding. Use the buttons below to take part."
+          aria-label="The courtyard at the wedding. Use the buttons beside or below it to take part."
         />
         {state === "loading" ? <p className="cana-note">Setting the tables…</p> : null}
         {state === "failed" ? (
           <p className="cana-note">
-            Your device could not start the scene. You can still read the story below.
+            Your device could not start the scene. You can still read the story beside it.
           </p>
         ) : null}
       </div>
-      <section className="cana-caption" aria-live="polite">
-        <p className="cana-step">
-          {step} of {PHASES.length} · {STEP_NAMES[phase]}
-        </p>
-        {STORY[phase].quotes.map(([ref, text]) => (
-          <p className="cana-verse" key={ref}>
-            <span>{ref}</span> {text}
+      <div className="cana-side">
+        <section className="cana-caption" aria-live="polite">
+          <p className="cana-step">
+            {step} of {PHASES.length} · {STEP_NAMES[phase]}
           </p>
-        ))}
-      </section>
-      <p className="cana-hint small" role="status">
-        {hint || "Tap the floor to walk, a guest to say hello, or a water pot to help."}
-      </p>
-      <div className="cana-actions" role="group" aria-label="Take part">
-        <button className="btn sm" disabled={!ready} onClick={act(c => c.helpWithJars())}>
-          Fill a pot
-        </button>
-        <button className="btn sm" disabled={!ready} onClick={act(c => c.greetNearest())}>
-          Say hello
-        </button>
-        <button className="btn sm" disabled={!ready} onClick={act(c => c.dance())}>
-          Dance
-        </button>
-        <button className="btn sm" disabled={!ready} onClick={act(c => c.offerCup())}>
-          Share a cup
-        </button>
-        <button
-          className="btn sm"
-          disabled={!ready || phase === "celebrate"}
-          onClick={act(c => c.skip())}
-        >
-          Next part
-        </button>
-        <button className="btn sm" disabled={!ready} onClick={act(c => c.replay())}>
-          Start again
-        </button>
+          {STORY[phase].quotes.map(([ref, text]) => (
+            <p className="cana-verse" key={ref}>
+              <span>{ref}</span> {text}
+            </p>
+          ))}
+        </section>
+        <p className="cana-hint small" role="status">
+          {hint || "Tap the floor to walk, a guest to say hello, or a water pot to help."}
+        </p>
+        <div className="cana-actions" role="group" aria-label="Take part">
+          <button className="btn sm" disabled={!ready} onClick={act(c => c.helpWithJars())}>
+            Fill a pot
+          </button>
+          <button className="btn sm" disabled={!ready} onClick={act(c => c.greetNearest())}>
+            Say hello
+          </button>
+          <button className="btn sm" disabled={!ready} onClick={act(c => c.dance())}>
+            Dance
+          </button>
+          <button className="btn sm" disabled={!ready} onClick={act(c => c.offerCup())}>
+            Share a cup
+          </button>
+          <button
+            className="btn sm"
+            disabled={!ready || phase === "celebrate"}
+            onClick={act(c => c.skip())}
+          >
+            Next part
+          </button>
+          <button className="btn sm" disabled={!ready} onClick={act(c => c.replay())}>
+            Start again
+          </button>
+        </div>
       </div>
     </div>
   );
