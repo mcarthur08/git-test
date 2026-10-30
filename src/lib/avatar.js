@@ -207,6 +207,45 @@ export function figureSVG(look, n, opts = {}) {
   if (item === "sheaf") {
     o += `<path d="M42 49 L40 39 M43 49 L43 38 M44 49 L46 39" stroke="#D8B04A" stroke-width=".9"/>`;
   }
+  if (item === "star") {
+    o += `<path d="M43 36 L44 39 L47 39 L44.6 41 L45.4 44 L43 42.2 L40.6 44 L41.4 41 L39 39 L42 39 Z" fill="#F2D58C"/>`;
+  }
+  if (item === "square") {
+    o += `<path d="M41 38 H42.4 V47 H46 V48.4 H41 Z" fill="#B98A4B"/>`;
+  }
+  if (item === "dove") {
+    o += `<ellipse cx="43" cy="46" rx="3" ry="2" fill="#F6F2EA"/><circle cx="45.4" cy="44" r="1.3" fill="#F6F2EA"/>`;
+  }
+  if (item === "stone") {
+    o += `<path d="M40.6 49 Q40 45 43 44 Q46 44 46 48 Q46 50 43 50 Z" fill="#9A948A"/>`;
+  }
+  if (item === "cup") {
+    o += `<path d="M40.6 43 H45.4 Q45.4 47 43 47.4 Q40.6 47 40.6 43 Z" fill="#C9A04B"/><rect x="42.6" y="47" width="1" height="2.4" fill="#B8892B"/>`;
+  }
+  if (item === "fish") {
+    o += `<ellipse cx="43" cy="53" rx="1.8" ry="4" fill="#9DBFD3"/>`;
+  }
+  if (item === "oar") {
+    o += `<rect x="41.8" y="10" width="1.2" height="68" fill="#8A5E34"/><path d="M40.6 4 Q42.4 3 44.2 4 L43.6 14 H41.2 Z" fill="#C69A5B"/>`;
+  }
+  if (item === "loaves") {
+    o += `<path d="M39.6 47 H46.4 L45.6 51 H40.4 Z" fill="#B98A4B"/><ellipse cx="43" cy="46" rx="3" ry="1.6" fill="#D9A25A"/>`;
+  }
+  if (item === "keys") {
+    o += `<circle cx="43" cy="48" r="1.4" fill="none" stroke="#C9A04B" stroke-width=".7"/><path d="M42.4 49 V54 M43.6 49 V54" stroke="#C9A04B" stroke-width=".8"/>`;
+  }
+  if (item === "bucket") {
+    o += `<path d="M40.8 50 H45.2 L44.6 54 H41.4 Z" fill="#8A5E34"/><path d="M40.8 50 Q43 46 45.2 50" fill="none" stroke="#C9B27A" stroke-width=".5"/>`;
+  }
+  if (item === "sycamore") {
+    o += `<path d="M43 49 Q43.6 42 43 36" stroke="#8A5E34" stroke-width=".8" fill="none"/><circle cx="41.6" cy="40" r="1.5" fill="#6E8A3E"/><circle cx="44.6" cy="38" r="1.5" fill="#6E8A3E"/>`;
+  }
+  if (item === "alabaster") {
+    o += `<path d="M42 42 H44 L45.4 46 Q45.4 49 43 49 Q40.6 49 40.6 46 Z" fill="#F3ECDC"/>`;
+  }
+  if (item === "palm") {
+    o += `<path d="M43 49 Q44 42 46 37 M44 44 L40.6 41.6 M44.6 41.6 L48 39.6 M45.2 39.4 L41.8 37.4" stroke="#5C8A3A" stroke-width=".9" fill="none"/>`;
+  }
   if (item === "shield") {
     o +=
       P("M14 30 Q20.6 27 26 30 L25.4 39 Q24 44 20 46 Q16 44 14.6 39 Z", "#B8892B") +

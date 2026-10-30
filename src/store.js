@@ -48,6 +48,7 @@ let state = {
   saveStatus: "",
   toast: null,
   reveals: [],
+  arrival: null, // { i, id }: the stop the character has just reached on the map
   viewer: null, // { look, n, name, sub } while the full-screen character is open
   teamChecked: false,
   transferChecked: false

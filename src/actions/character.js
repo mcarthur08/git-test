@@ -111,3 +111,18 @@ export function joinOrSave() {
     toast("Character saved");
   }
 }
+
+// Put on a keepsake from the map: it is saved straight to the character (and to a draft being edited).
+export function wearItem(i) {
+  const s = getState();
+  if (!s.me || s.readOnly) {
+    return;
+  }
+  const look = { ...s.me.look, item: i };
+  setState(st => ({
+    me: { ...st.me, look },
+    draft: st.draft ? { ...st.draft, look: { ...st.draft.look, item: i } } : st.draft
+  }));
+  saveMe();
+  toast(`Wearing ${UNLOCK.item[i][0]}`);
+}

@@ -2,6 +2,8 @@ import { STOPS } from "@/lib/data.js";
 import { plural, readingURL } from "@/lib/util.js";
 import { Icon } from "@/components/ui/Icon.jsx";
 import { selectStop } from "@/actions";
+import StopScene from "./StopScene.jsx";
+import Keepsake from "./Keepsake.jsx";
 
 // The story of the selected stop, locked until you've walked there.
 export default function StopCard({ sel, n, canPeek }) {
@@ -10,6 +12,7 @@ export default function StopCard({ sel, n, canPeek }) {
   const ref = s.ref.split(";")[0];
   return (
     <div className="stop-card" id="stopcard">
+      <StopScene i={sel} locked={!open} />
       <div className="row between">
         <p className="eyebrow">
           Stop {sel + 1} of {STOPS.length} · {n >= s.day ? "reached" : `day ${s.day}`}
@@ -36,6 +39,7 @@ export default function StopCard({ sel, n, canPeek }) {
           Read {plural(s.day - n, "more day")} to walk here and unlock this stop.
         </p>
       )}
+      <Keepsake stop={s} n={n} />
       <div className="row" style={{ justifyContent: "space-between" }}>
         <button
           className="btn sm"

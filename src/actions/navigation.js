@@ -1,5 +1,6 @@
 // Switching tabs, opening the reader and map stops, and the reader's text size and page colour.
 import { getState, setState } from "@/store.js";
+import { clearArrival } from "./ui.js";
 import { TABS, RD_SIZES } from "@/lib/data.js";
 import { lsSet } from "@/lib/util.js";
 import { draftFrom } from "@/lib/player.js";
@@ -36,6 +37,13 @@ export function selectStop(i) {
       c.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   }, 0);
+}
+
+// Open the map on a stop's story.
+export function openStop(i) {
+  clearArrival();
+  setState({ stop: i });
+  setTab("journey");
 }
 
 export function setReaderPrefs({ size, light }) {

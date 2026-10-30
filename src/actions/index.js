@@ -6,12 +6,15 @@ export {
   queueReveal,
   closeReveal,
   openViewer,
-  closeViewer
+  closeViewer,
+  arrive,
+  clearArrival
 } from "./ui.js";
 export {
   setTab,
   openReader,
   selectStop,
+  openStop,
   setReaderPrefs,
   changeReaderSize,
   toggleReaderLight
@@ -45,6 +48,7 @@ export {
   setDraft,
   setLook,
   setRole,
+  wearItem,
   setGender,
   randomName,
   surprise,
