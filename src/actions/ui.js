@@ -1,4 +1,4 @@
-// Toasts, confetti and the reveal-card queue.
+// Toasts, confetti, the reveal-card queue and the full-screen character.
 import { getState, setState } from "@/store.js";
 
 let toastId = 0;
@@ -48,3 +48,6 @@ export function closeReveal(act) {
     r.onAct();
   }
 }
+
+export const openViewer = viewer => setState({ viewer });
+export const closeViewer = () => setState({ viewer: null });

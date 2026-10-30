@@ -3,11 +3,22 @@ import { fmtDate, plural } from "@/lib/util.js";
 import { dayDate } from "@/lib/player.js";
 import { Icon } from "@/components/ui/Icon.jsx";
 import { Frame } from "@/components/ui/Avatar.jsx";
-import { openReader, toggleDay, setTab } from "@/actions";
+import { lookSummary } from "@/lib/look.js";
+import { openReader, toggleDay, setTab, openViewer } from "@/actions";
 
 // The big card: your character and the reading to do next.
 export default function Hero({ me, s, focus, target, behind, start, cheering, readOnly }) {
-  const stage = <Frame look={me.look} n={s.n} glow={cheering} cheer={cheering} />;
+  const stage = (
+    <Frame
+      look={me.look}
+      n={s.n}
+      glow={cheering}
+      cheer={cheering}
+      onExpand={() =>
+        openViewer({ look: me.look, n: s.n, name: me.alias, sub: lookSummary(me.look, s.n) })
+      }
+    />
+  );
   if (focus === null) {
     return (
       <section className="card">

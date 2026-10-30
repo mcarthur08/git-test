@@ -1,5 +1,13 @@
 // Everything the app does that isn't drawing. Components import from here.
-export { toast, dismissToast, confetti, queueReveal, closeReveal } from "./ui.js";
+export {
+  toast,
+  dismissToast,
+  confetti,
+  queueReveal,
+  closeReveal,
+  openViewer,
+  closeViewer
+} from "./ui.js";
 export {
   setTab,
   openReader,
