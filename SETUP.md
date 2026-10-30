@@ -142,26 +142,6 @@ Also check **Authentication › Settings › Authorized domains** in Firebase. `
 
 From then on, share **https://nt70-quest.web.app** with the group. GitHub Pages keeps working, but the Firebase address is the one to use. Accounts and progress are the same on both.
 
-## Test environment (separate users and database)
-
-The test site is a second Firebase project (`nt-quest`). It has its own sign-in users, its own Firestore database and its own address (`https://nt-quest.web.app`), so testing never touches the real group's data. Only `npm run build` talks to the live project (`nt70-quest`); `npm run dev` and `npm run build:staging` use the test one. The test site shows a red "Test environment" label.
-
-One-time setup in the test project (<https://console.firebase.google.com>, project `nt-quest`):
-
-1. **Authentication › Sign-in method:** turn on Google, Email link and Email/Password, the same as step 3.
-2. **Firestore Database:** click **Create database** (production mode), then paste `firestore.rules` into **Rules** and **Publish** (step 5).
-3. **Hosting:** click **Get started** once so the `nt-quest.web.app` site exists.
-4. **Make yourself a leader** in the test database (step 7), using your test account's ID.
-5. **GitHub secret:** the same as step 9, but for the `nt-quest` project. Create a service account with **Firebase Hosting Admin**, **API Keys Viewer** and **Service Usage Consumer**, download its JSON key, and save it as the repository secret `FIREBASE_SERVICE_ACCOUNT_NT_QUEST`.
-6. **Authorized domains:** under Authentication › Settings, add the domains you test from (for example `localhost` is there by default, and each preview address).
-
-Using it:
-
-- **Locally:** `npm run dev` runs against the test project.
-- **Every pull request:** the "Firebase preview" workflow posts a temporary preview address (using test data) on the PR.
-- **A stable test site:** push to a branch named `staging` (`git push origin <branch>:staging`) and the "Deploy test site" workflow publishes it to `https://nt-quest.web.app`.
-- **Rules changes:** `firebase deploy --only firestore:rules --project staging` to try them in the test project first, then publish to live from the console.
-
 ## Forgotten passwords (username accounts)
 
 Username accounts have no real email, so a forgotten password can't be reset. Move the person's progress to a new account instead:
@@ -256,7 +236,6 @@ To announce a new release, add an entry at the **top** of `RELEASES` in `src/lib
 | `src/firebase-config.js` | Your Firebase project settings (step 2) |
 | `firestore.rules` | Database security rules (step 5) |
 | `firebase.json`, `.firebaserc`, `.github/workflows/firebase-hosting.yml` | Firebase Hosting setup and automatic deploys (step 9) |
-| `.github/workflows/firebase-preview.yml`, `firebase-staging.yml` | Test environment deploys (see "Test environment") |
 | `public/` | Manifest, icons, service worker (`sw.js`), offline page, and the KJV text in `public/kjv/` |
 | `firebase.staging.json`, `.github/workflows/firebase-preview.yml`, `firebase-staging.yml`, `test-rules.yml`, `seed-test.yml`, `scripts/seed-test.mjs` | The test environment (see "Test environment") |
 

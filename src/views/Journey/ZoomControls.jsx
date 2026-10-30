@@ -8,6 +8,7 @@ export default function ZoomControls({ zoomed, expanded, onToggleExpand }) {
         onClick={onToggleExpand}
         aria-label={expanded ? "Close full screen map" : "Expand the map to full screen"}
         aria-pressed={expanded}
+        data-expand
       >
         <Icon k={expanded ? "collapse" : "expand"} />
       </button>

@@ -32,7 +32,8 @@ export function selectStop(i) {
   setState({ stop: i });
   setTimeout(() => {
     const c = document.getElementById("stopcard");
-    if (c && innerWidth <= 720) {
+    // The full-screen map shows the card itself, so scrolling the page behind it would only move things unseen.
+    if (c && innerWidth <= 720 && !document.body.classList.contains("map-full")) {
       c.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
   }, 0);

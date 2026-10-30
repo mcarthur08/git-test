@@ -49,6 +49,7 @@ export function Reveal() {
     }
     const onKey = e => {
       if (e.key === "Escape") {
+        e.preventDefault(); // tells other Escape handlers (the full-screen map) this press is spent
         closeReveal(false);
       }
     };
