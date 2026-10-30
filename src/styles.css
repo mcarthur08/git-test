@@ -169,9 +169,12 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: 0.06em;
+  min-width: 0;
 }
 .brand small {
   display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-family: var(--font-body);
   font-weight: 500;
   font-size: var(--step--1);
@@ -423,7 +426,7 @@ main.enter > *:nth-child(n + 6) {
 }
 .chip.sec {
   background: color-mix(in srgb, var(--sc) 14%, transparent);
-  color: var(--sc);
+  color: color-mix(in srgb, var(--sc) 65%, #fff);
   border-color: color-mix(in srgb, var(--sc) 40%, transparent);
 }
 .chip.ok {
@@ -1388,7 +1391,7 @@ details.more[open] summary > svg {
 }
 .rd-jump button,
 .rd-opts button {
-  min-height: 40px;
+  min-height: 44px;
   min-width: 44px;
   padding: 6px 12px;
   border-radius: 6px;
@@ -1463,6 +1466,7 @@ details.more[open] summary > svg {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 44px;
 }
 .rd-alt svg {
   width: 14px;
@@ -2288,8 +2292,8 @@ input[type="password"] {
   z-index: 2;
 }
 .map-ctl button {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
   border: 1px solid #8c7450;
   background: rgba(241, 230, 204, 0.94);
@@ -3349,10 +3353,6 @@ input[type="time"] {
     width: 34px;
     height: 34px;
     font-size: 12px;
-  }
-  .helpbtn {
-    width: 40px;
-    height: 40px;
   }
 }
 
