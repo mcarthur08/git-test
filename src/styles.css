@@ -196,7 +196,7 @@ button {
   width: 36px;
   height: 36px;
 }
-.mepill span:not(.bubble) {
+.mepill > span:not(.bubble) {
   font-family: var(--font-display);
   font-weight: 600;
   font-size: var(--step--1);
@@ -2907,7 +2907,7 @@ code {
   .vic {
     grid-template-columns: 1fr;
   }
-  .mepill span:not(.bubble) {
+  .mepill > span:not(.bubble) {
     display: none;
   }
   .mepill {
@@ -3032,7 +3032,7 @@ input[type="time"] {
   padding: 8px 12px;
   color-scheme: dark;
 }
-.mepill span:not(.bubble) {
+.mepill > span:not(.bubble) {
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.95rem;
