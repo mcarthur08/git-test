@@ -212,7 +212,14 @@ export function normConfig(c) {
       Array.isArray(c.teams) && typeof c.teams[i] === "string"
         ? c.teams[i].trim().slice(0, 30)
         : "";
-    teams.push(t && !teams.includes(t) ? t : def);
+    teams.push(t && !teams.includes(t) ? t : "");
+  });
+  // A default can already be taken by a custom name in another slot, so fall back to one that is free.
+  const free = DEFAULT_TEAMS.filter(def => !teams.includes(def));
+  DEFAULT_TEAMS.forEach((def, i) => {
+    if (!teams[i]) {
+      teams[i] = free.includes(def) ? def : free.find(f => !teams.includes(f));
+    }
   });
   return {
     start: parseISO(c.start) ? c.start : "",

@@ -10,6 +10,8 @@
     "seed:test": "node scripts/seed-test.mjs",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\" vite.config.js index.html",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint --ext .js,.jsx src vite.config.js"
   },
   "dependencies": {
@@ -21,7 +23,9 @@
     "@vitejs/plugin-react": "^4.2.1",
     "eslint": "^8.57.0",
     "firebase-admin": "^12.7.0",
+    "jsdom": "^25.0.1",
     "prettier": "^2.8.8",
-    "vite": "^4.5.3"
+    "vite": "^4.5.3",
+    "vitest": "^2.1.9"
   }
 }
