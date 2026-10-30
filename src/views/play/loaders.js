@@ -3,5 +3,6 @@
 export const LOADERS = {
   cana: () => import("@/views/Cana/index.js").then(m => m.default),
   bethsaida: () => import("@/views/Bethsaida/index.js").then(m => m.default),
-  galilee: () => import("@/views/Galilee/index.js").then(m => m.default)
+  galilee: () => import("@/views/Galilee/index.js").then(m => m.default),
+  jericho: () => import("@/views/Jericho/index.js").then(m => m.default)
 };

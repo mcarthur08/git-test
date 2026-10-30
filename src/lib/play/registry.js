@@ -4,6 +4,7 @@
 import { PHASES as CANA_PHASES, STORY as CANA_STORY } from "../cana/story.js";
 import { PARTS as BETHSAIDA_PARTS, STORY as BETHSAIDA_STORY } from "../bethsaida/story.js";
 import { PARTS as GALILEE_PARTS, STORY as GALILEE_STORY } from "../galilee/story.js";
+import { PARTS as JERICHO_PARTS, STORY as JERICHO_STORY } from "../jericho/story.js";
 
 export const SCENES = {
   cana: {
@@ -74,6 +75,30 @@ export const SCENES = {
       { label: "Bail water", run: "bail" },
       { label: "Wake him", run: "wakeHim" },
       { label: "Hold on", run: "holdOn" },
+      { label: "Say hello", run: "greetNearest" }
+    ]
+  },
+  jericho: {
+    id: "jericho",
+    title: "Zacchaeus in the sycamore",
+    ref: "Luke 19:1–10",
+    stop: "Jericho",
+    enter: "Step into the street",
+    parts: JERICHO_PARTS,
+    steps: {
+      street: "Jesus passes through Jericho",
+      press: "Little of stature",
+      climb: "Up into the sycomore",
+      called: "Make haste, and come down",
+      murmur: "They all murmured",
+      restore: "Half my goods"
+    },
+    story: JERICHO_STORY,
+    hint: "Tap the road to walk, a person to say hello, or the sycamore to climb it.",
+    actions: [
+      { label: "Climb the tree", run: "climbTree" },
+      { label: "Give to the poor", run: "giveCoin" },
+      { label: "Welcome him", run: "welcome" },
       { label: "Say hello", run: "greetNearest" }
     ]
   }

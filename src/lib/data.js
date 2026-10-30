@@ -600,6 +600,7 @@ export const STOPS = [
     day: 60,
     place: "Jericho",
     title: "Zacchaeus and Bartimaeus",
+    scene: "jericho",
     keepsake: "sycamore",
     ref: "Luke 19:1–10",
     x: 247,

@@ -27,6 +27,8 @@ export class Person {
     this.pose = "idle";
     this.poseUntil = 0;
     this.variant = null;
+    // how far they are lifted off the ground (up a tree, say)
+    this.lift = 0;
     this.t = rand() * 20;
     this.sprite = new Sprite(tex.idle);
     this.sprite.anchor.set(FIG.anchorX, FIG.anchorY);
@@ -190,13 +192,19 @@ export class Person {
       this.sprite.texture = tex;
     }
     this.sprite.scale.set(this.k * this.face, this.k);
-    this.sprite.y = bob;
+    this.sprite.y = bob - this.lift;
+    if (this.tag) {
+      this.tag.y = 4 - this.lift;
+    }
     this.sprite.rotation = sway;
     if (this.bubble) {
       if (now >= this.bubbleUntil) {
         this.clearBubble();
       } else {
-        this.bubble.position.set(this.x, this.y - FIG.h * 0.72 * (this.char.scale || 1));
+        this.bubble.position.set(
+          this.x,
+          this.y - FIG.h * 0.72 * (this.char.scale || 1) - this.lift
+        );
       }
     }
   }
