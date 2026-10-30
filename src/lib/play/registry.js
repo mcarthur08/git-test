@@ -5,6 +5,7 @@ import { PHASES as CANA_PHASES, STORY as CANA_STORY } from "../cana/story.js";
 import { PARTS as BETHSAIDA_PARTS, STORY as BETHSAIDA_STORY } from "../bethsaida/story.js";
 import { PARTS as GALILEE_PARTS, STORY as GALILEE_STORY } from "../galilee/story.js";
 import { PARTS as JERICHO_PARTS, STORY as JERICHO_STORY } from "../jericho/story.js";
+import { PARTS as CAPERNAUM_PARTS, STORY as CAPERNAUM_STORY } from "../capernaum/story.js";
 
 export const SCENES = {
   cana: {
@@ -99,6 +100,28 @@ export const SCENES = {
       { label: "Climb the tree", run: "climbTree" },
       { label: "Give to the poor", run: "giveCoin" },
       { label: "Welcome him", run: "welcome" },
+      { label: "Say hello", run: "greetNearest" }
+    ]
+  },
+  capernaum: {
+    id: "capernaum",
+    title: "Fishers of men",
+    ref: "Matthew 4:18–22",
+    stop: "Capernaum",
+    enter: "Step onto the shore",
+    parts: CAPERNAUM_PARTS,
+    steps: {
+      shore: "Casting a net",
+      call: "Follow me",
+      boat: "Mending their nets",
+      leave: "They followed him"
+    },
+    story: CAPERNAUM_STORY,
+    hint: "Tap the shallows to cast a net, a person to say hello, or the boat to mend a net.",
+    actions: [
+      { label: "Cast the net", run: "castNet" },
+      { label: "Mend a net", run: "mendNet" },
+      { label: "Follow him", run: "follow" },
       { label: "Say hello", run: "greetNearest" }
     ]
   }

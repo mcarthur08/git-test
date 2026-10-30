@@ -522,6 +522,7 @@ export const STOPS = [
     day: 30,
     place: "Capernaum",
     title: "Fishers of men",
+    scene: "capernaum",
     keepsake: "fish",
     ref: "Matthew 4:13–22",
     x: 266,
