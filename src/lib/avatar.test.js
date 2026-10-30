@@ -32,7 +32,7 @@ const randomLook = () => ({
   tunic: ri(20),
   sash: ri(8),
   hat: ri(8),
-  item: ri(10),
+  item: ri(30),
   face: ri(8),
   eyes: ri(8),
   eyeColor: ri(8),
@@ -40,7 +40,8 @@ const randomLook = () => ({
   mouth: ri(8),
   cover: ri(8),
   mantle: ri(8),
-  jewel: ri(8)
+  jewel: ri(8),
+  hem: ri(3)
 });
 
 describe("normLook", () => {
@@ -138,6 +139,7 @@ describe("normLook", () => {
       lim(out.cover, COVERS[out.g]);
       lim(out.mantle, MANTLES[out.g]);
       lim(out.jewel, JEWELS);
+      expect([0, 1]).toContain(out.hem);
       ["tunic", "sash", "hat", "item"].forEach(key =>
         expect(allowedNow(key, out.g, n)).toContain(out[key])
       );

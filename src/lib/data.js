@@ -342,7 +342,14 @@ export const UNLOCK = {
     ["Saw", "saw", 35, ""],
     ["Sickle", "sickle", 17, ""],
     ["Coin purse", "purse", 40, ""],
-    ["Censer", "censer", 63, ""]
+    ["Censer", "censer", 63, ""],
+    ["Timbrel", "timbrel", 22, ""],
+    ["Infant in swaddling cloth", "infant", 26, "f"],
+    ["Water basin", "basin", 19, "f"],
+    ["Water jar", "jar", 10, ""],
+    ["Merchant's scales", "scales", 33, ""],
+    ["Spindle", "spindle", 13, "f"],
+    ["Sheaf of grain", "sheaf", 8, ""]
   ]
 };
 export const UNLOCK_NAMES = { tunic: "robe", sash: "girdle", hat: "headgear", item: "item" };

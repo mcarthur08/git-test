@@ -39,13 +39,21 @@ export function fullSVG(look, n, opts = {}) {
   const ww = 21; // waist half-width (women)
   const by = f ? 178 : 176; // top of the sash
   const bh = f ? 14 : 16; // height of the sash
-  const my = f ? 262 : 318; // hem of the outer garment (men), inner hem of the shawl (women)
+  // A work tunic is hitched up to the knee (men) or the calf (women), so the legs show.
+  const short = L.hem === 1;
+  const H = short ? (f ? 328 : 298) : 372; // hem of the tunic
+  const Y = y => (short ? Math.round(200 + ((y - 200) * (H - 200)) / 172) : y);
+  const hwH = short ? (f ? 44 : 40.5) : hw; // half-width at the hem
+  const my = f ? 262 : short ? 258 : 318; // hem of the outer garment (men), inner hem of the shawl (women)
 
   // Patterns in the garments' own colours: a twill weave, a zigzag trim and a diamond embroidery.
   const edge = accent || shade(mantle, 0.3);
   const patterns =
     `<defs>` +
     `<pattern id="wv${u}" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 4 L4 0 M-1 1 L1 -1 M3 5 L5 3" fill="none" stroke="#000" stroke-width=".7" opacity=".1"/></pattern>` +
+    `<pattern id="zh${u}" y="${
+      H - 18
+    }" width="12" height="10" patternUnits="userSpaceOnUse"><path d="M0 8 L6 2 L12 8" fill="none" stroke="${trim}" stroke-width="1.8" stroke-linejoin="round"/></pattern>` +
     `<pattern id="zz${u}" width="12" height="10" patternUnits="userSpaceOnUse"><path d="M0 8 L6 2 L12 8" fill="none" stroke="${trim}" stroke-width="1.8" stroke-linejoin="round"/></pattern>` +
     `<pattern id="dm${u}" x="95.5" width="9" height="9" patternUnits="userSpaceOnUse"><path d="M4.5 1 L8 4.5 L4.5 8 L1 4.5 Z" fill="none" stroke="${edge}" stroke-width="1.2"/><circle cx="4.5" cy="4.5" r="1" fill="${edge}"/></pattern>` +
     `</defs>`;
@@ -56,24 +64,51 @@ export function fullSVG(look, n, opts = {}) {
     ? `M${100 - nw} 78 Q${100 - 20} 77 ${100 - sw} 90 L${100 - sw - 1} 126 Q${100 - sw - 2} 152 ${
         100 - ww - 2
       } 176 Q${100 - ww} 190 ${100 - ww - 1} 204 Q${100 - 33} 232 ${100 - 35} 262 Q${
-        100 - hw + 4
-      } 320 ${100 - hw} 372 Q100 382 ${100 + hw} 372 Q${100 + hw - 4} 320 ${100 + 35} 262 Q${
-        100 + 33
-      } 232 ${100 + ww + 1} 204 Q${100 + ww} 190 ${100 + ww + 2} 176 Q${100 + sw + 2} 152 ${
-        100 + sw + 1
-      } 126 L${100 + sw} 90 Q${100 + 20} 77 ${100 + nw} 78 Z`
+        100 - hwH + (short ? -1 : 4)
+      } ${short ? 298 : 320} ${100 - hwH} ${H} Q100 ${H + 10} ${100 + hwH} ${H} Q${
+        100 + hwH + (short ? 1 : -4)
+      } ${short ? 298 : 320} ${100 + 35} 262 Q${100 + 33} 232 ${100 + ww + 1} 204 Q${
+        100 + ww
+      } 190 ${100 + ww + 2} 176 Q${100 + sw + 2} 152 ${100 + sw + 1} 126 L${100 + sw} 90 Q${
+        100 + 20
+      } 77 ${100 + nw} 78 Z`
     : `M${100 - nw} 78 Q${100 - 24} 77 ${100 - sw} 90 L${100 - sw - 2} 140 Q${100 - sw + 2} 180 ${
         100 - sw + 4
-      } 202 L${100 - hw} 372 Q100 381 ${100 + hw} 372 L${100 + sw - 4} 202 Q${100 + sw - 2} 180 ${
-        100 + sw + 2
-      } 140 L${100 + sw} 90 Q${100 + 24} 77 ${100 + nw} 78 Z`;
+      } 202 L${100 - hwH} ${H} Q100 ${H + 9} ${100 + hwH} ${H} L${100 + sw - 4} 202 Q${
+        100 + sw - 2
+      } 180 ${100 + sw + 2} 140 L${100 + sw} 90 Q${100 + 24} 77 ${100 + nw} 78 Z`;
   const folds = f
-    ? S(`M${100 - 12} 252 Q${100 - 17} 312 ${100 - 24} 372`, INK, 1.4, 'opacity=".22"') +
-      S(`M${100 + 6} 246 Q${100 + 8} 312 ${100 + 14} 374`, INK, 1.4, 'opacity=".22"') +
-      S(`M${100 - 31} 272 Q${100 - 38} 322 ${100 - 43} 372`, INK, 1.4, 'opacity=".16"')
-    : S(`M${100 - 10} 226 Q${100 - 14} 300 ${100 - 18} 372`, INK, 1.4, 'opacity=".22"') +
-      S(`M${100 + 4} 214 Q${100 + 2} 300 ${100 + 8} 376`, INK, 1.4, 'opacity=".22"') +
-      S(`M${100 - 32} 250 Q${100 - 36} 310 ${100 - 40} 372`, INK, 1.4, 'opacity=".16"');
+    ? S(
+        `M${100 - 12} ${Y(252)} Q${100 - 17} ${Y(312)} ${100 - 24} ${H}`,
+        INK,
+        1.4,
+        'opacity=".22"'
+      ) +
+      S(
+        `M${100 + 6} ${Y(246)} Q${100 + 8} ${Y(312)} ${100 + 14} ${H + 2}`,
+        INK,
+        1.4,
+        'opacity=".22"'
+      ) +
+      S(`M${100 - 31} ${Y(272)} Q${100 - 38} ${Y(322)} ${100 - 43} ${H}`, INK, 1.4, 'opacity=".16"')
+    : S(
+        `M${100 - 10} ${Y(226)} Q${100 - 14} ${Y(300)} ${100 - 18} ${H}`,
+        INK,
+        1.4,
+        'opacity=".22"'
+      ) +
+      S(
+        `M${100 + 4} ${Y(214)} Q${100 + 2} ${Y(300)} ${100 + 8} ${H + 4}`,
+        INK,
+        1.4,
+        'opacity=".22"'
+      ) +
+      S(
+        `M${100 - 32} ${Y(250)} Q${100 - 36} ${Y(310)} ${100 - 40} ${H}`,
+        INK,
+        1.4,
+        'opacity=".16"'
+      );
   let body =
     patterns +
     `<clipPath id="ct${u}"><path d="${tunicPath}"/></clipPath>` +
@@ -83,10 +118,10 @@ export function fullSVG(look, n, opts = {}) {
     P(`M108 76 Q102 220 112 392 L260 392 L260 70 Z`, tunicD) +
     weave("M0 0 H200 V400 H0 Z") +
     folds +
-    P("M0 350 L200 350 L200 400 L0 400 Z", tunicDD) +
-    P("M0 354 H200 V364 H0 Z", `url(#zz${u})`) +
-    S("M0 350 L200 350", INK, 1.4, 'opacity=".5"') +
-    S("M0 366 L200 366", INK, 1, 'opacity=".3"') +
+    P(`M0 ${H - 22} L200 ${H - 22} L200 400 L0 400 Z`, tunicDD) +
+    P(`M0 ${H - 18} H200 V${H - 8} H0 Z`, `url(#zh${u})`) +
+    S(`M0 ${H - 22} L200 ${H - 22}`, INK, 1.4, 'opacity=".5"') +
+    S(`M0 ${H - 6} L200 ${H - 6}`, INK, 1, 'opacity=".3"') +
     // women: an embroidered placket down the front
     (f
       ? P(`M95.5 98 H104.5 V${by} H95.5 Z`, tunicDD) +
@@ -222,7 +257,14 @@ export function fullSVG(look, n, opts = {}) {
     `<path d="M80 384 Q72 386 70 393 Q80 398 92 395 L95 384 Z" fill="${skin}" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>` +
     S("M70 395 Q82 400 95 396", "#6B4A2A", 3.4) +
     S("M80 386 L89 393 M88 385 L90 393", "#6B4A2A", 1.4);
+  const mid = Math.round((H + 368) / 2);
+  const leg =
+    `<path d="M77 ${H - 8} Q75 ${mid} 80 368 L92 368 Q95 ${mid} 93 ${H - 8} Z" fill="${skin}"/>` +
+    `<path d="M87 ${H - 8} Q92 ${mid} 92 368 L87 368 Z" fill="${skinD}" opacity=".55"/>` +
+    S("M79 366 L93 371 M93 366 L79 371", "#6B4A2A", 1.3);
+  const legs = short ? leg + mirror(leg) : "";
   const feet =
+    legs +
     `<rect x="80" y="364" width="12" height="24" fill="${skin}"/><rect x="108" y="364" width="12" height="24" fill="${skin}"/>` +
     foot +
     mirror(foot);
@@ -549,6 +591,155 @@ export function fullSVG(look, n, opts = {}) {
         1.8
       ) +
       PO(`M${hx - 6} ${hy + 34} Q${hx + 2} ${hy + 25} ${hx + 10} ${hy + 34} Z`, "#E2B24E", 1.6);
+  }
+  if (item === "timbrel") {
+    const cx = hx + 4;
+    const cy = hy - 20;
+    itemFront =
+      `<circle cx="${cx}" cy="${cy}" r="16" fill="#E9DAB6" stroke="${INK}" stroke-width="1.8"/>` +
+      `<circle cx="${cx}" cy="${cy}" r="14" fill="none" stroke="${wood}" stroke-width="3.6"/>` +
+      `<circle cx="${cx}" cy="${cy}" r="8.5" fill="none" stroke="#B79F68" stroke-width="1" stroke-dasharray="2 2"/>` +
+      [0, 90, 180, 270]
+        .map(a => {
+          const r = (a * Math.PI) / 180;
+          return `<circle cx="${(cx + 14 * Math.cos(r)).toFixed(1)}" cy="${(
+            cy +
+            14 * Math.sin(r)
+          ).toFixed(1)}" r="2.3" fill="#E2B24E" stroke="${INK}" stroke-width="1"/>`;
+        })
+        .join("");
+  }
+  if (item === "infant") {
+    itemFront =
+      `<g transform="rotate(-12 ${hx} ${hy})">` +
+      PO(
+        `M${hx - 11} ${hy} Q${hx - 17} ${hy - 18} ${hx - 5} ${hy - 30} Q${hx + 9} ${hy - 33} ${
+          hx + 14
+        } ${hy - 18} Q${hx + 17} ${hy - 2} ${hx + 5} ${hy + 6} Z`,
+        "#EDE4CE",
+        1.8
+      ) +
+      S(
+        `M${hx - 14} ${hy - 12} Q${hx} ${hy - 8} ${hx + 16} ${hy - 14} M${hx - 12} ${hy - 4} Q${
+          hx + 2
+        } ${hy} ${hx + 12} ${hy - 4}`,
+        "#C9B58A",
+        1.4
+      ) +
+      `<circle cx="${hx}" cy="${
+        hy - 26
+      }" r="6.6" fill="${skin}" stroke="${INK}" stroke-width="1.6"/>` +
+      S(`M${hx - 3.4} ${hy - 26} h2.2 M${hx + 1.2} ${hy - 26} h2.2`, INK, 0.9) +
+      `</g>`;
+  }
+  if (item === "basin") {
+    itemFront =
+      PO(
+        `M${hx - 12} ${hy - 6} L${hx - 19} ${hy + 22} L${hx - 9} ${hy + 20} L${hx - 4} ${hy - 4} Z`,
+        "#EDE4CE",
+        1.4
+      ) +
+      PO(
+        `M${hx - 17} ${hy - 6} Q${hx - 15} ${hy + 10} ${hx + 2} ${hy + 10} Q${hx + 19} ${hy + 10} ${
+          hx + 21
+        } ${hy - 6} Z`,
+        "#A8743C",
+        1.8
+      ) +
+      `<ellipse cx="${hx + 2}" cy="${
+        hy - 6
+      }" rx="19" ry="4.4" fill="#7FB3C8" stroke="${INK}" stroke-width="1.6"/>` +
+      S(`M${hx - 8} ${hy - 6} Q${hx + 2} ${hy - 4} ${hx + 8} ${hy - 7}`, "#D6EBF3", 1);
+  }
+  if (item === "jar") {
+    const cx = hx + 3;
+    itemFront =
+      line(`M${cx - 6} ${hy - 33} Q${cx - 18} ${hy - 34} ${cx - 14} ${hy - 22}`, "#B5683A", 2.2) +
+      line(`M${cx + 6} ${hy - 33} Q${cx + 18} ${hy - 34} ${cx + 14} ${hy - 22}`, "#B5683A", 2.2) +
+      PO(
+        `M${cx - 6} ${hy - 26} Q${cx - 19} ${hy - 18} ${cx - 15} ${hy - 2} Q${cx - 11} ${
+          hy + 10
+        } ${cx} ${hy + 10} Q${cx + 11} ${hy + 10} ${cx + 15} ${hy - 2} Q${cx + 19} ${hy - 18} ${
+          cx + 6
+        } ${hy - 26} Z`,
+        "#B5683A",
+        1.8
+      ) +
+      S(`M${cx - 16} ${hy - 12} Q${cx} ${hy - 8} ${cx + 16} ${hy - 12}`, "#8E4A28", 1.6) +
+      PO(
+        `M${cx - 6} ${hy - 26} L${cx - 5} ${hy - 35} L${cx + 5} ${hy - 35} L${cx + 6} ${hy - 26} Z`,
+        "#B5683A",
+        1.6
+      ) +
+      PO(
+        `M${cx - 8} ${hy - 39} L${cx + 8} ${hy - 39} L${cx + 8} ${hy - 34} L${cx - 8} ${hy - 34} Z`,
+        "#8E4A28",
+        1.4
+      );
+  }
+  if (item === "scales") {
+    const cx = hx + 8;
+    const top = hy - 40;
+    itemFront =
+      line(`M${cx} ${hy - 2} L${cx} ${top}`, "#C9A04B", 1.6) +
+      line(`M${cx - 20} ${top + 4} L${cx + 20} ${top + 4}`, "#C9A04B", 1.6) +
+      S(
+        `M${cx - 20} ${top + 4} L${cx - 27} ${hy - 20} M${cx - 20} ${top + 4} L${cx - 13} ${
+          hy - 20
+        } M${cx + 20} ${top + 4} L${cx + 13} ${hy - 20} M${cx + 20} ${top + 4} L${cx + 27} ${
+          hy - 20
+        }`,
+        INK,
+        1
+      ) +
+      PO(`M${cx - 29} ${hy - 20} Q${cx - 20} ${hy - 11} ${cx - 11} ${hy - 20} Z`, "#C9A04B", 1.5) +
+      PO(`M${cx + 11} ${hy - 20} Q${cx + 20} ${hy - 11} ${cx + 29} ${hy - 20} Z`, "#C9A04B", 1.5) +
+      `<circle cx="${cx}" cy="${top}" r="2.6" fill="#E2B24E" stroke="${INK}" stroke-width="1"/>`;
+  }
+  if (item === "spindle") {
+    itemFront =
+      line(`M${hx - 2} ${hy + 4} L${hx + 4} ${hy - 36}`, wood, 2) +
+      `<ellipse cx="${hx}" cy="${
+        hy - 8
+      }" rx="6.4" ry="2.6" fill="#8A5E34" stroke="${INK}" stroke-width="1.2"/>` +
+      `<circle cx="${hx + 4.6}" cy="${
+        hy - 40
+      }" r="7.4" fill="#EDE4CE" stroke="${INK}" stroke-width="1.5"/>` +
+      S(
+        `M${hx - 0.6} ${hy - 42} Q${hx + 4.6} ${hy - 36} ${hx + 10} ${hy - 42} M${hx + 0.4} ${
+          hy - 38
+        } Q${hx + 4.6} ${hy - 34} ${hx + 9} ${hy - 38}`,
+        "#C9B58A",
+        1
+      ) +
+      S(`M${hx + 3} ${hy - 31} Q${hx + 12} ${hy - 14} ${hx + 9} ${hy + 8}`, "#EDE4CE", 0.9);
+  }
+  if (item === "sheaf") {
+    itemFront =
+      `<g transform="rotate(10 ${hx} ${hy})">` +
+      [-12, -6, 0, 6, 12]
+        .map(
+          dx =>
+            S(`M${hx + dx / 3} ${hy - 8} L${hx + dx} ${hy - 40}`, "#D8B04A", 2) +
+            S(`M${hx + dx / 3} ${hy - 8} L${hx + dx / 2} ${hy + 14}`, "#D8B04A", 2)
+        )
+        .join("") +
+      [-12, -6, 0, 6, 12]
+        .map(
+          dx =>
+            `<ellipse cx="${hx + dx}" cy="${
+              hy - 44
+            }" rx="3" ry="7" fill="#E2B24E" stroke="${INK}" stroke-width=".9" transform="rotate(${
+              dx * 2
+            } ${hx + dx} ${hy - 44})"/>`
+        )
+        .join("") +
+      PO(
+        `M${hx - 6} ${hy - 12} L${hx + 6} ${hy - 12} L${hx + 6} ${hy - 6} L${hx - 6} ${hy - 6} Z`,
+        wood,
+        1.2
+      ) +
+      `</g>`;
   }
   // tail of the sash, hanging in the opening of the mantle
   const tails =

@@ -338,7 +338,8 @@ export function newDraftFor(g) {
       mouth: r([0, 3]),
       cover: f ? r([1, 2, 3]) : r([0, 1, 1]),
       mantle: f ? Math.floor(Math.random() * 3) : r([0, 1, 4]),
-      jewel: f ? r([1, 2]) : 0
+      jewel: f ? r([1, 2]) : 0,
+      hem: 0
     }
   };
 }

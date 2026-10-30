@@ -186,6 +186,27 @@ export function figureSVG(look, n, opts = {}) {
   if (item === "censer") {
     o += `<path d="M42.6 48 L43 54" stroke="#C9A04B" stroke-width=".5"/><path d="M40.8 54 Q40.8 58 43 58 Q45.2 58 45.2 54 Z" fill="#C9A04B"/>`;
   }
+  if (item === "timbrel") {
+    o += `<circle cx="43" cy="42" r="4" fill="#E9DAB6" stroke="#8A5E34" stroke-width="1"/>`;
+  }
+  if (item === "infant") {
+    o += `<path d="M40 49 Q39 43 43 42 Q47 43 46 49 Z" fill="#EDE4CE"/>`;
+  }
+  if (item === "basin") {
+    o += `<path d="M39.6 47 Q40 51 43 51 Q46 51 46.4 47 Z" fill="#A8743C"/>`;
+  }
+  if (item === "jar") {
+    o += `<path d="M41.4 42 Q39 46 40.8 50 Q43 52 45.2 50 Q47 46 44.6 42 Z" fill="#B5683A"/>`;
+  }
+  if (item === "scales") {
+    o += `<path d="M43 36 V48 M39 39 H47" stroke="#C9A04B" stroke-width=".8"/>`;
+  }
+  if (item === "spindle") {
+    o += `<path d="M42.6 49 L44 38" stroke="#8A5E34" stroke-width=".8"/><circle cx="44" cy="37" r="1.8" fill="#EDE4CE"/>`;
+  }
+  if (item === "sheaf") {
+    o += `<path d="M42 49 L40 39 M43 49 L43 38 M44 49 L46 39" stroke="#D8B04A" stroke-width=".9"/>`;
+  }
   if (item === "shield") {
     o +=
       P("M14 30 Q20.6 27 26 30 L25.4 39 Q24 44 20 46 Q16 44 14.6 39 Z", "#B8892B") +

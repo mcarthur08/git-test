@@ -43,7 +43,8 @@ export function normLook(l, n) {
     mouth: pick(l.mouth, MOUTHS),
     cover: pick(l.cover, COVERS[g]),
     mantle: pick(l.mantle, MANTLES[g]),
-    jewel: g === "f" ? pick(l.jewel, JEWELS) : 0
+    jewel: g === "f" ? pick(l.jewel, JEWELS) : 0,
+    hem: l.hem === 1 ? 1 : 0
   };
 }
 
