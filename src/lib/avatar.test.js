@@ -302,6 +302,16 @@ describe("avatar drawing", () => {
       expect(a.filter(id => b.includes(id))).toEqual([]);
     });
 
+    it("never points at a pattern, clip path or filter that is not defined", () => {
+      for (let i = 0; i < 150; i++) {
+        const svg = fullSVG(randomLook(), ri(DAYS + 1));
+        const defined = new Set([...svg.matchAll(/sid="([^"]+)"/g)].map(m => m[1]));
+        [...svg.matchAll(/url(#([^)]+))/g)].forEach(m => {
+          expect(defined.has(m[1]), `missing #${m[1]}`).toBe(true);
+        });
+      }
+    });
+
     it("is chosen by avatarSVG's full option and cached by look", () => {
       const a = avatarSVG({ g: "m", skin: 2 }, 0, { full: true });
       expect(a).toContain("fb av");

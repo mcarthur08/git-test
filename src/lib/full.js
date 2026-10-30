@@ -33,42 +33,77 @@ export function fullSVG(look, n, opts = {}) {
     `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`;
   const mirror = svg => `<g transform="translate(200 0) scale(-1 1)">${svg}</g>`;
 
-  const sw = f ? 33 : 40; // shoulder half-width
+  const sw = f ? 30 : 40; // shoulder half-width
   const nw = f ? 11 : 14; // neck half-width at the collar
-  const hw = f ? 46 : 44; // hem half-width
-  const ww = 26; // waist half-width (women)
-  const by = f ? 182 : 176; // top of the sash
-  const my = f ? 262 : 318; // hem of the outer garment
+  const hw = f ? 47 : 44; // hem half-width
+  const ww = 21; // waist half-width (women)
+  const by = f ? 178 : 176; // top of the sash
+  const bh = f ? 14 : 16; // height of the sash
+  const my = f ? 262 : 318; // hem of the outer garment (men), inner hem of the shawl (women)
+
+  // Patterns in the garments' own colours: a twill weave, a zigzag trim and a diamond embroidery.
+  const edge = accent || shade(mantle, 0.3);
+  const patterns =
+    `<defs>` +
+    `<pattern id="wv${u}" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 4 L4 0 M-1 1 L1 -1 M3 5 L5 3" fill="none" stroke="#000" stroke-width=".7" opacity=".1"/></pattern>` +
+    `<pattern id="zz${u}" width="12" height="10" patternUnits="userSpaceOnUse"><path d="M0 8 L6 2 L12 8" fill="none" stroke="${trim}" stroke-width="1.8" stroke-linejoin="round"/></pattern>` +
+    `<pattern id="dm${u}" x="95.5" width="9" height="9" patternUnits="userSpaceOnUse"><path d="M4.5 1 L8 4.5 L4.5 8 L1 4.5 Z" fill="none" stroke="${edge}" stroke-width="1.2"/><circle cx="4.5" cy="4.5" r="1" fill="${edge}"/></pattern>` +
+    `</defs>`;
+  const weave = d => P(d, `url(#wv${u})`);
 
   // ---- tunic: the long inner robe ----
   const tunicPath = f
-    ? `M${100 - nw} 78 Q${100 - 22} 77 ${100 - sw} 90 L${100 - sw - 1} 130 Q${100 - ww} 166 ${
-        100 - ww
-      } 192 Q${100 - ww - 2} 232 ${100 - hw} 372 Q100 381 ${100 + hw} 372 Q${100 + ww + 2} 232 ${
-        100 + ww
-      } 192 Q${100 + ww} 166 ${100 + sw + 1} 130 L${100 + sw} 90 Q${100 + 22} 77 ${100 + nw} 78 Z`
+    ? `M${100 - nw} 78 Q${100 - 20} 77 ${100 - sw} 90 L${100 - sw - 1} 126 Q${100 - sw - 2} 152 ${
+        100 - ww - 2
+      } 176 Q${100 - ww} 190 ${100 - ww - 1} 204 Q${100 - 33} 232 ${100 - 35} 262 Q${
+        100 - hw + 4
+      } 320 ${100 - hw} 372 Q100 382 ${100 + hw} 372 Q${100 + hw - 4} 320 ${100 + 35} 262 Q${
+        100 + 33
+      } 232 ${100 + ww + 1} 204 Q${100 + ww} 190 ${100 + ww + 2} 176 Q${100 + sw + 2} 152 ${
+        100 + sw + 1
+      } 126 L${100 + sw} 90 Q${100 + 20} 77 ${100 + nw} 78 Z`
     : `M${100 - nw} 78 Q${100 - 24} 77 ${100 - sw} 90 L${100 - sw - 2} 140 Q${100 - sw + 2} 180 ${
         100 - sw + 4
       } 202 L${100 - hw} 372 Q100 381 ${100 + hw} 372 L${100 + sw - 4} 202 Q${100 + sw - 2} 180 ${
         100 + sw + 2
       } 140 L${100 + sw} 90 Q${100 + 24} 77 ${100 + nw} 78 Z`;
+  const folds = f
+    ? S(`M${100 - 12} 252 Q${100 - 17} 312 ${100 - 24} 372`, INK, 1.4, 'opacity=".22"') +
+      S(`M${100 + 6} 246 Q${100 + 8} 312 ${100 + 14} 374`, INK, 1.4, 'opacity=".22"') +
+      S(`M${100 - 31} 272 Q${100 - 38} 322 ${100 - 43} 372`, INK, 1.4, 'opacity=".16"')
+    : S(`M${100 - 10} 226 Q${100 - 14} 300 ${100 - 18} 372`, INK, 1.4, 'opacity=".22"') +
+      S(`M${100 + 4} 214 Q${100 + 2} 300 ${100 + 8} 376`, INK, 1.4, 'opacity=".22"') +
+      S(`M${100 - 32} 250 Q${100 - 36} 310 ${100 - 40} 372`, INK, 1.4, 'opacity=".16"');
   let body =
+    patterns +
     `<clipPath id="ct${u}"><path d="${tunicPath}"/></clipPath>` +
     PO(tunicPath, tunic) +
     `<g clip-path="url(#ct${u})">` +
-    // shade side, folds, hem band
+    // the shaded side, the weave, the folds and a patterned hem
     P(`M108 76 Q102 220 112 392 L260 392 L260 70 Z`, tunicD) +
-    S(`M${100 - 10} 226 Q${100 - 14} 300 ${100 - 18} 372`, INK, 1.4, 'opacity=".22"') +
-    S(`M${100 + 4} 214 Q${100 + 2} 300 ${100 + 8} 376`, INK, 1.4, 'opacity=".22"') +
-    S(`M${100 - 32} 250 Q${100 - 36} 310 ${100 - 40} 372`, INK, 1.4, 'opacity=".16"') +
+    weave("M0 0 H200 V400 H0 Z") +
+    folds +
     P("M0 350 L200 350 L200 400 L0 400 Z", tunicDD) +
+    P("M0 354 H200 V364 H0 Z", `url(#zz${u})`) +
     S("M0 350 L200 350", INK, 1.4, 'opacity=".5"') +
-    S("M0 360 L200 360", trim, 2.2, 'stroke-dasharray="4 3"') +
+    S("M0 366 L200 366", INK, 1, 'opacity=".3"') +
+    // women: an embroidered placket down the front
+    (f
+      ? P(`M95.5 98 H104.5 V${by} H95.5 Z`, tunicDD) +
+        P(`M95.5 98 H104.5 V${by} H95.5 Z`, `url(#dm${u})`) +
+        S(`M95.5 98 V${by} M104.5 98 V${by}`, INK, 0.9, 'opacity=".5"')
+      : "") +
     // sash
-    P(`M0 ${by} L200 ${by} L200 ${by + 16} L0 ${by + 16} Z`, sash) +
-    P(`M108 ${by} L200 ${by} L200 ${by + 16} L108 ${by + 16} Z`, "#000", 'opacity=".22"') +
+    P(`M0 ${by} L200 ${by} L200 ${by + bh} L0 ${by + bh} Z`, sash) +
+    P(`M108 ${by} L200 ${by} L200 ${by + bh} L108 ${by + bh} Z`, "#000", 'opacity=".22"') +
+    S(
+      `M0 ${by + 3.5} L200 ${by + 3.5} M0 ${by + bh - 3.5} L200 ${by + bh - 3.5}`,
+      "#fff",
+      0.9,
+      'opacity=".28"'
+    ) +
     S(`M0 ${by} L200 ${by}`, INK, 1.4) +
-    S(`M0 ${by + 16} L200 ${by + 16}`, INK, 1.4) +
+    S(`M0 ${by + bh} L200 ${by + bh}`, INK, 1.4) +
     `</g>`;
   // neckline
   body += f
@@ -97,54 +132,68 @@ export function fullSVG(look, n, opts = {}) {
       .join("");
   }
 
-  // ---- outer garment: a mantle (men) or shawl (women) hanging in two panels ----
-  const panel = `M${100 - 13} 80 Q${100 - 24} 80 ${100 - sw + 6} 92 L${100 - sw + 4} 160 Q${
-    100 - sw + 2
-  } ${my - 70} ${100 - sw - 2} ${my} Q${100 - 30} ${my + 8} ${100 - 17} ${my} Q${100 - 14} ${
-    my - 80
-  } ${100 - 13} 170 Z`;
-  let cloak = PO(panel, mantle) + mirror(PO(panel, mantleD));
-  if (accent) {
-    cloak +=
-      S(`M${100 - sw + 14} 96 Q${100 - sw + 12} ${my - 100} ${100 - sw + 8} ${my - 6}`, accent, 3) +
-      S(
-        `M${100 - sw + 22} 96 Q${100 - sw + 20} ${my - 100} ${100 - sw + 17} ${my - 6}`,
-        accent,
-        1.4
-      ) +
-      mirror(
-        S(
-          `M${100 - sw + 14} 96 Q${100 - sw + 12} ${my - 100} ${100 - sw + 8} ${my - 6}`,
-          accent,
-          3,
-          'opacity=".8"'
+  // ---- outer garment: a mantle (men) or a draped shawl (women), in two panels ----
+  // oy / iy are where the outer and inner corners of a panel's hem hang.
+  const panelFor = (oy, iy) =>
+    `M${100 - 13} 80 Q${100 - 22} 80 ${100 - sw + 5} 92 L${100 - sw + 3} 150 Q${100 - sw + 2} ${
+      oy - 70
+    } ${100 - sw - 1} ${oy}` +
+    // a shawl ends in a diagonal edge with a corner; a mantle has a softly rounded hem
+    (f ? ` L${100 - 15} ${iy}` : ` Q${100 - 28} ${iy + 8} ${100 - 15} ${iy}`) +
+    ` Q${100 - 12} ${iy - 80} ${100 - 12} 170 Z`;
+  // Stripes on striped mantles, embroidery on embroidered shawls, a plain edge otherwise.
+  const decorate = (d, key, oy, iy) => {
+    const cid = `cp${key}${u}`;
+    let o = `<clipPath id="${cid}"><path d="${d}"/></clipPath><g clip-path="url(#${cid})">`;
+    if (!f && accent) {
+      [
+        [8, 3.8],
+        [15, 1.8],
+        [22, 3.8]
+      ].forEach(([off, w]) => {
+        const x0 = 100 - sw + off;
+        o += P(`M${x0} 84 L${x0 + w} 84 L${x0 + w - 5} ${oy + 12} L${x0 - 5} ${oy + 12} Z`, accent);
+      });
+    }
+    if (f && accent) {
+      o +=
+        P(
+          `M${100 - 27} 84 L${100 - 15} 84 L${100 - 17} ${iy + 10} L${100 - 29} ${iy + 10} Z`,
+          `url(#dm${u})`
         ) +
-          S(
-            `M${100 - sw + 22} 96 Q${100 - sw + 20} ${my - 100} ${100 - sw + 17} ${my - 6}`,
-            accent,
-            1.4,
-            'opacity=".8"'
-          )
-      );
-  }
-  cloak +=
-    S(
-      `M${100 - sw + 6} 200 Q${100 - 34} ${my - 40} ${100 - sw} ${my - 8}`,
-      INK,
-      1.4,
-      'opacity=".25"'
-    ) +
+        P(
+          `M${100 - sw - 6} ${oy - 12} L${100 - 12} ${iy - 12} L${100 - 12} ${iy + 14} L${
+            100 - sw - 6
+          } ${oy + 14} Z`,
+          `url(#dm${u})`
+        );
+    }
+    if (f && !accent) {
+      o += S(`M${100 - 14} 84 Q${100 - 13} 160 ${100 - 14} ${iy - 6}`, shade(mantle, 0.28), 2.2);
+    }
+    return o + `</g>`;
+  };
+  const leftD = panelFor(f ? 236 : my, f ? 262 : my);
+  const rightD = panelFor(f ? 262 : my, f ? 298 : my);
+  const cloakFold = `M${100 - sw + 6} 200 Q${100 - 34} ${my - 40} ${100 - sw} ${my - 8}`;
+  const cloak =
+    PO(leftD, mantle) +
+    weave(leftD) +
+    decorate(leftD, "l", f ? 236 : my, f ? 262 : my) +
     mirror(
-      S(
-        `M${100 - sw + 6} 200 Q${100 - 34} ${my - 40} ${100 - sw} ${my - 8}`,
-        INK,
-        1.4,
-        'opacity=".25"'
-      )
-    );
+      PO(rightD, mantleD) +
+        weave(rightD) +
+        decorate(rightD, "r", f ? 262 : my, f ? 298 : my) +
+        `<path d="${rightD}" fill="#000" opacity=".1"/>`
+    ) +
+    S(cloakFold, INK, 1.4, 'opacity=".25"') +
+    mirror(S(cloakFold, INK, 1.4, 'opacity=".25"'));
 
   // ---- arms and hands ----
+  // Women's arms are the same shape, slimmer, scaled across their own centre line.
+  const armX = 100 - sw - 1;
   const arm = fill =>
+    `<g${f ? ` transform="translate(${armX} 0) scale(.78 1) translate(${-armX} 0)"` : ""}>` +
     PO(
       `M${100 - sw + 8} 84 Q${100 - sw - 8} 84 ${100 - sw - 9} 104 L${100 - sw - 11} 150 Q${
         100 - sw - 12
@@ -155,13 +204,17 @@ export function fullSVG(look, n, opts = {}) {
     ) +
     P(
       `M${100 - sw - 9} 190 L${100 - sw + 5} 190 L${100 - sw + 5} 200 L${100 - sw - 9} 200 Z`,
-      trim,
-      'opacity=".85"'
+      tunicDD
+    ) +
+    P(
+      `M${100 - sw - 9} 190 L${100 - sw + 5} 190 L${100 - sw + 5} 200 L${100 - sw - 9} 200 Z`,
+      `url(#zz${u})`
     ) +
     S(`M${100 - sw - 9} 190 L${100 - sw + 5} 190`, INK, 1.2) +
     `<ellipse cx="${
       100 - sw - 1
-    }" cy="209" rx="6.4" ry="8" fill="${skin}" stroke="${INK}" stroke-width="1.8"/>`;
+    }" cy="209" rx="6.4" ry="8" fill="${skin}" stroke="${INK}" stroke-width="1.8"/>` +
+    `</g>`;
   const arms = arm(tunic) + mirror(arm(tunicD));
 
   // ---- feet and sandals ----
