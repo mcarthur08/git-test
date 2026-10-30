@@ -4,7 +4,13 @@ import { joinOrSave } from "@/actions";
 import EditorPreview from "./EditorPreview.jsx";
 import IdentitySection from "./IdentitySection.jsx";
 import AccountSection from "./AccountSection.jsx";
-import { FaceSection, HairSection, ClothingSection, GearSection } from "./LookSections.jsx";
+import {
+  RoleSection,
+  FaceSection,
+  HairSection,
+  ClothingSection,
+  GearSection
+} from "./LookSections.jsx";
 
 function saveHint({ nm0, aliasTaken, onboarding }) {
   if (!nm0) {
@@ -53,6 +59,7 @@ export default function Editor({ onboarding }) {
         <EditorPreview ed={ed} />
         <div className="stack" style={{ gap: 26 }}>
           <IdentitySection d={d} g={g} />
+          <RoleSection d={d} g={g} n={n} />
           {quick ? (
             <div className="quick-more">
               <p className="small muted">

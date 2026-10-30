@@ -159,6 +159,33 @@ export function figureSVG(look, n, opts = {}) {
   if (item === "lamp") {
     o += `<ellipse cx="42.6" cy="48.6" rx="3.4" ry="1.6" fill="#B87333"/><path class="flame" d="M45.6 46.6 Q44.4 44.6 45.6 42.4 Q46.8 44.6 45.6 46.6 Z" fill="#FFB52E"/>`;
   }
+  if (item === "harp") {
+    o += `<path d="M40 40 Q38.6 46 41.6 49 M47 40 Q48.4 46 45.4 49 M39 40 L48 40" fill="none" stroke="#8A5E34" stroke-width="1"/><path d="M41.6 44 Q41.6 50 43.5 50 Q45.4 50 45.4 44 Z" fill="#A8743C"/>`;
+  }
+  if (item === "hammer") {
+    o += `<rect x="42.6" y="38" width="1.4" height="12" fill="#8A5E34"/><rect x="39.8" y="36.6" width="6.8" height="3.4" rx=".6" fill="#8F9AA3"/>`;
+  }
+  if (item === "spear") {
+    o += `<rect x="41.4" y="6" width="1.2" height="72" fill="#8A5E34"/><path d="M42 0 Q44.6 4 43 8 L41 8 Q39.4 4 42 0 Z" fill="#D8DEE4"/>`;
+  }
+  if (item === "net") {
+    o += `<path d="M41.4 47 L38.6 56 Q42.5 58 46.4 56 L43.6 47 Z" fill="#D9C9A0" stroke="#6E5A36" stroke-width=".5"/>`;
+  }
+  if (item === "cloth") {
+    o += `<rect x="39.6" y="42" width="5.6" height="7" rx=".8" fill="#4A3A2E"/>`;
+  }
+  if (item === "saw") {
+    o += `<rect x="41.6" y="37" width="2.6" height="12" fill="#B8C0C8"/><rect x="41" y="47" width="3.6" height="3" fill="#8A5E34"/>`;
+  }
+  if (item === "sickle") {
+    o += `<rect x="42.6" y="42" width="1.2" height="8" fill="#8A5E34"/><path d="M43 42 Q44 37 48 37 Q45 39 44.6 42 Z" fill="#B8C0C8"/>`;
+  }
+  if (item === "purse") {
+    o += `<path d="M41 48 Q39 52 41 54 Q43 55 45 54 Q47 52 44.6 48 Z" fill="#8A5E34"/><circle cx="43" cy="52" r="1.1" fill="#E2B24E"/>`;
+  }
+  if (item === "censer") {
+    o += `<path d="M42.6 48 L43 54" stroke="#C9A04B" stroke-width=".5"/><path d="M40.8 54 Q40.8 58 43 58 Q45.2 58 45.2 54 Z" fill="#C9A04B"/>`;
+  }
   if (item === "shield") {
     o +=
       P("M14 30 Q20.6 27 26 30 L25.4 39 Q24 44 20 46 Q16 44 14.6 39 Z", "#B8892B") +

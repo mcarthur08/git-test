@@ -33,7 +33,15 @@ export {
   startRecover,
   checkTransfer
 } from "./tribes.jsx";
-export { setDraft, setLook, setGender, randomName, surprise, joinOrSave } from "./character.js";
+export {
+  setDraft,
+  setLook,
+  setRole,
+  setGender,
+  randomName,
+  surprise,
+  joinOrSave
+} from "./character.js";
 export { saveConfig } from "./settings.js";
 export {
   liveRelease,

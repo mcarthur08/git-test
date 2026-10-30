@@ -2009,6 +2009,48 @@ button.team:hover {
   box-shadow: 0 0 0 1px var(--gold), 0 0 16px -4px rgba(242, 213, 140, 0.6);
   color: var(--gold-hi);
 }
+.roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+.role {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 6px 4px;
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  min-height: 44px;
+  transition: transform 0.15s var(--spring), border-color 0.2s, box-shadow 0.2s;
+}
+.role:hover {
+  border-color: var(--bronze);
+}
+.role:active {
+  transform: scale(0.96);
+}
+.role[aria-pressed="true"] {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 0 16px -4px rgba(242, 213, 140, 0.6);
+  color: var(--gold-hi);
+}
+.rprev {
+  width: 64px;
+  height: 114px;
+  border-radius: 4px;
+  overflow: hidden;
+  display: block;
+  background: radial-gradient(80% 60% at 50% 40%, #5a3b22, #1a1310);
+}
+.rprev .av {
+  width: 100%;
+  height: 100%;
+}
 .fprev {
   width: 72px;
   height: 40px;

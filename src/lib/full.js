@@ -349,6 +349,207 @@ export function fullSVG(look, n, opts = {}) {
         cy - 8
       }" width="24" height="4.4" fill="#F1E7CC" stroke="${INK}" stroke-width="1"/>`;
   }
+  if (item === "harp") {
+    // a kinnor: two arms, a crossbar, a sound box in the hand and four strings
+    const lx = hx + 6;
+    const top = hy - 46;
+    const bot = hy - 2;
+    itemFront =
+      `<g transform="rotate(-8 ${hx} ${hy})">` +
+      line(`M${lx - 14} ${top} Q${lx - 19} ${hy - 12} ${lx - 7} ${bot}`, wood, 3.4) +
+      line(`M${lx + 14} ${top} Q${lx + 19} ${hy - 12} ${lx + 7} ${bot}`, wood, 3.4) +
+      [-8, -3, 3, 8]
+        .map(o => S(`M${lx + o} ${top + 3} L${lx + o * 0.7} ${hy - 8}`, "#EADFB4", 1))
+        .join("") +
+      line(`M${lx - 17} ${top} L${lx + 17} ${top}`, wood, 3.4) +
+      PO(
+        `M${lx - 10} ${hy - 10} Q${lx - 10} ${bot + 3} ${lx} ${bot + 3} Q${lx + 10} ${bot + 3} ${
+          lx + 10
+        } ${hy - 10} Z`,
+        "#A8743C",
+        1.6
+      ) +
+      `</g>`;
+  }
+  if (item === "hammer") {
+    itemFront =
+      `<g transform="rotate(10 ${hx} ${hy})">` +
+      PO(
+        `M${hx - 2.4} ${hy - 34} L${hx + 2.4} ${hy - 34} L${hx + 2.4} ${hy + 16} L${hx - 2.4} ${
+          hy + 16
+        } Z`,
+        wood,
+        1.4
+      ) +
+      PO(
+        `M${hx - 14} ${hy - 47} L${hx + 10} ${hy - 47} Q${hx + 14} ${hy - 40} ${hx + 10} ${
+          hy - 33
+        } L${hx - 14} ${hy - 33} Z`,
+        "#8F9AA3",
+        1.8
+      ) +
+      P(
+        `M${hx - 14} ${hy - 47} L${hx - 6} ${hy - 47} L${hx - 6} ${hy - 33} L${hx - 14} ${
+          hy - 33
+        } Z`,
+        "#6F7A83"
+      ) +
+      S(`M${hx - 3} ${hy - 44} L${hx + 8} ${hy - 44}`, "#D8DEE4", 1.2) +
+      `</g>`;
+  }
+  if (item === "spear") {
+    const blade = `M${hx} 10 Q${hx + 9} 30 ${hx + 2.6} 52 L${hx - 2.6} 52 Q${hx - 9} 30 ${hx} 10 Z`;
+    itemBack =
+      line(`M${hx} 392 L${hx} 50`, wood, 3.4) +
+      PO(
+        `M${hx + 1.5} 57 Q${hx + 14} 52 ${hx + 23} 60 Q${hx + 14} 66 ${hx + 1.5} 72 Z`,
+        "#9A2A22",
+        1.4
+      ) +
+      PO(blade, "#D8DEE4", 1.8) +
+      S(`M${hx} 16 L${hx} 50`, "#9AA3AB", 1) +
+      PO(`M${hx - 4} 51 L${hx + 4} 51 L${hx + 4} 56 L${hx - 4} 56 Z`, "#C9A04B", 1.4);
+  }
+  if (item === "net") {
+    // a cast net with floats along the hem, hung from the hand
+    itemFront =
+      `<defs><pattern id="nt${u}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0 H7 M0 0 V7" fill="none" stroke="#6E5A36" stroke-width="1"/></pattern></defs>` +
+      PO(
+        `M${hx - 3} ${hy + 2} L${hx - 17} ${hy + 50} Q${hx} ${hy + 58} ${hx + 17} ${hy + 50} L${
+          hx + 3
+        } ${hy + 2} Z`,
+        "#D9C9A0",
+        1.6
+      ) +
+      P(
+        `M${hx - 3} ${hy + 2} L${hx - 17} ${hy + 50} Q${hx} ${hy + 58} ${hx + 17} ${hy + 50} L${
+          hx + 3
+        } ${hy + 2} Z`,
+        `url(#nt${u})`
+      ) +
+      [-14, -5, 5, 14]
+        .map(
+          o =>
+            `<circle cx="${hx + o}" cy="${
+              hy + 52 - Math.abs(o) * 0.1
+            }" r="2.4" fill="#C9A04B" stroke="${INK}" stroke-width="1"/>`
+        )
+        .join("");
+  }
+  if (item === "cloth") {
+    // a roll of woven goat-hair cloth, for a tentmaker
+    itemFront =
+      PO(
+        `M${hx - 12} ${hy - 22} L${hx + 12} ${hy - 22} L${hx + 12} ${hy + 6} L${hx - 12} ${
+          hy + 6
+        } Z`,
+        "#4A3A2E",
+        1.6
+      ) +
+      S(
+        `M${hx - 6} ${hy - 20} V${hy + 4} M${hx} ${hy - 20} V${hy + 4} M${hx + 6} ${hy - 20} V${
+          hy + 4
+        }`,
+        "#8B7355",
+        1.2
+      ) +
+      PO(
+        `M${hx - 12} ${hy - 22} Q${hx} ${hy - 28} ${hx + 12} ${hy - 22} Q${hx} ${hy - 17} ${
+          hx - 12
+        } ${hy - 22} Z`,
+        "#6B5640",
+        1.4
+      ) +
+      S(`M${hx + 8} ${hy - 22} L${hx + 17} ${hy - 38}`, "#E9DAB6", 1.6);
+  }
+  if (item === "saw") {
+    const blade = `M${hx - 4} ${hy - 10} L${hx + 10} ${hy - 10} L${hx + 6} ${hy - 56} L${hx - 4} ${
+      hy - 56
+    } Z`;
+    const teeth = [...Array(9)]
+      .map(
+        (_, i) =>
+          `L${hx + 10 - i * 0.45 - 2} ${hy - 12 - i * 5} L${hx + 10 - i * 0.45 + 1.5} ${
+            hy - 15 - i * 5
+          }`
+      )
+      .join(" ");
+    itemFront =
+      `<g transform="rotate(12 ${hx} ${hy})">` +
+      PO(blade, "#B8C0C8", 1.6) +
+      S(`M${hx + 10} ${hy - 10} ${teeth}`, INK, 1.1) +
+      PO(
+        `M${hx - 5} ${hy - 10} L${hx + 11} ${hy - 10} L${hx + 10} ${hy + 12} L${hx - 4} ${
+          hy + 12
+        } Z`,
+        wood,
+        1.6
+      ) +
+      `<ellipse cx="${hx + 3}" cy="${
+        hy + 1
+      }" rx="3" ry="4.4" fill="${skin}" stroke="${INK}" stroke-width="1"/>` +
+      `</g>`;
+  }
+  if (item === "sickle") {
+    itemFront =
+      `<g transform="rotate(12 ${hx} ${hy})">` +
+      PO(
+        `M${hx - 2.4} ${hy - 16} L${hx + 2.4} ${hy - 16} L${hx + 2.4} ${hy + 14} L${hx - 2.4} ${
+          hy + 14
+        } Z`,
+        wood,
+        1.4
+      ) +
+      PO(
+        `M${hx - 1} ${hy - 16} Q${hx + 3} ${hy - 46} ${hx + 28} ${hy - 46} Q${hx + 13} ${hy - 38} ${
+          hx + 9
+        } ${hy - 16} Z`,
+        "#B8C0C8",
+        1.6
+      ) +
+      `</g>`;
+  }
+  if (item === "purse") {
+    itemFront =
+      S(`M${hx} ${hy} L${hx + 1} ${hy + 8}`, "#5B3A21", 1.6) +
+      PO(
+        `M${hx - 5} ${hy + 6} Q${hx - 16} ${hy + 20} ${hx - 10} ${hy + 31} Q${hx} ${hy + 37} ${
+          hx + 12
+        } ${hy + 31} Q${hx + 17} ${hy + 20} ${hx + 7} ${hy + 6} Z`,
+        "#8A5E34",
+        1.8
+      ) +
+      PO(
+        `M${hx - 6} ${hy + 6} L${hx + 8} ${hy + 6} L${hx + 8} ${hy + 10} L${hx - 6} ${hy + 10} Z`,
+        "#C9A04B",
+        1.4
+      ) +
+      `<circle cx="${hx + 1}" cy="${
+        hy + 22
+      }" r="5" fill="#E2B24E" stroke="${INK}" stroke-width="1.2"/>` +
+      S(`M${hx + 1} ${hy + 19.5} V${hy + 24.5}`, "#9C7A45", 1);
+  }
+  if (item === "censer") {
+    itemFront =
+      S(`M${hx} ${hy} L${hx + 2} ${hy + 30}`, INK, 2.8) +
+      S(`M${hx} ${hy} L${hx + 2} ${hy + 30}`, "#C9A04B", 1.2) +
+      S(
+        `M${hx + 2} ${hy + 27} Q${hx - 5} ${hy + 18} ${hx + 2} ${hy + 10} Q${hx + 8} ${hy + 3} ${
+          hx + 3
+        } ${hy - 6}`,
+        "#DDD6C8",
+        2.2,
+        'opacity=".55"'
+      ) +
+      PO(
+        `M${hx - 8} ${hy + 34} Q${hx - 8} ${hy + 48} ${hx + 2} ${hy + 48} Q${hx + 12} ${hy + 48} ${
+          hx + 12
+        } ${hy + 34} Z`,
+        "#C9A04B",
+        1.8
+      ) +
+      PO(`M${hx - 6} ${hy + 34} Q${hx + 2} ${hy + 25} ${hx + 10} ${hy + 34} Z`, "#E2B24E", 1.6);
+  }
   // tail of the sash, hanging in the opening of the mantle
   const tails =
     PO(`M101 ${by + 8} L112 ${by + 12} L118 ${by + 56} L107 ${by + 52} Z`, sash, 1.6) +

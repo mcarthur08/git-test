@@ -3,6 +3,7 @@ import { getState, setState } from "@/store.js";
 import { UNLOCK, NAMES_M, NAMES_F, PLACES } from "@/lib/data.js";
 import { lsSet } from "@/lib/util.js";
 import { normLook } from "@/lib/avatar.js";
+import { applyRole } from "@/lib/roles.js";
 import { stats, teamIndex, takenAliases, draftName, aliasOf, newDraftFor } from "@/lib/player.js";
 import { toast, confetti, queueReveal } from "./ui.js";
 import { saveMe } from "./saving.js";
@@ -22,6 +23,17 @@ export function setLook(key, val) {
     return;
   }
   setDraft(d => ({ look: { ...d.look, [key]: val } }));
+}
+
+export function setRole(role) {
+  const s = getState();
+  const n = s.phase === "join" ? 0 : s.me ? stats(s.me).n : 0;
+  const { look, locked } = applyRole({ ...s.draft.look, g: s.draft.gender }, role, n);
+  setDraft(d => ({ look: { ...d.look, ...look } }));
+  if (locked.length) {
+    const l = locked.find(x => x.key === "item") || locked[0];
+    toast(`${l.label} unlocks after ${l.need} days of reading`);
+  }
 }
 
 export function setGender(g) {
