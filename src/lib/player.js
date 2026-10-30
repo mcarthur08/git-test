@@ -12,6 +12,24 @@ import {
 import { iso, parseISO, daysBetween, cleanName as cleanNameOf } from "./util.js";
 import { normLook } from "./avatar.js";
 
+// Quiz scores: a whole number is the original 5-question quiz (3 means 3/5); later quizzes are
+// stored as text like "6/7", so earlier scores and perfect-quiz points keep their meaning.
+export function quizScore(v) {
+  if (Number.isInteger(v)) {
+    return v >= 0 && v <= 5 ? { got: v, of: 5 } : null;
+  }
+  const m = typeof v === "string" && /^(\d{1,2})\/(\d{1,2})$/.exec(v);
+  return m && +m[2] > 0 && +m[1] <= +m[2] ? { got: +m[1], of: +m[2] } : null;
+}
+export const fmtQuiz = v => {
+  const q = quizScore(v);
+  return q ? `${q.got}/${q.of}` : "";
+};
+export const quizPerfect = v => {
+  const q = quizScore(v);
+  return !!q && q.got === q.of;
+};
+
 export function normPlayer(d, id) {
   if (!d || typeof d !== "object") {
     return null;
@@ -40,14 +58,7 @@ export function normPlayer(d, id) {
       if (d.quiz && typeof d.quiz === "object") {
         for (const [k, v] of Object.entries(d.quiz)) {
           const n = +k;
-          if (
-            Number.isInteger(n) &&
-            n >= 1 &&
-            n <= DAYS &&
-            Number.isInteger(v) &&
-            v >= 0 &&
-            v <= 5
-          ) {
+          if (Number.isInteger(n) && n >= 1 && n <= DAYS && quizScore(v)) {
             q[n] = v;
           }
         }
@@ -92,7 +103,7 @@ export function stats(p) {
     streak: cur,
     best,
     quizzes: qs.length,
-    perfect: qs.filter(v => v === 5).length
+    perfect: qs.filter(quizPerfect).length
   };
 }
 

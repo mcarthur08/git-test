@@ -20,6 +20,10 @@ let state = {
   writeError: null,
   cheers: [],
   replies: [],
+  messages: [],
+  reports: [],
+  chatFilter: "all", // all | open (unanswered questions)
+  chatSeen: "",
   openDisc: {},
   kjv: {},
   tab: "today",
@@ -36,6 +40,8 @@ let state = {
   quiz: null,
   readDay: 1,
   readFrom: "today",
+  readJump: null, // { ci, v } to scroll to when the reader opens
+  mark: null, // reading bookmark (see actions/bookmark.js)
   rdSize: 2,
   rdLight: false,
   auth: {},

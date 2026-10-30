@@ -14,9 +14,11 @@ export default function QuizNudge({ me }) {
   return (
     <section className="card row between quiz-nudge">
       <div>
-        <p className="eyebrow">1-minute refresher</p>
+        <p className="eyebrow">2-minute challenge</p>
         <b>Quiz yourself on Day {last}</b>
-        <p className="small muted">5 quick questions from {PLAN[last - 1].label}.</p>
+        <p className="small muted">
+          7 questions on who said and did what in {PLAN[last - 1].label}.
+        </p>
       </div>
       <button className="btn go" onClick={() => startQuiz(last)}>
         Take the quiz

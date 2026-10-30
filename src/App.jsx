@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { setState, useStore } from "@/store.js";
 import { draftFrom } from "@/lib/player.js";
-import { boot, checkWhatsNew, checkGuide } from "@/actions";
+import { boot, checkWhatsNew, checkGuide, flushMark } from "@/actions";
 import Header from "@/components/layout/Header.jsx";
 import { Avatar } from "@/components/ui/Avatar.jsx";
 import { BackButton } from "@/components/ui/BackButton.jsx";
@@ -20,6 +20,7 @@ import Leader from "@/views/Leader/index.jsx";
 import Reader from "@/views/Reader/index.jsx";
 import Quiz from "@/views/Quiz/index.jsx";
 import Help from "@/views/Help/index.jsx";
+import Chat from "@/views/Chat/index.jsx";
 
 // Which screen is showing: the sign-in / join flow first, then one view per tab.
 function View() {
@@ -67,6 +68,13 @@ function View() {
       return <Quiz />;
     case "help":
       return <Help />;
+    case "chat":
+      return (
+        <>
+          <BackButton tab="today" label="Back to Today" />
+          <Chat />
+        </>
+      );
     default:
       return <Today />;
   }
@@ -85,7 +93,9 @@ export default function App() {
   }, [phase, meId]);
   useEffect(() => {
     const onVisible = () => {
-      if (!document.hidden) {
+      if (document.hidden) {
+        flushMark();
+      } else {
         checkWhatsNew();
       }
     };
@@ -100,6 +110,7 @@ export default function App() {
   }, [phase, tab, draft, me]);
   return (
     <>
+      <TestBadge />
       <Header />
       <main id="main" className="wrap enter" aria-live="polite" key={phase + ":" + tab}>
         <View />

@@ -33,8 +33,22 @@ export default function Help() {
           ))}
           <Tip ic="target" title="Daily quiz">
             <p className="muted">
-              After you check off a day, try 5 quick questions from that reading. A perfect score
-              adds a point for your tribe.
+              After you check off a day, take the 7-question challenge on that reading: who said it,
+              who did it, what happened, and which verses you read. A perfect score adds a point for
+              your tribe.
+            </p>
+          </Tip>
+          <Tip ic="book" title="Your place in the reading">
+            <p className="muted">
+              Reading in the app? Your place is saved as you go, and you can tap any verse to
+              bookmark it. Tap <b>Continue</b> on Today to pick up right there, on any device.
+            </p>
+          </Tip>
+          <Tip ic="chat" title="Group chat">
+            <p className="muted">
+              Ask questions and share thoughts in the group chat: tap the chat bubble at the top.
+              Tick <b>This is a question</b> so a leader can find and answer it. See something that
+              isn't right? Tap <b>Report</b> and a leader will take a look.
             </p>
           </Tip>
           <Tip ic="lock" title="Forgot your password?">

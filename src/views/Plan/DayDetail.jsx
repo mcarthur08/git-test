@@ -1,7 +1,7 @@
 import { useStore } from "@/store.js";
 import { PLAN, SECTIONS } from "@/lib/data.js";
 import { parseISO, fmtDate } from "@/lib/util.js";
-import { stats, dayDate } from "@/lib/player.js";
+import { stats, dayDate, fmtQuiz } from "@/lib/player.js";
 import { Icon } from "@/components/ui/Icon.jsx";
 import { openReader, toggleDay, startQuiz } from "@/actions";
 import { selectDay } from "./selectDay.js";
@@ -41,7 +41,7 @@ export default function DayDetail({ day }) {
         </button>
         {isDone ? (
           <button className="btn" onClick={() => startQuiz(sel.day)}>
-            <Icon k="target" /> {q !== undefined ? `Quiz ${q}/5` : "Quiz"}
+            <Icon k="target" /> {q !== undefined ? `Quiz ${fmtQuiz(q)}` : "Quiz"}
           </button>
         ) : null}
         <button className="btn sm" onClick={() => selectDay(null)}>

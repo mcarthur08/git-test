@@ -1,9 +1,13 @@
 import { IS_TEST } from "@/firebase-config.js";
 
-// A corner label on the test environment so nobody mistakes it for the real app.
+// A label on every test build, so nobody mistakes the test copy for the real group.
 export function TestBadge() {
   if (!IS_TEST) {
     return null;
   }
-  return <div className="test-badge">Test environment · not real data</div>;
+  return (
+    <div className="test-badge" role="note">
+      Test environment · not the real group
+    </div>
+  );
 }

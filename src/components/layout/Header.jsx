@@ -41,6 +41,33 @@ function SaveStatus({ status }) {
   );
 }
 
+// New chat messages from other people since this device last had the chat open.
+function useUnread() {
+  const { messages, chatSeen, uid } = useStore();
+  return messages.filter(m => m.uid !== uid && m.at > (chatSeen || "")).length;
+}
+
+// The chat bubble beside the ?, with a count of new messages.
+function ChatButton({ active }) {
+  const unread = useUnread();
+  const label = unread ? `Group chat, ${unread} new` : "Group chat";
+  return (
+    <button
+      className={"helpbtn chatbtn" + (active ? " on" : "")}
+      onClick={() => setTab("chat")}
+      aria-label={label}
+      title="Group chat"
+    >
+      <Icon k="chat" />
+      {unread && !active ? (
+        <i className="tab-badge" aria-hidden="true">
+          {unread > 9 ? "9+" : unread}
+        </i>
+      ) : null}
+    </button>
+  );
+}
+
 function TabBar({ tab }) {
   const tabs = TABS.filter(([k]) => NAV_TABS.includes(k));
   return (
@@ -70,6 +97,7 @@ export default function Header() {
           </h1>
         </div>
         <SaveStatus status={me ? saveStatus : ""} />
+        {me && phase === "ready" ? <ChatButton active={tab === "chat"} /> : null}
         {me && phase === "ready" ? (
           <button
             className="helpbtn"
