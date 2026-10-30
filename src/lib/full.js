@@ -741,6 +741,259 @@ export function fullSVG(look, n, opts = {}) {
       ) +
       `</g>`;
   }
+  if (item === "star") {
+    const cx = hx + 2;
+    const cy = hy - 46;
+    const pts = [...Array(10)]
+      .map((_, i) => {
+        const a = ((-90 + i * 36) * Math.PI) / 180;
+        const r = i % 2 ? 4.8 : 12;
+        return `${(cx + r * Math.cos(a)).toFixed(1)} ${(cy + r * Math.sin(a)).toFixed(1)}`;
+      })
+      .join(" L");
+    itemFront =
+      line(`M${hx} ${hy + 16} L${cx} ${cy + 8}`, wood, 2.2) +
+      `<circle cx="${cx}" cy="${cy}" r="17" fill="#FFE49A" opacity=".22"/>` +
+      PO(`M${pts} Z`, "#F2D58C", 1.6);
+  }
+  if (item === "square") {
+    itemFront =
+      `<g transform="rotate(-8 ${hx} ${hy})">` +
+      PO(
+        `M${hx - 4} ${hy - 42} L${hx + 2.4} ${hy - 42} L${hx + 2.4} ${hy - 6} L${hx + 24} ${
+          hy - 6
+        } L${hx + 24} ${hy} L${hx - 4} ${hy} Z`,
+        "#B98A4B",
+        1.6
+      ) +
+      S(
+        `M${hx - 4} ${hy - 34} h3 M${hx - 4} ${hy - 26} h3 M${hx - 4} ${hy - 18} h3 M${
+          hx + 6
+        } ${hy} v-3 M${hx + 14} ${hy} v-3`,
+        INK,
+        1
+      ) +
+      `</g>`;
+  }
+  if (item === "dove") {
+    const cx = hx + 2;
+    const cy = hy - 12;
+    itemFront =
+      PO(`M${cx - 20} ${cy - 2} L${cx - 9} ${cy - 5} L${cx - 9} ${cy + 3} Z`, "#E8E2D6", 1.3) +
+      `<ellipse cx="${cx}" cy="${cy}" rx="11" ry="7" fill="#F6F2EA" stroke="${INK}" stroke-width="1.6"/>` +
+      `<circle cx="${cx + 10}" cy="${
+        cy - 8
+      }" r="4.8" fill="#F6F2EA" stroke="${INK}" stroke-width="1.5"/>` +
+      PO(
+        `M${cx + 14.4} ${cy - 9} L${cx + 19} ${cy - 7.6} L${cx + 14.4} ${cy - 6.4} Z`,
+        "#E39A3A",
+        1
+      ) +
+      `<circle cx="${cx + 11}" cy="${cy - 9}" r="1" fill="${INK}"/>` +
+      S(`M${cx - 6} ${cy - 3} Q${cx - 1} ${cy - 14} ${cx + 6} ${cy - 5}`, "#C9C2B4", 1.6) +
+      S(`M${cx - 2} ${cy + 7} v3 M${cx + 3} ${cy + 7} v3`, "#E39A3A", 1.2);
+  }
+  if (item === "stone") {
+    itemFront =
+      PO(
+        `M${hx - 11} ${hy - 4} Q${hx - 13} ${hy - 14} ${hx - 5} ${hy - 19} Q${hx + 4} ${hy - 24} ${
+          hx + 11
+        } ${hy - 16} Q${hx + 15} ${hy - 8} ${hx + 9} ${hy - 3} Q${hx} ${hy} ${hx - 11} ${hy - 4} Z`,
+        "#9A948A",
+        1.8
+      ) +
+      P(
+        `M${hx - 5} ${hy - 19} Q${hx + 4} ${hy - 24} ${hx + 11} ${hy - 16} Q${hx + 3} ${hy - 15} ${
+          hx - 5
+        } ${hy - 19} Z`,
+        "#B7B1A6"
+      ) +
+      S(`M${hx - 2} ${hy - 12} l4 3 l-2 4`, INK, 1, 'opacity=".5"');
+  }
+  if (item === "cup") {
+    itemFront =
+      PO(
+        `M${hx - 10} ${hy - 26} L${hx + 10} ${hy - 26} Q${hx + 10} ${hy - 10} ${hx} ${hy - 8} Q${
+          hx - 10
+        } ${hy - 10} ${hx - 10} ${hy - 26} Z`,
+        "#C9A04B",
+        1.8
+      ) +
+      `<ellipse cx="${hx}" cy="${
+        hy - 26
+      }" rx="10" ry="3" fill="#8E1F2D" stroke="${INK}" stroke-width="1.4"/>` +
+      PO(
+        `M${hx - 2} ${hy - 9} L${hx + 2} ${hy - 9} L${hx + 2} ${hy - 2} L${hx - 2} ${hy - 2} Z`,
+        "#B8892B",
+        1.2
+      ) +
+      PO(
+        `M${hx - 7} ${hy - 3} L${hx + 7} ${hy - 3} L${hx + 5} ${hy + 1} L${hx - 5} ${hy + 1} Z`,
+        "#C9A04B",
+        1.4
+      );
+  }
+  if (item === "fish") {
+    itemFront =
+      `<g transform="rotate(8 ${hx} ${hy})">` +
+      PO(`M${hx} ${hy + 2} L${hx - 7} ${hy + 14} L${hx + 7} ${hy + 14} Z`, "#7FA2B8", 1.4) +
+      `<ellipse cx="${hx}" cy="${
+        hy + 30
+      }" rx="8" ry="17" fill="#9DBFD3" stroke="${INK}" stroke-width="1.6"/>` +
+      P(
+        `M${hx - 7} ${hy + 34} Q${hx} ${hy + 46} ${hx + 7} ${hy + 34} Q${hx} ${hy + 41} ${hx - 7} ${
+          hy + 34
+        } Z`,
+        "#E9F2F6"
+      ) +
+      S(`M${hx - 6} ${hy + 22} q6 3 12 0 M${hx - 7} ${hy + 28} q7 3 14 0`, "#6C90A6", 1) +
+      `<circle cx="${hx + 3}" cy="${hy + 40}" r="1.6" fill="${INK}"/>` +
+      `</g>`;
+  }
+  if (item === "oar") {
+    itemBack =
+      line(`M${hx} 392 L${hx} 70`, wood, 3.2) +
+      PO(
+        `M${hx - 6.5} 36 Q${hx - 9} 58 ${hx - 4} 84 L${hx + 4} 84 Q${hx + 9} 58 ${
+          hx + 6.5
+        } 36 Q${hx} 30 ${hx - 6.5} 36 Z`,
+        "#C69A5B",
+        1.8
+      ) +
+      S(`M${hx} 40 L${hx} 80`, "#A67A3E", 1);
+  }
+  if (item === "loaves") {
+    itemFront =
+      [-8, 0, 8]
+        .map(
+          o =>
+            `<ellipse cx="${hx + o}" cy="${
+              hy - 15 - (o === 0 ? 3 : 0)
+            }" rx="6.4" ry="4.6" fill="#D9A25A" stroke="${INK}" stroke-width="1.3"/>`
+        )
+        .join("") +
+      PO(
+        `M${hx - 16} ${hy - 12} L${hx + 16} ${hy - 12} L${hx + 12} ${hy + 8} L${hx - 12} ${
+          hy + 8
+        } Z`,
+        "#B98A4B",
+        1.8
+      ) +
+      S(
+        `M${hx - 14} ${hy - 6} H${hx + 14} M${hx - 13} ${hy} H${hx + 13} M${hx - 6} ${hy - 12} V${
+          hy + 8
+        } M${hx + 6} ${hy - 12} V${hy + 8}`,
+        "#8A6230",
+        1
+      );
+  }
+  if (item === "keys") {
+    const key = a =>
+      `<g transform="rotate(${a} ${hx} ${hy + 8})">` +
+      S(`M${hx} ${hy + 18} V${hy + 42}`, "#C9A04B", 2.2) +
+      PO(`M${hx} ${hy + 34} h6 v3 h-6 M${hx} ${hy + 40} h5 v3 h-5`, "#C9A04B", 1) +
+      `<circle cx="${hx}" cy="${
+        hy + 14
+      }" r="4.4" fill="none" stroke="#C9A04B" stroke-width="2.2"/>` +
+      `</g>`;
+    itemFront =
+      `<circle cx="${hx}" cy="${hy + 6}" r="5" fill="none" stroke="#8F7430" stroke-width="2"/>` +
+      key(-14) +
+      key(14);
+  }
+  if (item === "bucket") {
+    itemFront =
+      S(`M${hx} ${hy} L${hx} ${hy + 8}`, "#C9B27A", 1.8) +
+      S(`M${hx - 11} ${hy + 10} Q${hx} ${hy - 6} ${hx + 11} ${hy + 10}`, "#C9B27A", 1.8) +
+      PO(
+        `M${hx - 11} ${hy + 10} L${hx + 11} ${hy + 10} L${hx + 8} ${hy + 30} L${hx - 8} ${
+          hy + 30
+        } Z`,
+        "#8A5E34",
+        1.8
+      ) +
+      S(`M${hx - 10} ${hy + 16} H${hx + 10} M${hx - 9} ${hy + 24} H${hx + 9}`, "#5B3A21", 1.2) +
+      `<ellipse cx="${hx}" cy="${
+        hy + 10
+      }" rx="11" ry="2.8" fill="#7FB3C8" stroke="${INK}" stroke-width="1.3"/>`;
+  }
+  if (item === "sycamore") {
+    const leaves = [
+      [-9, -22, -30],
+      [8, -30, 25],
+      [-10, -38, -35],
+      [9, -46, 30],
+      [-6, -52, -20],
+      [3, -60, 10]
+    ];
+    itemFront =
+      line(`M${hx} ${hy + 6} Q${hx + 3} ${hy - 30} ${hx - 1} ${hy - 62}`, wood, 2.2) +
+      leaves
+        .map(
+          ([dx, dy, r]) =>
+            `<ellipse cx="${hx + dx}" cy="${
+              hy + dy
+            }" rx="7" ry="4.2" fill="#6E8A3E" stroke="${INK}" stroke-width="1.2" transform="rotate(${r} ${
+              hx + dx
+            } ${hy + dy})"/>`
+        )
+        .join("") +
+      [
+        [-3, -34],
+        [5, -42]
+      ]
+        .map(
+          ([dx, dy]) =>
+            `<circle cx="${hx + dx}" cy="${
+              hy + dy
+            }" r="2.8" fill="#A86A4A" stroke="${INK}" stroke-width="1"/>`
+        )
+        .join("");
+  }
+  if (item === "alabaster") {
+    itemFront =
+      PO(
+        `M${hx - 3.5} ${hy - 34} L${hx + 3.5} ${hy - 34} L${hx + 4} ${hy - 26} L${hx - 4} ${
+          hy - 26
+        } Z`,
+        "#E9DFC9",
+        1.4
+      ) +
+      PO(
+        `M${hx - 4} ${hy - 26} Q${hx - 15} ${hy - 16} ${hx - 10} ${hy - 2} Q${hx - 6} ${
+          hy + 2
+        } ${hx} ${hy + 2} Q${hx + 6} ${hy + 2} ${hx + 10} ${hy - 2} Q${hx + 15} ${hy - 16} ${
+          hx + 4
+        } ${hy - 26} Z`,
+        "#F3ECDC",
+        1.8
+      ) +
+      S(`M${hx - 12} ${hy - 14} Q${hx} ${hy - 9} ${hx + 12} ${hy - 14}`, "#C9A04B", 1.6) +
+      `<ellipse cx="${hx}" cy="${
+        hy - 34
+      }" rx="4.4" ry="1.8" fill="#C9A04B" stroke="${INK}" stroke-width="1"/>`;
+  }
+  if (item === "palm") {
+    const at = t => ({
+      x: (1 - t) * (1 - t) * hx + 2 * (1 - t) * t * (hx + 2) + t * t * (hx + 16),
+      y: (1 - t) * (1 - t) * (hy + 6) + 2 * (1 - t) * t * (hy - 34) + t * t * (hy - 64)
+    });
+    const leaflets = [...Array(9)]
+      .map((_, i) => {
+        const p = at(0.28 + i * 0.09);
+        const len = 14 - i * 0.8;
+        return S(
+          `M${p.x.toFixed(1)} ${p.y.toFixed(1)} l${-len} -5 M${p.x.toFixed(1)} ${p.y.toFixed(
+            1
+          )} l${len} -5`,
+          "#5C8A3A",
+          2.4
+        );
+      })
+      .join("");
+    itemFront =
+      line(`M${hx} ${hy + 6} Q${hx + 2} ${hy - 34} ${hx + 16} ${hy - 64}`, "#7A5B2E", 2) + leaflets;
+  }
   // tail of the sash, hanging in the opening of the mantle
   const tails =
     PO(`M101 ${by + 8} L112 ${by + 12} L118 ${by + 56} L107 ${by + 52} Z`, sash, 1.6) +

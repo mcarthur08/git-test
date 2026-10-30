@@ -11,13 +11,16 @@ import {
 } from "@/lib/journey.js";
 import { selectStop } from "@/actions";
 import { mapVB, mapZoom, setMapAspect } from "@/lib/mapCamera.js";
+import { useWalk } from "./useWalk.js";
 import MapStop from "./MapStop.jsx";
 import { wireGestures, gesture } from "./mapGestures.js";
 
 // mini = the small window around the player on Today; otherwise the full, zoomable map on Journey.
 export function JourneyMap({ mini }) {
-  const { me, players, stop: sel } = useStore();
+  const { me, players, stop: sel, arrival, reveals } = useStore();
   const ref = useRef(null);
+  const meRef = useRef(null);
+  const pathRef = useRef(null);
   const myN = me ? stats(me).n : 0;
   const zoom = mini ? 1 : mapZoom();
   const named = zoom >= 2; // names show once you zoom in close
@@ -25,6 +28,15 @@ export function JourneyMap({ mini }) {
   const crowd = useMemo(() => buildCrowd(people, me && me.id, named), [people, me, named]);
   const lookKey = me ? JSON.stringify(me.look) : "";
   const meHTML = useMemo(() => (me ? buildMe(me.look, myN, !mini) : ""), [lookKey, myN, mini]);
+  useWalk({
+    id: me && me.id,
+    n: myN,
+    waiting: reveals.length > 0,
+    mini,
+    me: meRef,
+    path: pathRef,
+    svg: ref
+  });
   useEffect(() => {
     if (!mini && ref.current) {
       return wireGestures(ref.current);
@@ -70,6 +82,7 @@ export function JourneyMap({ mini }) {
     >
       <g dangerouslySetInnerHTML={{ __html: MAP_BASE }} />
       <path
+        ref={pathRef}
         d={routePath(myN)}
         fill="none"
         stroke="var(--flame)"
@@ -83,17 +96,19 @@ export function JourneyMap({ mini }) {
         return (
           <MapStop
             key={i}
+            index={i}
             stop={s}
             reached={reached}
             next={next}
             last={i === STOPS.length - 1}
             selected={sel === i && !mini}
+            arriving={!!arrival && arrival.i === i}
             onSelect={mini ? null : onSelect(i)}
           />
         );
       })}
       <g dangerouslySetInnerHTML={{ __html: crowd }} />
-      <g dangerouslySetInnerHTML={{ __html: meHTML }} />
+      <g ref={meRef} dangerouslySetInnerHTML={{ __html: meHTML }} />
     </svg>
   );
 }

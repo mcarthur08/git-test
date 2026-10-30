@@ -8,6 +8,7 @@ import { BackButton } from "@/components/ui/BackButton.jsx";
 import { Toast } from "@/components/ui/Toast.jsx";
 import { Reveal } from "@/components/ui/Reveal.jsx";
 import { CharacterViewer } from "@/components/ui/CharacterViewer.jsx";
+import { ArrivalBanner } from "@/components/ui/ArrivalBanner.jsx";
 import { TestBadge } from "@/components/ui/TestBadge.jsx";
 import SignIn from "@/views/SignIn/index.jsx";
 import Editor from "@/views/Me/Editor.jsx";
@@ -117,6 +118,7 @@ export default function App() {
         <View />
       </main>
       <Toast />
+      <ArrivalBanner />
       <CharacterViewer />
       <Reveal />
       <TestBadge />
