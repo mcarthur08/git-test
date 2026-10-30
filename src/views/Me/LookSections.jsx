@@ -34,7 +34,7 @@ export function RoleSection({ d, g, n }) {
             aria-pressed={wearsRole(look, role, n)}
             title={roleBlurb(role, g)}
           >
-            <span className="rprev">
+            <span className="fprev rprev">
               <Avatar look={applyRole(look, role, n).look} n={n} full />
             </span>
             <span>{roleName(role, g)}</span>
