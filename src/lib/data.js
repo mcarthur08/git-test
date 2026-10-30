@@ -605,6 +605,23 @@ export const STOPS = [
 // (local time), then shows once per device to anyone who hasn't seen that version.
 export const RELEASES = [
   {
+    v: "1.4",
+    from: "2026-10-30T06:00",
+    title: "A brighter look",
+    items: [
+      [
+        "today",
+        "Desert morning",
+        "A lighter, warmer design with clearer lettering. Prefer the old look? Switch back under Me › Appearance."
+      ],
+      [
+        "book",
+        "A clean reading page",
+        "The reader opens on a white page. Tap Sepia for a warmer one."
+      ]
+    ]
+  },
+  {
     v: "1.3",
     from: "2026-10-30T06:00",
     title: "Talk it over",

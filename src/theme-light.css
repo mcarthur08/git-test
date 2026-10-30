@@ -1,0 +1,343 @@
+/* Light theme, "Desert morning": warm sand page, white cards, terracotta and olive accents, modern
+   type (Plus Jakarta Sans for the interface, Fraunces for titles). It is the default; the original
+   dark theme is kept for anyone who picks it under Me (see lib/theme.js). Everything here is scoped
+   to [data-theme="light"], so the dark theme in styles.css is untouched. */
+:root[data-theme="light"] {
+  --bg: #fbf7f0;
+  --surface: #ffffff;
+  --surface-2: #f5eee3;
+  --ink: #2b2420;
+  --muted: #6f6257;
+  --line: #e8decf;
+  --bronze: #d8c6ac;
+  --flame: #c2603d;
+  --flame-2: #d8853f;
+  --gold: #c2603d; /* the main accent: buttons, progress, highlights */
+  --gold-hi: #a24d2f; /* accent used for text, darker so it reads on white */
+  --teal: #5b7f5a;
+  --violet: #7e5a94;
+  --rose: #b4432e;
+  --sky: #3f6fb0;
+  --on: #ffffff;
+  --gold-ink: #ffffff;
+  --sec-g: #6f9a6d;
+  --sec-a: #d07a52;
+  --sec-p: #d2a24c;
+  --sec-l: #7d8bd0;
+  --sec-r: #c2603d;
+  --tint: rgba(194, 96, 61, 0.07); /* terracotta wash for highlighted cards */
+  --tint-line: rgba(194, 96, 61, 0.3);
+  --shadow: 0 1px 2px rgba(80, 50, 20, 0.06), 0 12px 30px -16px rgba(80, 50, 20, 0.25);
+  --shadow-lg: 0 30px 60px -20px rgba(60, 35, 15, 0.35);
+  --radius: 18px;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+
+/* Page and top bar */
+[data-theme="light"] body {
+  background: radial-gradient(120% 50% at 50% -10%, #f6e6d3 0%, rgba(246, 230, 211, 0) 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+[data-theme="light"] body::before {
+  background: var(--bg);
+}
+[data-theme="light"] #top {
+  background: rgba(251, 247, 240, 0.96);
+  box-shadow: 0 1px 0 var(--line);
+}
+/* Frosted glass only where the tab bar sits inside the header: on phones the tab bar is fixed to
+   the bottom, and a backdrop-filter here would pin it to the header instead. */
+@media (min-width: 641px) {
+  [data-theme="light"] #top {
+    background: rgba(251, 247, 240, 0.88);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+  }
+}
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] .disp,
+[data-theme="light"] .brand h1 {
+  letter-spacing: -0.01em;
+  font-weight: 650;
+}
+[data-theme="light"] .brand-mark {
+  background: linear-gradient(145deg, #d97a55, var(--gold));
+  color: #fff;
+  box-shadow: 0 6px 16px -8px rgba(194, 96, 61, 0.7);
+}
+[data-theme="light"] .tabs {
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 -8px 24px -16px rgba(80, 50, 20, 0.35);
+  border-top-color: var(--line);
+}
+@media (min-width: 641px) {
+  [data-theme="light"] .tabs {
+    background: none;
+    box-shadow: none;
+  }
+}
+[data-theme="light"] .tab-badge {
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* Cards and panels */
+[data-theme="light"] .card,
+[data-theme="light"] .stat,
+[data-theme="light"] .reveal-card,
+[data-theme="light"] .team.open,
+[data-theme="light"] .roster li,
+[data-theme="light"] .tile {
+  background: var(--surface);
+}
+[data-theme="light"] .card {
+  border-color: var(--line);
+}
+[data-theme="light"] .card::before,
+[data-theme="light"] .reveal-card::before,
+[data-theme="light"] .frame::after {
+  border-color: transparent;
+}
+[data-theme="light"] .stat .ic,
+[data-theme="light"] .rv-list li,
+[data-theme="light"] .badge,
+[data-theme="light"] .tile .ck,
+[data-theme="light"] .cheer,
+[data-theme="light"] .replies li > div,
+[data-theme="light"] .qz-verse,
+[data-theme="light"] .rd-jump button,
+[data-theme="light"] .rd-opts button,
+[data-theme="light"] .team,
+[data-theme="light"] .roster,
+[data-theme="light"] .prow,
+[data-theme="light"] .vic .q,
+[data-theme="light"] .opt,
+[data-theme="light"] .feat,
+[data-theme="light"] .stoplist button,
+[data-theme="light"] .tribe-line,
+[data-theme="light"] .msg,
+[data-theme="light"] .w-feats li {
+  background: var(--surface-2);
+}
+[data-theme="light"] .vic.locked {
+  background: #f2ebe0;
+}
+[data-theme="light"] .note {
+  background: var(--tint);
+  border-color: var(--tint-line);
+}
+[data-theme="light"] .note.warn {
+  background: rgba(180, 67, 46, 0.08);
+  border-color: rgba(180, 67, 46, 0.35);
+}
+/* Highlighted cards: terracotta instead of gold */
+[data-theme="light"] .recap,
+[data-theme="light"] .continue,
+[data-theme="light"] .catchup,
+[data-theme="light"] .cheer-card,
+[data-theme="light"] .w-card {
+  border-color: var(--tint-line);
+  box-shadow: var(--shadow);
+}
+[data-theme="light"] .pinned,
+[data-theme="light"] .improved,
+[data-theme="light"] .save-bar,
+[data-theme="light"] .recover,
+[data-theme="light"] .w-when,
+[data-theme="light"] .w-ic,
+[data-theme="light"] .chip.soft,
+[data-theme="light"] .tag.q,
+[data-theme="light"] .prow.me,
+[data-theme="light"] .roster li.me,
+[data-theme="light"] .msg.mine,
+[data-theme="light"] .cheer.on {
+  background: var(--tint);
+  border-color: var(--tint-line);
+  box-shadow: none;
+}
+[data-theme="light"] .rv-ic {
+  border-color: var(--tint-line);
+}
+[data-theme="light"] .vs-flash {
+  background-color: rgba(194, 96, 61, 0.2);
+}
+[data-theme="light"] .hero-day {
+  text-shadow: none;
+}
+
+/* Buttons */
+[data-theme="light"] .btn {
+  background: #fff;
+  border-color: var(--line);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(80, 50, 20, 0.08);
+}
+[data-theme="light"] .btn.go {
+  background: var(--gold);
+  border-color: transparent;
+  color: #fff;
+  text-shadow: none;
+  box-shadow: 0 8px 18px -10px rgba(194, 96, 61, 0.8);
+}
+[data-theme="light"] .btn.dark {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+[data-theme="light"] .btn.done-state,
+[data-theme="light"] .chip.ok {
+  background: rgba(91, 127, 90, 0.12);
+  border-color: rgba(91, 127, 90, 0.4);
+}
+[data-theme="light"] .btn.google {
+  background: #fff;
+  border-color: var(--line);
+}
+[data-theme="light"] .seg {
+  background: var(--surface-2);
+}
+[data-theme="light"] .seg button[aria-pressed="true"] {
+  background: var(--gold);
+  color: #fff;
+}
+[data-theme="light"] .opt[aria-pressed="true"],
+[data-theme="light"] .feat[aria-pressed="true"] {
+  border-color: var(--gold);
+  background: var(--tint);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+[data-theme="light"] .sw-opt {
+  border-color: #fff;
+}
+[data-theme="light"] .sw-opt[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--gold);
+}
+
+/* Form fields */
+[data-theme="light"] select,
+[data-theme="light"] input[type="date"],
+[data-theme="light"] input[type="text"],
+[data-theme="light"] input[type="email"],
+[data-theme="light"] input[type="password"],
+[data-theme="light"] input[type="time"],
+[data-theme="light"] textarea,
+[data-theme="light"] .reply-form textarea,
+[data-theme="light"] .compose textarea,
+[data-theme="light"] code,
+[data-theme="light"] .stoplist .sn {
+  background: #fff;
+  color: var(--ink);
+  border-color: var(--line);
+}
+[data-theme="light"] .compose {
+  box-shadow: 0 -8px 30px -16px rgba(80, 50, 20, 0.35);
+}
+
+/* Progress */
+[data-theme="light"] .meter {
+  background: #efe5d8;
+  box-shadow: none;
+}
+[data-theme="light"] .meter i {
+  background: linear-gradient(90deg, #e09a72, var(--gold));
+  box-shadow: none;
+}
+[data-theme="light"] .tdot,
+[data-theme="light"] .tdot.mile,
+[data-theme="light"] .tdot.go,
+[data-theme="light"] .tdot.me {
+  border-color: #fff;
+}
+[data-theme="light"] .tdot {
+  background: #e8decf;
+}
+[data-theme="light"] .track-wrap {
+  background: linear-gradient(180deg, #f5e9da 0%, var(--bg) 80%);
+}
+
+/* Avatars, crests and medals: white rings instead of dark ones */
+[data-theme="light"] .bubble {
+  background: radial-gradient(circle at 50% 30%, #f6e6d3, #e9d2b8 75%);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--line);
+}
+[data-theme="light"] .frame {
+  background: radial-gradient(70% 55% at 50% 38%, #f3dcc0 0%, #e2bf98 55%, #c9976c 100%);
+  box-shadow: 0 0 0 1px var(--line), 0 18px 40px -20px rgba(80, 50, 20, 0.45);
+}
+[data-theme="light"] .frame.glow {
+  box-shadow: 0 0 0 2px var(--gold), 0 0 40px -6px rgba(194, 96, 61, 0.6);
+}
+[data-theme="light"] .wn-art,
+[data-theme="light"] .fprev {
+  background: radial-gradient(circle at 50% 35%, #f7e9d8, #ebd5bc 75%);
+  border-color: var(--line);
+}
+[data-theme="light"] .medal-ic {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--bc), 0 4px 10px -4px rgba(80, 50, 20, 0.4);
+}
+[data-theme="light"] .crest {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--tc);
+}
+[data-theme="light"] .crest.big {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--tc), 0 0 40px -6px var(--tc);
+}
+[data-theme="light"] .tile.done {
+  color: #fff;
+  border-color: transparent;
+}
+[data-theme="light"] .tile.done .r {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Quiz */
+[data-theme="light"] .qz-opt {
+  background: #fff;
+  color: var(--ink);
+}
+[data-theme="light"] .qz-opt.right {
+  background: rgba(91, 127, 90, 0.14);
+  color: #2f5a2e;
+}
+[data-theme="light"] .qz-opt.wrong {
+  background: rgba(180, 67, 46, 0.1);
+  color: #8e2f1f;
+}
+[data-theme="light"] .qz-fb.no b,
+[data-theme="light"] .chip.behind,
+[data-theme="light"] .savestat.error {
+  color: var(--rose);
+}
+
+/* Reader: a clean white page by default; the page button switches to warm sepia */
+[data-theme="light"] .reader {
+  --rd-ink: #2b2420;
+  --rd-bg: #fffdf8;
+  --rd-num: var(--gold);
+  --rd-head: var(--gold-hi);
+}
+[data-theme="light"] .reader.light {
+  --rd-bg: linear-gradient(180deg, #f6ecd9, #efe1c6);
+}
+
+/* Popups and toasts */
+[data-theme="light"] .reveal {
+  background: rgba(43, 36, 32, 0.45);
+}
+[data-theme="light"] .toast {
+  background: var(--ink);
+  color: #fbf7f0;
+  box-shadow: var(--shadow-lg);
+}
+[data-theme="light"] .w-title em {
+  background: linear-gradient(180deg, #d97a55, var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+[data-theme="light"] .rv-list li.rv-ver {
+  background: none;
+  border: 0;
+}
