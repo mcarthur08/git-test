@@ -5,5 +5,13 @@ export const LOADERS = {
   bethsaida: () => import("@/views/Bethsaida/index.js").then(m => m.default),
   galilee: () => import("@/views/Galilee/index.js").then(m => m.default),
   jericho: () => import("@/views/Jericho/index.js").then(m => m.default),
-  capernaum: () => import("@/views/Capernaum/index.js").then(m => m.default)
+  capernaum: () => import("@/views/Capernaum/index.js").then(m => m.default),
+  bethlehem: () => import("@/views/Bethlehem/index.js").then(m => m.default),
+  nazareth: () => import("@/views/Nazareth/index.js").then(m => m.default),
+  jordan: () => import("@/views/Jordan/index.js").then(m => m.default),
+  wilderness: () => import("@/views/Wilderness/index.js").then(m => m.default),
+  caesarea: () => import("@/views/Caesarea/index.js").then(m => m.default),
+  samaria: () => import("@/views/Samaria/index.js").then(m => m.default),
+  bethany: () => import("@/views/Bethany/index.js").then(m => m.default),
+  jerusalem: () => import("@/views/Jerusalem/index.js").then(m => m.default)
 };

@@ -351,6 +351,6 @@ describe("the scene as the map sees it", () => {
       "greetNearest"
     ]);
     expect(def.enter).toMatch(/hillside/);
-    expect(sceneOf(STOPS.find(s => s.place === "Nazareth"))).toBeNull();
+    expect(sceneOf({ place: "Nowhere" })).toBeNull();
   });
 });
