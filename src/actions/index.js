@@ -1,9 +1,22 @@
 // Everything the app does that isn't drawing. Components import from here.
-export { toast, dismissToast, confetti, queueReveal, closeReveal } from "./ui.js";
+export {
+  toast,
+  dismissToast,
+  confetti,
+  queueReveal,
+  closeReveal,
+  openViewer,
+  closeViewer,
+  arrive,
+  clearArrival,
+  openScene,
+  closeScene
+} from "./ui.js";
 export {
   setTab,
   openReader,
   selectStop,
+  openStop,
   setReaderPrefs,
   changeReaderSize,
   toggleReaderLight
@@ -33,7 +46,16 @@ export {
   startRecover,
   checkTransfer
 } from "./tribes.jsx";
-export { setDraft, setLook, setGender, randomName, surprise, joinOrSave } from "./character.js";
+export {
+  setDraft,
+  setLook,
+  setRole,
+  wearItem,
+  setGender,
+  randomName,
+  surprise,
+  joinOrSave
+} from "./character.js";
 export { saveConfig } from "./settings.js";
 export {
   liveRelease,

@@ -1,4 +1,4 @@
-// Toasts, confetti and the reveal-card queue.
+// Toasts, confetti, the reveal-card queue, the full-screen character and the arrival banner.
 import { getState, setState } from "@/store.js";
 
 let toastId = 0;
@@ -48,3 +48,21 @@ export function closeReveal(act) {
     r.onAct();
   }
 }
+
+export const openViewer = viewer => setState({ viewer });
+export const closeViewer = () => setState({ viewer: null });
+
+let arrivalId = 0;
+let arrivalTimer = null;
+export function arrive(i) {
+  clearTimeout(arrivalTimer);
+  setState({ arrival: { i, id: ++arrivalId } });
+  arrivalTimer = setTimeout(() => setState({ arrival: null }), 3400);
+}
+export function clearArrival() {
+  clearTimeout(arrivalTimer);
+  setState({ arrival: null });
+}
+
+export const openScene = name => setState({ scene: name });
+export const closeScene = () => setState({ scene: null });

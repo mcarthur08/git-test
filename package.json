@@ -1,7 +1,7 @@
 {
   "name": "nt70-quest",
   "private": true,
-  "version": "1.3.0",
+  "version": "1.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,9 +15,12 @@
     "lint": "eslint --ext .js,.jsx src vite.config.js"
   },
   "dependencies": {
+    "easystarjs": "^0.4.4",
     "firebase": "10.12.2",
+    "pixi.js": "^8.22.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "xstate": "^5.33.3"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",

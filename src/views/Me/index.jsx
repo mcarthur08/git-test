@@ -2,10 +2,11 @@ import { useStore } from "@/store.js";
 import { ReminderCard } from "@/components/ui/ReminderCard.jsx";
 import { InstallCard } from "@/components/ui/InstallCard.jsx";
 import { AppVersion } from "@/components/ui/AppVersion.jsx";
+import { AppearanceCard } from "@/components/ui/AppearanceCard.jsx";
 import { setTab } from "@/actions";
 import Editor from "./Editor.jsx";
 
-// The Me tab: leader shortcut, daily reminder and the character editor.
+// The Me tab: leader shortcut, daily reminder, appearance and the character editor.
 export default function Me() {
   const canLead = useStore(s => s.canLead);
   return (
@@ -23,6 +24,7 @@ export default function Me() {
       ) : null}
       <InstallCard />
       <ReminderCard />
+      <AppearanceCard />
       <Editor />
       <AppVersion />
     </>

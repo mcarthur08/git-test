@@ -1,10 +1,18 @@
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useStore, setState } from "@/store.js";
 import { stats, takenAliases, draftName, aliasOf } from "@/lib/player.js";
 import { joinOrSave } from "@/actions";
 import EditorPreview from "./EditorPreview.jsx";
+import EditorTabs from "./EditorTabs.jsx";
 import IdentitySection from "./IdentitySection.jsx";
 import AccountSection from "./AccountSection.jsx";
-import { FaceSection, HairSection, ClothingSection, GearSection } from "./LookSections.jsx";
+import {
+  RoleSection,
+  FaceSection,
+  HairSection,
+  ClothingSection,
+  GearSection
+} from "./LookSections.jsx";
 
 function saveHint({ nm0, aliasTaken, onboarding }) {
   if (!nm0) {
@@ -16,9 +24,50 @@ function saveHint({ nm0, aliasTaken, onboarding }) {
   return onboarding ? "Everything can be changed later." : "Changes show on the leaderboard.";
 }
 
+const TABS = [
+  { id: "name", label: "Name" },
+  { id: "role", label: "Role" },
+  { id: "face", label: "Face" },
+  { id: "hair", label: "Hair" },
+  { id: "clothes", label: "Clothes" },
+  { id: "gear", label: "Gear" }
+];
+
+// The pinned character and tabs sit under the page's own sticky header, whose height depends on the device.
+function useHeaderHeight() {
+  useLayoutEffect(() => {
+    const top = document.getElementById("top");
+    if (!top) {
+      return undefined;
+    }
+    const root = document.documentElement.style;
+    const set = () => root.setProperty("--top-h", top.offsetHeight + "px");
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(top);
+    return () => ro.disconnect();
+  }, []);
+}
+
 // Creating a character (onboarding) or editing yours (the Me tab). Edits happen on a draft until you save.
 export default function Editor({ onboarding }) {
   const { draft, me, config, players, readOnly, fullEditor, backend, account } = useStore();
+  const [tab, setTab] = useState(onboarding ? "name" : "role");
+  const panel = useRef(null);
+  const first = useRef(true);
+  useHeaderHeight();
+  // Switching tabs while the bar is pinned shows the top of the new options instead of wherever the scroll was.
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    document.getElementById("etab-" + tab)?.scrollIntoView({ block: "nearest", inline: "center" });
+    const bar = document.querySelector(".etabs");
+    if (bar && bar.getBoundingClientRect().top <= parseFloat(getComputedStyle(bar).top) + 2) {
+      panel.current?.scrollIntoView({ block: "start" });
+    }
+  }, [tab]);
   if (!draft) {
     return null;
   }
@@ -31,6 +80,8 @@ export default function Editor({ onboarding }) {
   const ed = { d, n, g, onboarding, alias, aliasTaken, canSave: !(!nm0 || aliasTaken || readOnly) };
   // New players get a quick start: name and a ready-made look. Every detail stays one tap away.
   const quick = onboarding && !fullEditor;
+  const tabs = quick ? TABS.filter(t => t.id === "name" || t.id === "role") : TABS;
+  const active = tabs.some(t => t.id === tab) ? tab : tabs[0].id;
   return (
     <>
       {onboarding ? (
@@ -51,8 +102,30 @@ export default function Editor({ onboarding }) {
       ) : null}
       <section className="card editor">
         <EditorPreview ed={ed} />
-        <div className="stack" style={{ gap: 26 }}>
-          <IdentitySection d={d} g={g} />
+        <div className="stack ed-main" style={{ gap: 18 }}>
+          <EditorTabs tabs={tabs} active={active} onChange={setTab} />
+          <div
+            id="epanel"
+            role="tabpanel"
+            aria-labelledby={"etab-" + active}
+            className="stack"
+            style={{ gap: 26 }}
+            ref={panel}
+          >
+            {active === "name" ? (
+              <>
+                <IdentitySection d={d} g={g} />
+                {!onboarding && backend === "firebase" && account ? (
+                  <AccountSection account={account} />
+                ) : null}
+              </>
+            ) : null}
+            {active === "role" ? <RoleSection d={d} g={g} n={n} /> : null}
+            {active === "face" ? <FaceSection d={d} g={g} n={n} /> : null}
+            {active === "hair" ? <HairSection d={d} g={g} n={n} /> : null}
+            {active === "clothes" ? <ClothingSection d={d} g={g} n={n} /> : null}
+            {active === "gear" ? <GearSection d={d} g={g} n={n} /> : null}
+          </div>
           {quick ? (
             <div className="quick-more">
               <p className="small muted">
@@ -62,16 +135,6 @@ export default function Editor({ onboarding }) {
                 Customize every detail
               </button>
             </div>
-          ) : (
-            <>
-              <FaceSection d={d} g={g} n={n} />
-              <HairSection d={d} g={g} n={n} />
-              <ClothingSection d={d} g={g} n={n} />
-              <GearSection d={d} g={g} n={n} />
-            </>
-          )}
-          {!onboarding && backend === "firebase" && account ? (
-            <AccountSection account={account} />
           ) : null}
           <div className="save-bar">
             <div>
