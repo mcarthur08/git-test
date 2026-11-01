@@ -37,6 +37,7 @@ let state = {
   openProgress: false,
   cheering: false,
   mapVB: null,
+  mapAspect: null, // width / height of the screen area the big map is drawn in (null = the map's own shape)
   quiz: null,
   readDay: 1,
   readFrom: "today",
@@ -48,6 +49,9 @@ let state = {
   saveStatus: "",
   toast: null,
   reveals: [],
+  scene: null, // the name of the scene that is open, such as "cana"
+  arrival: null, // { i, id }: the stop the character has just reached on the map
+  viewer: null, // { look, n, name, sub } while the full-screen character is open
   teamChecked: false,
   transferChecked: false
 };

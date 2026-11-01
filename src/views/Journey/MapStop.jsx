@@ -1,5 +1,17 @@
 // One town on the map: a dot, an optional pulse for the next stop, and its name. Clickable on the big map only.
-export default function MapStop({ stop: s, reached, next, last, selected, onSelect }) {
+import { landmarkFor } from "@/lib/landmarks.js";
+
+export default function MapStop({
+  stop: s,
+  index,
+  reached,
+  next,
+  last,
+  selected,
+  arriving,
+  onSelect
+}) {
+  const lm = landmarkFor(index);
   const r = last ? 9 : 6;
   const interactive = !onSelect
     ? {}
@@ -22,7 +34,21 @@ export default function MapStop({ stop: s, reached, next, last, selected, onSele
       }
       {...interactive}
     >
+      {lm ? (
+        <g
+          className="m-lm"
+          transform={`translate(${s.x + lm.dx} ${s.y + lm.dy}) scale(${lm.s})`}
+          pointerEvents="none"
+          dangerouslySetInnerHTML={{ __html: lm.svg }}
+        />
+      ) : null}
       {next ? <circle cx={s.x} cy={s.y} r={r + 4} className="m-pulse" /> : null}
+      {arriving ? (
+        <>
+          <circle cx={s.x} cy={s.y} r={r + 3} className="m-arrive" />
+          <circle cx={s.x} cy={s.y} r={r + 3} className="m-arrive m-arrive-2" />
+        </>
+      ) : null}
       <circle cx={s.x} cy={s.y} r={r + 7} fill="transparent" />
       <circle cx={s.x} cy={s.y} r={r} className="m-dot" />
       {last ? (

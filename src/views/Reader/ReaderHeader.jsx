@@ -3,6 +3,10 @@ import { PLAN } from "@/lib/data.js";
 import { parseISO, fmtDate } from "@/lib/util.js";
 import { dayDate } from "@/lib/player.js";
 import { changeReaderSize, toggleReaderLight } from "@/actions";
+import { currentTheme } from "@/lib/theme.js";
+
+// The page button: dark/light in the dark theme, white/sepia in the light theme.
+const pageLabels = () => (currentTheme() === "light" ? ["White", "Sepia"] : ["Dark", "Light"]);
 
 const jumpTo = i => {
   const el = document.getElementById("rd-ch-" + i);
@@ -41,8 +45,8 @@ export default function ReaderHeader({ day, chs, light }) {
           <button onClick={() => changeReaderSize(1)} aria-label="Larger text">
             A+
           </button>
-          <button onClick={toggleReaderLight} aria-label={light ? "Dark page" : "Light page"}>
-            {light ? "Dark" : "Light"}
+          <button onClick={toggleReaderLight} aria-label={`${pageLabels()[light ? 0 : 1]} page`}>
+            {pageLabels()[light ? 0 : 1]}
           </button>
         </div>
       </div>

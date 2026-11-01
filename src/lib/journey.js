@@ -114,12 +114,57 @@ const waves = [
       `<path d="M${x} ${y} q5 -4 10 0 t10 0" fill="none" stroke="var(--sea-ink)" stroke-width="1.4" opacity=".45"/>`
   )
   .join("");
+// Palms along the Jordan, wheat in the Galilee valleys, dunes in the south and a snowy Hermon in the north.
+const palmAt = (x, y) =>
+  `<path d="M${x} ${y} q1 -5 0 -10" fill="none" stroke="#5a4326" stroke-width="1.5" stroke-linecap="round"/><path d="M${x} ${
+    y - 10
+  } q-5 -2 -7 2 M${x} ${y - 10} q-6 -5 -9 -1 M${x} ${y - 10} q5 -2 7 2 M${x} ${
+    y - 10
+  } q6 -5 9 -1" fill="none" stroke="#4f7a34" stroke-width="1.5" stroke-linecap="round"/>`;
+const terrain =
+  [
+    [262, 300],
+    [266, 352],
+    [262, 440],
+    [286, 232]
+  ]
+    .map(([x, y]) => palmAt(x, y))
+    .join("") +
+  [
+    [196, 205],
+    [206, 214],
+    [188, 214],
+    [214, 226],
+    [200, 226]
+  ]
+    .map(
+      ([x, y]) =>
+        `<path d="M${x} ${y} v-6 M${x + 2} ${y} v-5 M${
+          x - 2
+        } ${y} v-5" stroke="#c4a23c" stroke-width="1.2" stroke-linecap="round"/>`
+    )
+    .join("") +
+  [
+    [140, 505],
+    [168, 522],
+    [200, 538],
+    [232, 522],
+    [150, 548]
+  ]
+    .map(
+      ([x, y]) =>
+        `<path d="M${
+          x - 12
+        } ${y} q6 -7 12 -2 q6 -5 12 2" fill="none" stroke="var(--land-2)" stroke-width="2.2" stroke-linecap="round"/>`
+    )
+    .join("") +
+  `<path d="M318 96 L334 64 L350 96 Z" fill="var(--hill)"/><path d="M334 64 l5 9 l-3 -2 l-2 4 l-3 -4 l-3 2 z" fill="#f4f6f8"/>`;
 export const MAP_BASE = `
     <rect width="360" height="560" fill="var(--sea)"/>${waves}
     <path d="M150 0 Q165 40 168 88 Q170 120 158 132 Q174 140 150 154 Q140 190 130 230 Q118 290 102 350 Q88 410 74 470 Q62 520 52 560 L360 560 L360 0 Z" fill="var(--land)"/>
     <path d="M150 0 Q165 40 168 88 Q170 120 158 132 Q174 140 150 154 Q140 190 130 230 Q118 290 102 350 Q88 410 74 470 Q62 520 52 560" fill="none" stroke="var(--land-2)" stroke-width="6" opacity=".9"/>
     <path d="M300 0 Q340 140 320 260 Q345 380 330 560 L360 560 L360 0 Z" fill="var(--land-2)" opacity=".55"/>
-    ${hills}${trees}
+    ${hills}${trees}${terrain}
     <path d="M292 62 Q285 85 282 101 M282 115 Q279 138 276 153 M275 197 Q262 230 276 262 Q262 300 274 340 Q262 380 270 430" fill="none" stroke="var(--sea-ink)" stroke-width="2.6" stroke-linecap="round"/>
     <ellipse cx="282" cy="108" rx="5" ry="7" fill="var(--sea)" stroke="var(--sea-ink)" stroke-width="1.5"/>
     <path d="M276 152 C292 152 291 175 287 188 C283 198 270 200 267 190 C262 176 264 156 276 152 Z" fill="var(--sea)" stroke="var(--sea-ink)" stroke-width="1.5"/>

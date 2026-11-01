@@ -3,6 +3,7 @@ import { getState, setState } from "@/store.js";
 import { UNLOCK, NAMES_M, NAMES_F, PLACES } from "@/lib/data.js";
 import { lsSet } from "@/lib/util.js";
 import { normLook } from "@/lib/avatar.js";
+import { applyRole } from "@/lib/roles.js";
 import { stats, teamIndex, takenAliases, draftName, aliasOf, newDraftFor } from "@/lib/player.js";
 import { toast, confetti, queueReveal } from "./ui.js";
 import { saveMe } from "./saving.js";
@@ -22,6 +23,17 @@ export function setLook(key, val) {
     return;
   }
   setDraft(d => ({ look: { ...d.look, [key]: val } }));
+}
+
+export function setRole(role) {
+  const s = getState();
+  const n = s.phase === "join" ? 0 : s.me ? stats(s.me).n : 0;
+  const { look, locked } = applyRole({ ...s.draft.look, g: s.draft.gender }, role, n);
+  setDraft(d => ({ look: { ...d.look, ...look } }));
+  if (locked.length) {
+    const l = locked.find(x => x.key === "item") || locked[0];
+    toast(`${l.label} unlocks after ${l.need} days of reading`);
+  }
 }
 
 export function setGender(g) {
@@ -98,4 +110,19 @@ export function joinOrSave() {
   } else {
     toast("Character saved");
   }
+}
+
+// Put on a keepsake from the map: it is saved straight to the character (and to a draft being edited).
+export function wearItem(i) {
+  const s = getState();
+  if (!s.me || s.readOnly) {
+    return;
+  }
+  const look = { ...s.me.look, item: i };
+  setState(st => ({
+    me: { ...st.me, look },
+    draft: st.draft ? { ...st.draft, look: { ...st.draft.look, item: i } } : st.draft
+  }));
+  saveMe();
+  toast(`Wearing ${UNLOCK.item[i][0]}`);
 }

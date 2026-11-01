@@ -169,9 +169,12 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: 0.06em;
+  min-width: 0;
 }
 .brand small {
   display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-family: var(--font-body);
   font-weight: 500;
   font-size: var(--step--1);
@@ -193,7 +196,7 @@ button {
   width: 36px;
   height: 36px;
 }
-.mepill span:not(.bubble) {
+.mepill > span:not(.bubble) {
   font-family: var(--font-display);
   font-weight: 600;
   font-size: var(--step--1);
@@ -423,7 +426,7 @@ main.enter > *:nth-child(n + 6) {
 }
 .chip.sec {
   background: color-mix(in srgb, var(--sc) 14%, transparent);
-  color: var(--sc);
+  color: color-mix(in srgb, var(--sc) 65%, #fff);
   border-color: color-mix(in srgb, var(--sc) 40%, transparent);
 }
 .chip.ok {
@@ -479,6 +482,30 @@ main.enter > *:nth-child(n + 6) {
   animation-delay: var(--d, 0s);
 }
 .pt.cheer .pt-head {
+  animation: lift 1.6s var(--ease) 1;
+}
+.fb .fb-body {
+  transform-origin: 100px 400px;
+}
+.fb .fb-head {
+  transform-origin: 100px 80px;
+}
+.fb .pt-eyes {
+  transform-origin: 100px 92px;
+}
+.fb.live .fb-body {
+  animation: breathe 4.2s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.fb.live .fb-head {
+  animation: sway 7s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.fb.live .pt-eyes {
+  animation: blink 5.5s infinite;
+  animation-delay: var(--d, 0s);
+}
+.fb.cheer .fb-head {
   animation: lift 1.6s var(--ease) 1;
 }
 .fg .fg-body {
@@ -584,18 +611,18 @@ main.enter > *:nth-child(n + 6) {
   width: 100%;
   height: 100%;
 }
-.frame-fig {
-  position: absolute;
-  right: 8px;
-  bottom: 6px;
-  width: 22%;
-  aspect-ratio: 3 / 4;
-  z-index: 3;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
+/* The full-body character stands on a strip of ground in a tall frame. */
+.frame.full {
+  aspect-ratio: 5 / 9;
+  background: linear-gradient(#4a3826, #2b2016) bottom / 100% 5% no-repeat,
+    radial-gradient(70% 45% at 50% 34%, #6a4527 0%, #3a2617 50%, #160f0b 100%);
 }
-.frame-fig .av {
+.frame .fb {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+  z-index: 3;
 }
 .frame.glow {
   box-shadow: 0 0 0 1px #6e5330, 0 0 0 4px #1a1410, 0 0 0 5px var(--gold),
@@ -1388,7 +1415,7 @@ details.more[open] summary > svg {
 }
 .rd-jump button,
 .rd-opts button {
-  min-height: 40px;
+  min-height: 44px;
   min-width: 44px;
   padding: 6px 12px;
   border-radius: 6px;
@@ -1463,6 +1490,7 @@ details.more[open] summary > svg {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 44px;
 }
 .rd-alt svg {
   width: 14px;
@@ -1877,6 +1905,9 @@ button.team:hover {
   color: var(--gold-hi);
   overflow-wrap: anywhere;
 }
+.preview .frame.full {
+  max-width: 250px;
+}
 .preview .alias {
   font-family: var(--font-display);
   font-weight: 700;
@@ -1981,6 +2012,45 @@ button.team:hover {
   border-color: var(--gold);
   box-shadow: 0 0 0 1px var(--gold), 0 0 16px -4px rgba(242, 213, 140, 0.6);
   color: var(--gold-hi);
+}
+.roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+.role {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-2);
+  padding: 6px 4px;
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  min-height: 44px;
+  transition: transform 0.15s var(--spring), border-color 0.2s, box-shadow 0.2s;
+}
+.role:hover {
+  border-color: var(--bronze);
+}
+.role:active {
+  transform: scale(0.96);
+}
+.role[aria-pressed="true"] {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 0 16px -4px rgba(242, 213, 140, 0.6);
+  color: var(--gold-hi);
+}
+/* A taller version of the picker thumbnail (.fprev), which also carries the theme's backdrop. */
+.fprev.rprev {
+  width: 64px;
+  height: 114px;
+}
+.fprev.rprev .av {
+  width: 100%;
+  height: 100%;
 }
 .fprev {
   width: 72px;
@@ -2217,6 +2287,9 @@ input[type="password"] {
 .reveal-art .frame.mid {
   width: 150px;
 }
+.reveal-art .frame.full.mid {
+  width: 120px;
+}
 .reveal-art .medal {
   width: 124px;
   height: 124px;
@@ -2267,6 +2340,7 @@ input[type="password"] {
   overflow: hidden;
 }
 .map-wrap .map {
+  aspect-ratio: 360 / 560; /* MAP_W / MAP_H: the box keeps the map's shape whatever view the camera is showing */
   touch-action: pan-y;
   cursor: zoom-in;
   user-select: none;
@@ -2279,17 +2353,18 @@ input[type="password"] {
 .map-wrap.zoomed .map:active {
   cursor: grabbing;
 }
+/* On the open sea at the left, below the compass: the towns along the right edge stay uncovered. */
 .map-ctl {
   position: absolute;
-  right: 10px;
-  top: 10px;
+  left: 10px;
+  top: 72px;
   display: grid;
   gap: 6px;
   z-index: 2;
 }
 .map-ctl button {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
   border: 1px solid #8c7450;
   background: rgba(241, 230, 204, 0.94);
@@ -2333,6 +2408,27 @@ input[type="password"] {
 }
 .map-card.expanded .map-wrap .map {
   touch-action: none;
+}
+/* Turned sideways: the map fills the whole screen, clear of the notch and rounded corners. JourneyMap measures
+   the space and shows a matching slice of the map, which you drag up and down. */
+@media (orientation: landscape) {
+  .map-card.expanded {
+    padding: max(8px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px))
+      max(8px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
+    grid-template-rows: minmax(0, 1fr);
+    align-content: stretch;
+    justify-items: stretch;
+  }
+  .map-card.expanded .map-wrap {
+    width: 100%;
+    height: 100%;
+  }
+  .map-card.expanded .map-wrap .map {
+    height: 100%;
+  }
+  .map-card.expanded .map-hint {
+    display: none;
+  }
 }
 .m-name {
   font: 700 4.2px var(--font-body);
@@ -2790,8 +2886,8 @@ code {
   .preview {
     position: static;
   }
-  .preview .frame {
-    max-width: 260px;
+  .preview .frame.full {
+    max-width: 200px;
   }
   .two {
     grid-template-columns: 1fr;
@@ -2868,7 +2964,8 @@ code {
     gap: 18px;
   }
   .hero .frame {
-    max-width: 220px;
+    max-width: 180px;
+    margin-inline: auto;
   }
   .hero-day {
     font-size: var(--step-2);
@@ -2903,7 +3000,7 @@ code {
   .vic {
     grid-template-columns: 1fr;
   }
-  .mepill span:not(.bubble) {
+  .mepill > span:not(.bubble) {
     display: none;
   }
   .mepill {
@@ -3028,7 +3125,7 @@ input[type="time"] {
   padding: 8px 12px;
   color-scheme: dark;
 }
-.mepill span:not(.bubble) {
+.mepill > span:not(.bubble) {
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.95rem;
@@ -3350,10 +3447,6 @@ input[type="time"] {
     height: 34px;
     font-size: 12px;
   }
-  .helpbtn {
-    width: 40px;
-    height: 40px;
-  }
 }
 
 /* Reading bookmark */
@@ -3405,4 +3498,639 @@ input[type="time"] {
   letter-spacing: 0.06em;
   text-align: center;
   text-transform: uppercase;
+}
+
+/* Character editor: the character stays pinned while the options below it change. */
+.editor {
+  --prev-h: 204px;
+}
+.editor .preview {
+  top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px) + 16px);
+}
+.editor .preview .frame.full {
+  max-width: clamp(110px, calc((100vh - 440px) * 0.555), 250px);
+}
+.pv-info {
+  display: contents;
+}
+/* The pinned block has to fit in the window, so only the character, name and save button stay. */
+.pv-sum,
+.pv-note {
+  display: none;
+}
+.editor .ed-main {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+.etabs {
+  position: sticky;
+  top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px));
+  z-index: 3;
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.etabs::-webkit-scrollbar {
+  display: none;
+}
+.etabs button {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.etabs button:hover {
+  border-color: var(--bronze);
+}
+.etabs button[aria-selected="true"] {
+  background: linear-gradient(var(--gold-hi), var(--gold));
+  color: var(--gold-ink);
+  border-color: #6e4f1e;
+}
+#epanel {
+  scroll-margin-top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px) + 72px);
+}
+@media (max-width: 760px) {
+  .editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .editor .preview {
+    position: sticky;
+    top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px));
+    z-index: 4;
+    box-sizing: border-box;
+    height: var(--prev-h);
+    margin: -22px -22px 0;
+    padding: 12px 22px;
+    grid-template-columns: 100px minmax(0, 1fr);
+    gap: 14px;
+    align-content: center;
+    align-items: center;
+    justify-items: stretch;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .editor .preview .frame.full {
+    width: 100px;
+    max-width: none;
+  }
+  .pv-info {
+    display: grid;
+    gap: 6px;
+    align-content: center;
+    min-width: 0;
+  }
+  .editor .preview .alias,
+  .pv-sum {
+    margin: 0;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pv-note {
+    display: none;
+  }
+  .preview.taken .pv-sum {
+    display: none;
+  }
+  .editor .preview .btn {
+    width: 100%;
+  }
+  .editor .ed-main {
+    padding-top: 12px;
+  }
+  .etabs {
+    top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px) + var(--prev-h));
+    margin-inline: -22px;
+    padding-inline: 22px;
+  }
+  #epanel {
+    scroll-margin-top: calc(
+      var(--top-h, 66px) + env(safe-area-inset-top, 0px) + var(--prev-h) + 72px
+    );
+  }
+}
+@media (max-width: 640px) {
+  .editor .preview {
+    margin: -18px -16px 0;
+    padding-inline: 16px;
+  }
+  .etabs {
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+}
+@media (min-width: 761px) {
+  /* Room for the pinned character to stay in view even when a tab's options are short. */
+  .editor {
+    min-height: calc(100vh - var(--top-h, 66px));
+    align-items: start;
+  }
+}
+
+/* Full-screen character: the figure as large as the screen allows, on a dark stage in every theme. */
+.frame.expandable {
+  cursor: zoom-in;
+}
+.frame-expand {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(20, 14, 10, 0.55);
+  color: #fff;
+  cursor: pointer;
+}
+.frame-expand svg {
+  width: 20px;
+  height: 20px;
+}
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  justify-items: center;
+  gap: 10px;
+  padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px))
+    max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: radial-gradient(70% 55% at 50% 38%, #6a4527 0%, #3a2617 50%, #0e0907 100%);
+  color: #f6e9d8;
+  cursor: zoom-out;
+  animation: fadein 0.25s ease;
+}
+.viewer-close {
+  justify-self: end;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+}
+.viewer-close svg {
+  width: 22px;
+  height: 22px;
+}
+.viewer-stage {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.45));
+  animation: pop 0.35s var(--spring, ease) both;
+}
+.viewer-stage .av {
+  width: 100%;
+  height: 100%;
+}
+.viewer-cap {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  text-align: center;
+}
+.viewer-cap b {
+  font-family: var(--font-display);
+  font-size: var(--step-2, 1.4rem);
+  color: #f2d58c;
+}
+.viewer-cap span {
+  font-size: 0.9rem;
+  color: #d9c9b2;
+}
+
+/* Journey map: landmarks, the walk, the arrival, stop scenes and keepsakes. */
+.m-lm {
+  opacity: 0.55;
+}
+.m-stop.reached .m-lm,
+.m-stop.sel .m-lm {
+  opacity: 1;
+}
+.m-arrive {
+  fill: none;
+  stroke: #d9a21e;
+  stroke-width: 3;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: marrive 1.1s ease-out 3;
+}
+.m-arrive-2 {
+  animation-delay: 0.35s;
+}
+@keyframes marrive {
+  from {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  to {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+/* the character bobs as it walks */
+.walking .fg.live .fg-body {
+  animation: walkbob 0.42s ease-in-out infinite;
+}
+@keyframes walkbob {
+  50% {
+    transform: translateY(-1.6px) rotate(1.4deg);
+  }
+}
+.arrival {
+  position: fixed;
+  z-index: 32;
+  top: calc(var(--top-h, 66px) + env(safe-area-inset-top, 0px) + 10px);
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(92vw, 420px);
+  padding: 10px 16px 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--gold);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.6);
+  text-align: left;
+  cursor: pointer;
+  animation: arrivalin 0.4s var(--spring, ease) both;
+}
+.arrival > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+.arrival b {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.2;
+  color: var(--gold-hi);
+}
+.arrival span span {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.arrival-ic {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--gold-ink);
+}
+.arrival-ic svg {
+  width: 18px;
+  height: 18px;
+}
+@keyframes arrivalin {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.96);
+  }
+}
+.stop-scene {
+  position: relative;
+  aspect-ratio: 3 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1c2a5a;
+}
+.stop-scene svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.stop-scene.locked svg {
+  filter: grayscale(0.9) brightness(0.55) blur(1.5px);
+}
+.ss-cap {
+  position: absolute;
+  left: 8px;
+  bottom: 6px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+.ss-cap svg {
+  width: 14px;
+  height: 14px;
+  filter: none;
+}
+.sc-twinkle {
+  animation: sctwinkle 3s ease-in-out infinite;
+}
+.sc-glow {
+  animation: scglow 2.4s ease-in-out infinite alternate;
+}
+.sc-rain {
+  animation: scrain 0.55s linear infinite;
+}
+.sc-bolt {
+  animation: scbolt 4s infinite;
+}
+.sc-wave {
+  animation: scwave 3.2s ease-in-out infinite alternate;
+}
+.sc-heat {
+  animation: scglow 2s ease-in-out infinite alternate;
+}
+.sc-rock {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: scrock 2.2s ease-in-out infinite alternate;
+}
+@keyframes sctwinkle {
+  50% {
+    opacity: 0.3;
+  }
+}
+@keyframes scglow {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scrain {
+  to {
+    transform: translate(-7px, 14px);
+  }
+}
+@keyframes scbolt {
+  0%,
+  86%,
+  100% {
+    opacity: 0;
+  }
+  88%,
+  92% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.2;
+  }
+}
+@keyframes scwave {
+  to {
+    transform: translateX(-12px);
+  }
+}
+@keyframes scrock {
+  from {
+    transform: rotate(-4deg) translateY(1px);
+  }
+  to {
+    transform: rotate(4deg) translateY(-2px);
+  }
+}
+.keepsake {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.keepsake.locked {
+  opacity: 0.75;
+}
+.keepsake .ks-art {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+.keepsake .ks-art svg {
+  width: 100%;
+  height: 100%;
+}
+.keepsake .ks-art > svg.ic,
+.keepsake.locked .ks-art svg {
+  width: 26px;
+  height: 26px;
+}
+.keepsake .ks-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.keepsake .ks-text b {
+  font-family: var(--font-display);
+}
+@media (max-width: 420px) {
+  .keepsake {
+    grid-template-columns: auto 1fr;
+  }
+  .keepsake .btn {
+    grid-column: 1 / -1;
+  }
+}
+
+/* The wedding at Cana: a full-screen place to walk around in. */
+.play {
+  position: fixed;
+  inset: 0;
+  z-index: 36;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  gap: 8px;
+  padding: max(8px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px))
+    max(10px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+  background: radial-gradient(90% 60% at 50% 30%, #3a2617 0%, #150f0b 100%);
+  color: #f6e9d8;
+}
+.play-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.play-title {
+  display: grid;
+  line-height: 1.15;
+}
+.play-title b {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: #f2d58c;
+}
+.play-title span {
+  font-size: 0.8rem;
+  color: #d9c9b2;
+}
+.play-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.play-close[aria-pressed="false"] {
+  opacity: 0.7;
+}
+.play-close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+}
+.play-close svg {
+  width: 22px;
+  height: 22px;
+}
+.play-host {
+  position: relative;
+  min-height: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #2a1c12;
+  touch-action: manipulation;
+}
+.play-host canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.play-note {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 24px;
+  text-align: center;
+  font-weight: 700;
+  color: #f2d58c;
+}
+.play-caption {
+  display: grid;
+  gap: 3px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  max-height: 22vh;
+  overflow: auto;
+}
+.play-step {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #f2d58c;
+}
+.play-verse {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+.play-verse span {
+  font-weight: 800;
+  color: #f2d58c;
+}
+.play-hint {
+  margin: 0;
+  text-align: center;
+  color: #d9c9b2;
+}
+.play-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+.play-actions .btn {
+  flex: 1 1 auto;
+}
+.play-side {
+  display: contents;
+}
+/* A wide screen, or a phone turned sideways: the hall fills the left and the story and buttons sit beside it. */
+@media (min-aspect-ratio: 6/5) and (min-width: 640px) {
+  .play {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: 14px;
+  }
+  .play-bar {
+    grid-column: 1 / -1;
+  }
+  .play-host {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .play-side {
+    grid-column: 2;
+    grid-row: 2;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .play-caption {
+    max-height: none;
+  }
+  .play-hint {
+    text-align: left;
+  }
+  .play-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/* A tablet held upright keeps the tall hall, in a column. */
+@media (min-width: 760px) and (max-aspect-ratio: 6/5) {
+  .play {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+  .play > * {
+    width: min(100%, 520px);
+  }
 }

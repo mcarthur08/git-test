@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { normLook, mixHex, avatarSVG, portraitSVG, figureSVG } from "./avatar.js";
+import { normLook, mixHex, avatarSVG, portraitSVG, figureSVG, fullSVG } from "./avatar.js";
+import { lookSummary } from "./look.js";
 import {
   UNLOCK,
   allowedFor,
@@ -18,6 +19,9 @@ import {
   DAYS
 } from "./data.js";
 
+// Every figure gets its own random element ids, so two drawings only match once those are left out.
+const strip = svg => svg.replace(/(id="|#)[^"')]+/g, "$1");
+
 const allowedNow = (key, g, n) =>
   allowedFor(key, g)
     .filter(([e]) => e[2] <= n)
@@ -32,7 +36,7 @@ const randomLook = () => ({
   tunic: ri(20),
   sash: ri(8),
   hat: ri(8),
-  item: ri(10),
+  item: ri(30),
   face: ri(8),
   eyes: ri(8),
   eyeColor: ri(8),
@@ -40,7 +44,8 @@ const randomLook = () => ({
   mouth: ri(8),
   cover: ri(8),
   mantle: ri(8),
-  jewel: ri(8)
+  jewel: ri(8),
+  hem: ri(3)
 });
 
 describe("normLook", () => {
@@ -138,6 +143,7 @@ describe("normLook", () => {
       lim(out.cover, COVERS[out.g]);
       lim(out.mantle, MANTLES[out.g]);
       lim(out.jewel, JEWELS);
+      expect([0, 1]).toContain(out.hem);
       ["tunic", "sash", "hat", "item"].forEach(key =>
         expect(allowedNow(key, out.g, n)).toContain(out[key])
       );
@@ -227,9 +233,121 @@ describe("avatar drawing", () => {
     expect(a.filter(id => b.includes(id))).toEqual([]);
   });
 
+  it("is flat: no gradients or blur filters, only solid fills and clip paths", () => {
+    for (let i = 0; i < 100; i++) {
+      const svg = portraitSVG(randomLook(), ri(DAYS + 1));
+      expect(svg).not.toMatch(/<(linearGradient|radialGradient|filter)\b|\sfilter=/);
+      expect(svg).not.toMatch(/fill="url\(/);
+    }
+  });
+
+  it("keeps the animation hooks the stylesheet targets", () => {
+    const p = portraitSVG({ g: "m" }, 5, { live: true });
+    ["pt-body", "pt-head", "pt-eyes"].forEach(c => expect(p).toContain(`class="${c}"`));
+    const f = figureSVG({ g: "m" }, 5, { live: true });
+    ["fg-body", "fg-head"].forEach(c => expect(f).toContain(`class="${c}"`));
+  });
+
+  it("crops the full portrait tight, the bust to the head, and honours a custom window", () => {
+    const vb = svg => /viewBox="([^"]+)"/.exec(svg)[1];
+    expect(vb(portraitSVG({ g: "m" }, 0))).toBe("14 20 172 206");
+    expect(vb(portraitSVG({ g: "m" }, 0, { bust: true }))).toBe("46 30 108 108");
+    expect(vb(portraitSVG({ g: "m" }, 0, { vb: "66 76 68 30" }))).toBe("66 76 68 30");
+  });
+
+  it("keeps the full-portrait crop at the frame shape of 5:6", () => {
+    const m = /viewBox="[\d.]+ [\d.]+ ([\d.]+) ([\d.]+)"/.exec(portraitSVG({ g: "m" }, 0));
+    expect(Number(m[1]) / Number(m[2])).toBeCloseTo(5 / 6, 1);
+  });
+
+  describe("the full-body character", () => {
+    const BAD_FULL = /undefined|NaN|\[object|null/;
+
+    it("is a tall svg with the animation hooks the stylesheet targets", () => {
+      const svg = fullSVG({ g: "m" }, 5, { live: true });
+      expect(svg).toMatch(/viewBox="0 0 200 400"/);
+      ["fb-body", "fb-head", "pt-eyes"].forEach(c => expect(svg).toContain(`class="${c}"`));
+      expect(svg).toContain("fb av live");
+      expect(fullSVG({ g: "m" }, 5, { cheer: true })).toContain("cheer");
+    });
+
+    it("draws every item, hat and head covering for both genders without a missing value", () => {
+      ["m", "f"].forEach(g => {
+        UNLOCK.item.forEach((_, item) =>
+          UNLOCK.hat.forEach((__, hat) => {
+            const svg = fullSVG({ g, item, hat, tunic: 6, sash: 4 }, DAYS);
+            expect(svg, `${g} item ${item} hat ${hat}`).not.toMatch(BAD_FULL);
+          })
+        );
+        COVERS[g].forEach((_, cover) => {
+          expect(fullSVG({ g, cover }, DAYS), `${g} cover ${cover}`).not.toMatch(BAD_FULL);
+        });
+      });
+    });
+
+    it("draws random looks without a missing value", () => {
+      for (let i = 0; i < 100; i++) {
+        expect(fullSVG(randomLook(), ri(DAYS + 1))).not.toMatch(BAD_FULL);
+      }
+    });
+
+    it("shows each held item, so no item is lost when the corner figure is gone", () => {
+      // a few items are only for women, so each is drawn on someone who can wear it
+      UNLOCK.item.forEach(([name, , , who], item) => {
+        if (item > 0) {
+          const g = who || "m";
+          expect(strip(fullSVG({ g, item }, DAYS)), name).not.toBe(
+            strip(fullSVG({ g, item: 0 }, DAYS))
+          );
+        }
+      });
+    });
+
+    it("gives each character its own element ids and never repeats one inside a figure", () => {
+      const ids = svg => [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
+      const a = ids(fullSVG({ g: "f" }, DAYS));
+      const b = ids(fullSVG({ g: "f" }, DAYS));
+      expect(new Set(a).size).toBe(a.length);
+      expect(a.filter(id => b.includes(id))).toEqual([]);
+    });
+
+    it("never points at a pattern, clip path or filter that is not defined", () => {
+      for (let i = 0; i < 150; i++) {
+        const svg = fullSVG(randomLook(), ri(DAYS + 1));
+        const defined = new Set([...svg.matchAll(/sid="([^"]+)"/g)].map(m => m[1]));
+        [...svg.matchAll(/url(#([^)]+))/g)].forEach(m => {
+          expect(defined.has(m[1]), `missing #${m[1]}`).toBe(true);
+        });
+      }
+    });
+
+    it("is chosen by avatarSVG's full option and cached by look", () => {
+      const a = avatarSVG({ g: "m", skin: 2 }, 0, { full: true });
+      expect(a).toContain("fb av");
+      expect(avatarSVG({ g: "m", skin: 2, bogus: 1 }, 0, { full: true })).toBe(a);
+      expect(avatarSVG({ g: "m", skin: 2 }, 0)).not.toBe(a);
+      expect(avatarSVG({ g: "m", skin: 2 }, 0, { portrait: true })).not.toBe(a);
+    });
+  });
+
   it("does not repeat an id within one portrait", () => {
     const svg = portraitSVG({ g: "f" }, DAYS);
     const ids = [...svg.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
+describe("lookSummary", () => {
+  it("names the gender, the head covering and the mantle or shawl", () => {
+    expect(lookSummary({ g: "m", cover: 1, mantle: 0 }, 0)).toBe(
+      "Brother · Headcloth · Striped wool mantle"
+    );
+    expect(lookSummary({ g: "f", cover: 0, mantle: 4 }, 0)).toBe("Sister · Embroidered plum shawl");
+  });
+
+  it("copes with anything stored", () => {
+    [null, {}, { g: "x", cover: 99, mantle: -1 }].forEach(l =>
+      expect(lookSummary(l, 0)).toMatch(/^(Brother|Sister)/)
+    );
   });
 });
